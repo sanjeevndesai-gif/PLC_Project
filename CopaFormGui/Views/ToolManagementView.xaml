@@ -1,0 +1,122 @@
+<UserControl x:Class="CopaFormGui.Views.ToolManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
+            <Grid>
+                <TextBlock Text="Tool Management" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse Width="16" Height="16" Margin="0,0,6,0"
+                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
+                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
+                               Foreground="White" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content: List + Edit Panel -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Tool List -->
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,0" Padding="8">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Tool Library" Style="{StaticResource SectionHeaderStyle}" Margin="4,0,0,8"/>
+                    <DataGrid ItemsSource="{Binding Tools}"
+                              SelectedItem="{Binding SelectedTool}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"          Width="50"/>
+                            <DataGridTextColumn Header="Name"        Binding="{Binding ToolName}"        Width="*"/>
+                            <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"        Width="80"/>
+                            <DataGridTextColumn Header="Dia (mm)"   Binding="{Binding Diameter, StringFormat={}{0:F1}}"    Width="75"/>
+                            <DataGridTextColumn Header="Strokes"     Binding="{Binding CurrentStrokes}"  Width="70"/>
+                            <DataGridTextColumn Header="Max"         Binding="{Binding MaxStrokes}"      Width="70"/>
+                            <DataGridTextColumn Header="Status"      Binding="{Binding Status}"          Width="70"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+
+            <!-- Edit Panel -->
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Tool Details" Style="{StaticResource SectionHeaderStyle}"/>
+
+                        <TextBlock Text="Tool Name" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditToolName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Tool Type" Style="{StaticResource FormLabelStyle}"/>
+                        <ComboBox ItemsSource="{Binding ToolTypes}"
+                                  SelectedItem="{Binding EditToolType}"
+                                  Padding="8,6" FontSize="13"
+                                  Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Diameter (mm)" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditDiameter, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Length (mm)" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditLength, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Stroke Length (mm)" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditStrokeLength, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Max Strokes" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditMaxStrokes, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Current Strokes" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditCurrentStrokes, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Notes" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditNotes, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 TextWrapping="Wrap" Height="60"
+                                 AcceptsReturn="True" Margin="0,0,0,16"/>
+
+                        <Button Content="Save Tool"     Command="{Binding SaveToolCommand}"
+                                Style="{StaticResource SuccessButtonStyle}" Height="36" Margin="0,0,0,6"/>
+                        <Button Content="Reset Strokes" Command="{Binding ResetStrokesCommand}"
+                                Style="{StaticResource WarningButtonStyle}" Height="32" Margin="0,0,0,6"/>
+                        <Button Content="Delete Tool"   Command="{Binding DeleteToolCommand}"
+                                Style="{StaticResource DangerButtonStyle}"  Height="32"/>
+
+                        <TextBlock Text="{Binding StatusMessage}" Margin="0,12,0,0"
+                                   FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Bottom Actions -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="+ Add Tool" Command="{Binding AddToolCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
