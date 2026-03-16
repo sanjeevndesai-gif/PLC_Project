@@ -17,7 +17,6 @@ public partial class LoginWindow : Window
         _viewModel.LoginCompleted += OnLoginCompleted;
 
         // Wire up PasswordBox (WPF PasswordBox doesn't support binding natively)
-        PasswordBox.Password = "deltatau";
         PasswordBox.PasswordChanged += (_, _) => _viewModel.Password = PasswordBox.Password;
     }
 
