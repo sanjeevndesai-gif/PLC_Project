@@ -30,11 +30,16 @@ public partial class App : Application
 
         // ViewModels
         services.AddSingleton<LoginViewModel>();
+        services.AddSingleton<OverviewViewModel>();
         services.AddSingleton<DatabaseViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<PunchingViewModel>();
+        services.AddSingleton<HandControlViewModel>();
         services.AddSingleton<AlarmViewModel>();
         services.AddSingleton<ToolManagementViewModel>();
+        services.AddSingleton<IOMonitorViewModel>();
+        services.AddSingleton<ProductionViewModel>();
+        services.AddSingleton<ProgramEditorViewModel>();
         services.AddSingleton<MainViewModel>();
 
         // Views

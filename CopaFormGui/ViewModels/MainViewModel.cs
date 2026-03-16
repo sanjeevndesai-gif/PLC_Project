@@ -23,33 +23,48 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _statusBarMessage = "Ready";
 
+    private readonly OverviewViewModel _overviewViewModel;
     private readonly DatabaseViewModel _databaseViewModel;
     private readonly SettingsViewModel _settingsViewModel;
     private readonly PunchingViewModel _punchingViewModel;
+    private readonly HandControlViewModel _handControlViewModel;
     private readonly AlarmViewModel _alarmViewModel;
     private readonly ToolManagementViewModel _toolManagementViewModel;
+    private readonly IOMonitorViewModel _ioMonitorViewModel;
+    private readonly ProductionViewModel _productionViewModel;
+    private readonly ProgramEditorViewModel _programEditorViewModel;
 
     public MainViewModel(
         IControllerService controllerService,
+        OverviewViewModel overviewViewModel,
         DatabaseViewModel databaseViewModel,
         SettingsViewModel settingsViewModel,
         PunchingViewModel punchingViewModel,
+        HandControlViewModel handControlViewModel,
         AlarmViewModel alarmViewModel,
-        ToolManagementViewModel toolManagementViewModel)
+        ToolManagementViewModel toolManagementViewModel,
+        IOMonitorViewModel ioMonitorViewModel,
+        ProductionViewModel productionViewModel,
+        ProgramEditorViewModel programEditorViewModel)
     {
         _controllerService = controllerService;
+        _overviewViewModel = overviewViewModel;
         _databaseViewModel = databaseViewModel;
         _settingsViewModel = settingsViewModel;
         _punchingViewModel = punchingViewModel;
+        _handControlViewModel = handControlViewModel;
         _alarmViewModel = alarmViewModel;
         _toolManagementViewModel = toolManagementViewModel;
+        _ioMonitorViewModel = ioMonitorViewModel;
+        _productionViewModel = productionViewModel;
+        _programEditorViewModel = programEditorViewModel;
 
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = _controllerService.IsConnected;
         UpdateConnectionStatus();
 
-        CurrentView = _punchingViewModel;
-        CurrentViewName = "Punching";
+        CurrentView = _overviewViewModel;
+        CurrentViewName = "Overview";
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionState state)
@@ -64,11 +79,27 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void ShowOverview()
+    {
+        CurrentView = _overviewViewModel;
+        CurrentViewName = "Overview";
+        StatusBarMessage = "Machine Overview";
+    }
+
+    [RelayCommand]
     private void ShowPunching()
     {
         CurrentView = _punchingViewModel;
         CurrentViewName = "Punching";
         StatusBarMessage = "Punching Operations";
+    }
+
+    [RelayCommand]
+    private void ShowHandControl()
+    {
+        CurrentView = _handControlViewModel;
+        CurrentViewName = "Hand Control";
+        StatusBarMessage = "Hand Control – Manual Jog";
     }
 
     [RelayCommand]
@@ -101,6 +132,30 @@ public partial class MainViewModel : ObservableObject
         CurrentView = _toolManagementViewModel;
         CurrentViewName = "Tool Management";
         StatusBarMessage = "Tool Management";
+    }
+
+    [RelayCommand]
+    private void ShowIOMonitor()
+    {
+        CurrentView = _ioMonitorViewModel;
+        CurrentViewName = "I/O Monitor";
+        StatusBarMessage = "PLC Digital I/O Monitor";
+    }
+
+    [RelayCommand]
+    private void ShowProduction()
+    {
+        CurrentView = _productionViewModel;
+        CurrentViewName = "Production";
+        StatusBarMessage = "Production Counter & Shift History";
+    }
+
+    [RelayCommand]
+    private void ShowProgramEditor()
+    {
+        CurrentView = _programEditorViewModel;
+        CurrentViewName = "Program Editor";
+        StatusBarMessage = "CNC Punch Program Editor";
     }
 
     [RelayCommand]
