@@ -47,6 +47,40 @@ public class InverseBoolToVisibilityConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+/// <summary>Converts a double value to bool by comparing it with a ConverterParameter double.</summary>
+[ValueConversion(typeof(double), typeof(bool))]
+public class EqualityToBoolConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is double d && parameter is string s &&
+            double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out double p))
+            return Math.Abs(d - p) < 1e-9;
+        return false;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool b && b && parameter is string s &&
+            double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out double p))
+            return p;
+        return System.Windows.Data.Binding.DoNothing;
+    }
+}
+
+/// <summary>Converts an IOPointState to a SolidColorBrush.</summary>
+[ValueConversion(typeof(bool), typeof(SolidColorBrush))]
+public class IOStateToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => (value is bool b && b)
+            ? new SolidColorBrush(Color.FromRgb(0x28, 0xA7, 0x45))
+            : new SolidColorBrush(Color.FromRgb(0xBD, 0xBD, 0xBD));
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 [ValueConversion(typeof(CopaFormGui.Models.AlarmSeverity), typeof(SolidColorBrush))]
 public class AlarmSeverityToColorConverter : IValueConverter
 {

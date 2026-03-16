@@ -10,6 +10,8 @@
             <conv:BoolToVisibilityConverter      x:Key="BoolToVisibility"/>
             <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
             <conv:AlarmSeverityToColorConverter  x:Key="AlarmSeverityToColor"/>
+            <conv:EqualityToBoolConverter        x:Key="EqualityToBool"/>
+            <conv:IOStateToBrushConverter        x:Key="IOStateToBrush"/>
 
             <!-- Base Colors -->
             <SolidColorBrush x:Key="PrimaryBrush"      Color="#1565C0"/>
