@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:CopaFormGui.ViewModels"
         mc:Ignorable="d"
         Title="Copa Form – Connect to Controller"
-        Height="480" Width="440"
+        Height="560" Width="440"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         Background="#F5F5F5">
@@ -52,35 +52,60 @@
                 <!-- Password -->
                 <TextBlock Text="Password" Style="{StaticResource FormLabelStyle}"/>
                 <PasswordBox x:Name="PasswordBox"
+                             PasswordChanged="PasswordBox_PasswordChanged"
                              Style="{StaticResource InputPasswordBoxStyle}"
                              Margin="0,0,0,12"/>
 
-                <!-- Status / Error Message -->
-                <Border Background="#FFF3CD" CornerRadius="4" Padding="10,8"
-                        Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                <!-- Status Message -->
+                <Border CornerRadius="4" Padding="10,8" Margin="0,4,0,4"
+                        Visibility="{Binding StatusMessage, Converter={StaticResource StringToVisibility}}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="#E3F2FD"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasError}" Value="True">
+                                    <Setter Property="Background" Value="#FFEBEE"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                     <TextBlock Text="{Binding StatusMessage}"
-                               Foreground="#856404" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{Binding HasError, Converter={StaticResource BoolToErrorBrush}}"
+                               FontSize="12" TextWrapping="Wrap" MinHeight="18"/>
                 </Border>
 
                 <!-- Connecting progress -->
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0"
+                <StackPanel Margin="0,8,0,0"
                             Visibility="{Binding IsConnecting, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Text="Connecting to controller..." FontSize="12"
-                               Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="Please wait, connecting to controller..."
+                               FontSize="12" FontWeight="SemiBold" FontStyle="Italic"
+                               Foreground="{StaticResource PrimaryBrush}"
+                               HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <ProgressBar IsIndeterminate="True" Height="10"
+                                 Foreground="{StaticResource PrimaryBrush}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
 
         <!-- Buttons -->
         <StackPanel Grid.Row="2" Margin="24,0,24,24">
-            <Button Content="Connect"
-                    Command="{Binding ConnectCommand}"
-                    Style="{StaticResource PrimaryButtonStyle}"
+            <Button x:Name="ConnectButton"
+                Content="Connect"
+                    Click="ConnectButton_Click"
+                Background="{StaticResource PrimaryBrush}"
+                Foreground="White"
+                FontSize="13"
+                FontWeight="SemiBold"
+                Cursor="Hand"
                     Height="40" Margin="0,0,0,8"
                     IsDefault="True"/>
             <Button Content="No Device (Open Offline)"
                     Command="{Binding NoDeviceCommand}"
-                    Style="{StaticResource SecondaryButtonStyle}"
+                Background="#757575"
+                Foreground="White"
+                FontSize="13"
+                FontWeight="SemiBold"
+                Cursor="Hand"
                     Height="36"/>
         </StackPanel>
     </Grid>

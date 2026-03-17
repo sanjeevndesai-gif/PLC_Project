@@ -34,7 +34,7 @@ public partial class OverviewViewModel : ObservableObject
     [ObservableProperty] private double _airPressure = 6.2;
 
     // Controller info
-    [ObservableProperty] private string _controllerIp = "192.168.0.200";
+    [ObservableProperty] private string _controllerIp = "172.20.0.200";
     [ObservableProperty] private string _firmwareVersion = "v3.1.4";
     [ObservableProperty] private string _lastConnected = "—";
     [ObservableProperty] private string _statusMessage = "Ready";

@@ -110,7 +110,7 @@ This copies:
 
 | Field | Default |
 |-------|---------|
-| IP Address | 192.168.0.200 |
+| IP Address | 172.20.0.200 |
 | User Name | root |
 | Password | deltatau |
 

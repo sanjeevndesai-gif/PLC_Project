@@ -12,6 +12,7 @@ public interface IControllerService
 {
     ConnectionState ConnectionState { get; }
     bool IsConnected { get; }
+    string? LastConnectionError { get; }
     event EventHandler<ConnectionState>? ConnectionStateChanged;
 
     Task<bool> ConnectAsync(string ipAddress, string userName, string password);

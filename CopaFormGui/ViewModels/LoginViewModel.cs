@@ -10,7 +10,7 @@ public partial class LoginViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
 
     [ObservableProperty]
-    private string _ipAddress = "192.168.0.200";
+    private string _ipAddress = "172.20.0.200";
 
     [ObservableProperty]
     private string _userName = "root";
@@ -37,34 +37,56 @@ public partial class LoginViewModel : ObservableObject
         var saved = _settingsService.LoadConnectionSettings();
         IpAddress = saved.IpAddress;
         UserName = saved.UserName;
+        Password = saved.Password;
     }
 
     [RelayCommand(CanExecute = nameof(CanConnect))]
     private async Task ConnectAsync()
     {
+        await ConnectFromUiAsync();
+    }
+
+    public async Task ConnectFromUiAsync()
+    {
+        if (!CanConnect()) return;
+
         IsConnecting = true;
         HasError = false;
         StatusMessage = "Connecting...";
+        await Task.Yield(); // let WPF render the progress bar before blocking work starts
 
-        var connected = await _controllerService.ConnectAsync(IpAddress, UserName, Password);
-
-        IsConnecting = false;
-
-        if (connected)
+        try
         {
-            _settingsService.SaveConnectionSettings(new Models.ConnectionSettings
+            var connected = await _controllerService.ConnectAsync(IpAddress, UserName, Password ?? string.Empty);
+
+            if (connected)
             {
-                IpAddress = IpAddress,
-                UserName = UserName,
-                Password = Password
-            });
-            StatusMessage = "Connected successfully.";
-            LoginCompleted?.Invoke(this, true);
+                _settingsService.SaveConnectionSettings(new Models.ConnectionSettings
+                {
+                    IpAddress = IpAddress,
+                    UserName = UserName,
+                    Password = Password ?? string.Empty
+                });
+                StatusMessage = "Connected successfully.";
+                LoginCompleted?.Invoke(this, true);
+            }
+            else
+            {
+                HasError = true;
+                StatusMessage = string.IsNullOrWhiteSpace(_controllerService.LastConnectionError)
+                    ? $"Cannot connect to PLC at {IpAddress}:22 — Check IP address, network cable, and that the PLC is powered on. Please try again."
+                    : _controllerService.LastConnectionError + "\n\nPlease check the connection and try again.";
+            }
         }
-        else
+        catch (Exception ex)
         {
             HasError = true;
-            StatusMessage = $"Cannot connect to PLC at {IpAddress}:502 — Check IP address, network cable, and that the PLC is powered on.";
+            StatusMessage = $"Connection error: {ex.Message}";
+            App.LogException("LoginViewModel.ConnectFromUiAsync", ex);
+        }
+        finally
+        {
+            IsConnecting = false;
         }
     }
 

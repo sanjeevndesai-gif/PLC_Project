@@ -9,6 +9,8 @@
             <conv:BoolToStatusTextConverter      x:Key="BoolToStatusText"/>
             <conv:BoolToVisibilityConverter      x:Key="BoolToVisibility"/>
             <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+            <conv:StringToVisibilityConverter    x:Key="StringToVisibility"/>
+            <conv:BoolToErrorBrushConverter      x:Key="BoolToErrorBrush"/>
             <conv:AlarmSeverityToColorConverter  x:Key="AlarmSeverityToColor"/>
             <conv:EqualityToBoolConverter        x:Key="EqualityToBool"/>
             <conv:IOStateToBrushConverter        x:Key="IOStateToBrush"/>

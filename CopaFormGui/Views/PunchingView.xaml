@@ -14,7 +14,6 @@
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
             <Grid>
                 <TextBlock Text="Punching Operations" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                <!-- Controller Status -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Ellipse Width="16" Height="16" Margin="0,0,6,0"
                              Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
@@ -27,71 +26,77 @@
         <!-- Content -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="290"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left Panel: Program Selection + Controls -->
-            <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                <!-- Program List -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="Programs" Style="{StaticResource SectionHeaderStyle}"/>
-                        <ListBox ItemsSource="{Binding Programs}"
-                                 SelectedItem="{Binding SelectedProgram}"
-                                 Height="180" BorderThickness="1"
-                                 BorderBrush="{StaticResource BorderBrush}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Margin="4,2">
-                                        <TextBlock Text="{Binding ProgramName}" FontWeight="SemiBold" FontSize="13"/>
-                                        <TextBlock Text="{Binding Description}" FontSize="11"
-                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </StackPanel>
-                </Border>
+            <!-- Left Panel: scrollable so all buttons are always reachable -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,8,0">
+                <StackPanel>
 
-                <!-- Machine Mode -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="Machine Mode" Style="{StaticResource SectionHeaderStyle}"/>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Manual" Command="{Binding SetModeManualCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,6,0" Width="80"/>
-                            <Button Content="Auto" Command="{Binding SetModeAutoCommand}"
-                                    Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,6,0" Width="80"/>
-                            <Button Content="Home" Command="{Binding HomeAxesCommand}"
-                                    Style="{StaticResource WarningButtonStyle}" Width="80"/>
+                    <!-- Program List -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Programs" Style="{StaticResource SectionHeaderStyle}"/>
+                            <ListBox ItemsSource="{Binding Programs}"
+                                     SelectedItem="{Binding SelectedProgram}"
+                                     Height="160"
+                                     BorderThickness="1"
+                                     BorderBrush="{StaticResource BorderBrush}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="4,2">
+                                            <TextBlock Text="{Binding ProgramName}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="{Binding Description}" FontSize="11"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
                         </StackPanel>
-                        <TextBlock Margin="0,8,0,0">
-                            <Run Text="Mode: " FontWeight="SemiBold"/>
-                            <Run Text="{Binding CurrentMode}" Foreground="{StaticResource PrimaryBrush}"/>
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
+                    </Border>
 
-                <!-- Run Controls -->
-                <Border Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Run Controls" Style="{StaticResource SectionHeaderStyle}"/>
-                        <Button Content="&#x25B6; Start Program" Command="{Binding StartProgramCommand}"
-                                Style="{StaticResource SuccessButtonStyle}" Height="36" Margin="0,0,0,6"/>
-                        <Button Content="&#x25FC; Stop" Command="{Binding StopProgramCommand}"
-                                Style="{StaticResource DangerButtonStyle}" Height="36" Margin="0,0,0,6"/>
-                        <Button Content="&#x26A0; E-STOP" Command="{Binding EmergencyStopCommand}"
-                                Background="Red" Foreground="White" Height="44" FontWeight="Bold" FontSize="14"
-                                Style="{StaticResource BaseButtonStyle}"/>
-                        <Button Content="Reset E-Stop" Command="{Binding ResetEStopCommand}"
-                                Style="{StaticResource WarningButtonStyle}" Height="32" Margin="0,6,0,0"
-                                Visibility="{Binding IsEmergencyStop, Converter={StaticResource BoolToVisibility}}"/>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
+                    <!-- Machine Mode -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Machine Mode" Style="{StaticResource SectionHeaderStyle}"/>
+                            <UniformGrid Rows="1" Columns="3">
+                                <Button Content="Manual" Command="{Binding SetModeManualCommand}"
+                                        Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,4,0" Height="34"/>
+                                <Button Content="Auto"   Command="{Binding SetModeAutoCommand}"
+                                        Style="{StaticResource PrimaryButtonStyle}"   Margin="0,0,4,0" Height="34"/>
+                                <Button Content="Home"   Command="{Binding HomeAxesCommand}"
+                                        Style="{StaticResource WarningButtonStyle}"   Height="34"/>
+                            </UniformGrid>
+                            <TextBlock Margin="0,8,0,0">
+                                <Run Text="Mode: " FontWeight="SemiBold"/>
+                                <Run Text="{Binding CurrentMode}" Foreground="{StaticResource PrimaryBrush}"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-            <!-- Right Panel: Position Display + Status -->
+                    <!-- Run Controls -->
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Run Controls" Style="{StaticResource SectionHeaderStyle}"/>
+                            <Button Content="▶  Start Program" Command="{Binding StartProgramCommand}"
+                                    Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="0,0,0,6"/>
+                            <Button Content="■  Stop" Command="{Binding StopProgramCommand}"
+                                    Style="{StaticResource DangerButtonStyle}"  Height="38" Margin="0,0,0,6"/>
+                            <Button Content="⚠  E-STOP" Command="{Binding EmergencyStopCommand}"
+                                    Background="Red" Foreground="White" FontSize="15" FontWeight="Bold"
+                                    Height="48" Margin="0,0,0,6"
+                                    Style="{StaticResource BaseButtonStyle}"/>
+                            <Button Content="Reset E-Stop" Command="{Binding ResetEStopCommand}"
+                                    Style="{StaticResource WarningButtonStyle}" Height="34"
+                                    Visibility="{Binding IsEmergencyStop, Converter={StaticResource BoolToVisibility}}"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Right Panel -->
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -103,53 +108,50 @@
                 <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,8">
                     <StackPanel>
                         <TextBlock Text="Current Axis Positions (mm)" Style="{StaticResource SectionHeaderStyle}"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <!-- X -->
-                            <Border Grid.Column="0" Background="#E3F2FD" CornerRadius="6" Padding="12" Margin="0,0,8,0">
+                        <UniformGrid Rows="1" Columns="2">
+                            <Border Background="#E3F2FD" CornerRadius="6" Padding="12" Margin="0,0,6,0">
                                 <StackPanel HorizontalAlignment="Center">
                                     <TextBlock Text="X Axis" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding PosX, StringFormat={}{0:F3}}"
-                                               FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"
+                                               FontSize="24" FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryBrush}"
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
-                            <!-- Y -->
-                            <Border Grid.Column="1" Background="#E8F5E9" CornerRadius="6" Padding="12" Margin="0,0,8,0">
+                            <Border Background="#E8F5E9" CornerRadius="6" Padding="12" Margin="0,0,0,0">
                                 <StackPanel HorizontalAlignment="Center">
                                     <TextBlock Text="Y Axis" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding PosY, StringFormat={}{0:F3}}"
-                                               FontSize="22" FontWeight="Bold" Foreground="#2E7D32"
+                                               FontSize="24" FontWeight="Bold" Foreground="#2E7D32"
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
-                        </Grid>
+                        </UniformGrid>
                     </StackPanel>
                 </Border>
 
-                <!-- Jog / Move To Target -->
+                <!-- Move To Target -->
                 <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,8">
                     <StackPanel>
                         <TextBlock Text="Move To Target Position" Style="{StaticResource SectionHeaderStyle}"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="X:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox Grid.Column="1" Text="{Binding TargetX, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
-                            <TextBlock Grid.Column="2" Text="Y:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox Grid.Column="3" Text="{Binding TargetY, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
-                            <Button Grid.Column="4" Content="Move" Command="{Binding MoveToTargetCommand}"
-                                    Style="{StaticResource PrimaryButtonStyle}" Width="80"/>
+                            <TextBlock Grid.Column="0" Text="X:" Style="{StaticResource FormLabelStyle}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox   Grid.Column="1" Text="{Binding TargetX, UpdateSourceTrigger=PropertyChanged}"
+                                       Style="{StaticResource InputTextBoxStyle}" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="2" Text="Y:" Style="{StaticResource FormLabelStyle}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox   Grid.Column="3" Text="{Binding TargetY, UpdateSourceTrigger=PropertyChanged}"
+                                       Style="{StaticResource InputTextBoxStyle}" Margin="0,0,10,0"/>
+                            <Button    Grid.Column="4" Content="Move" Command="{Binding MoveToTargetCommand}"
+                                       Style="{StaticResource PrimaryButtonStyle}" Width="80"/>
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -158,38 +160,35 @@
                 <Border Grid.Row="2" Style="{StaticResource CardStyle}">
                     <StackPanel>
                         <TextBlock Text="Program Status" Style="{StaticResource SectionHeaderStyle}"/>
-                        <Grid Margin="0,0,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
+                        <!-- Stats row -->
+                        <UniformGrid Rows="1" Columns="3" Margin="0,0,0,10">
+                            <StackPanel>
                                 <TextBlock Text="Program" Style="{StaticResource FormLabelStyle}"/>
                                 <TextBlock Text="{Binding ProgramName}" FontSize="14" FontWeight="SemiBold"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="1">
+                            <StackPanel>
                                 <TextBlock Text="Completed" Style="{StaticResource FormLabelStyle}"/>
                                 <TextBlock Text="{Binding CompletedStrokes}" FontSize="14" FontWeight="SemiBold"
                                            Foreground="{StaticResource SuccessBrush}"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="2">
+                            <StackPanel>
                                 <TextBlock Text="Total" Style="{StaticResource FormLabelStyle}"/>
                                 <TextBlock Text="{Binding TotalStrokes}" FontSize="14" FontWeight="SemiBold"/>
                             </StackPanel>
-                        </Grid>
-                        <!-- Progress Bar -->
+                        </UniformGrid>
+                        <!-- Progress bar -->
                         <ProgressBar Height="18"
                                      Maximum="{Binding TotalStrokes}"
                                      Value="{Binding CompletedStrokes}"
                                      Foreground="{StaticResource SuccessBrush}"
                                      Background="#E0E0E0"
-                                     Margin="0,0,0,12"/>
-                        <!-- Status Message -->
+                                     Margin="0,0,0,10"/>
+                        <!-- Status message -->
                         <TextBlock Text="{Binding StatusMessage}" FontSize="13"
                                    Foreground="{StaticResource TextSecondaryBrush}"/>
                     </StackPanel>
                 </Border>
+
             </Grid>
         </Grid>
     </Grid>

@@ -47,6 +47,28 @@ public class InverseBoolToVisibilityConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+[ValueConversion(typeof(string), typeof(Visibility))]
+public class StringToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => string.IsNullOrWhiteSpace(value as string) ? Visibility.Collapsed : Visibility.Visible;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+[ValueConversion(typeof(bool), typeof(SolidColorBrush))]
+public class BoolToErrorBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => (value is bool b && b)
+            ? new SolidColorBrush(Color.FromRgb(0xDC, 0x35, 0x45))  // red on error
+            : new SolidColorBrush(Color.FromRgb(0x0D, 0x47, 0xA1)); // blue on success/info
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 /// <summary>Converts a double value to bool by comparing it with a ConverterParameter double.</summary>
 [ValueConversion(typeof(double), typeof(bool))]
 public class EqualityToBoolConverter : IValueConverter
