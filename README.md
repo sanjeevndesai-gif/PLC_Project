@@ -167,6 +167,29 @@ Axis travel limits (min/max for X, Y, Z) and home positions configuration.
 
 ---
 
+### Screen 8 – Program Editor: 2D Punch Preview
+
+The Program Editor bottom panel includes a **2D Punch Preview** tab.  
+It renders the sheet plate as a white rectangle on a light-blue canvas with all punch-hole
+positions drawn as red circles, automatically scaled and centred to fit.
+X/Y axis arrows appear in the lower-left corner.  
+The preview updates live whenever a step is added, edited, saved, or deleted.
+
+![Program Editor – 2D Punch Preview](https://github.com/user-attachments/assets/0011dfa9-9286-4bbd-978d-189fadeb407b)
+
+---
+
+### Screen 9 – Program Editor: 3D Punch Preview
+
+Switch to the **3D Punch Preview** tab for a perspective view of the same program.  
+The steel sheet is rendered as a 3-D slab (grey) with red cylinders at every punch position.
+Selected steps highlight in yellow. The scene uses WPF native `Viewport3D` — no
+third-party libraries required. X / Y / Z axis labels are shown at the edges of the scene.
+
+![Program Editor – 3D Punch Preview](https://github.com/user-attachments/assets/d3d132e4-0879-462d-a08a-b3df58a7033f)
+
+---
+
 ## Project Structure
 
 ```
@@ -174,15 +197,21 @@ CopaFormGui/
 ├── Models/
 │   ├── AlarmRecord.cs
 │   ├── ConnectionSettings.cs
+│   ├── LicenseFile.cs
 │   ├── MachineSettings.cs
+│   ├── PunchPreviewPoint.cs
 │   ├── PunchProgram.cs
 │   └── ToolRecord.cs
 ├── Services/
 │   ├── IControllerService.cs / ControllerService.cs
+│   ├── ILicenseService.cs / LicenseService.cs
+│   ├── LicenseCrypto.cs
+│   ├── LicenseValidationResult.cs
 │   └── ISettingsService.cs  / SettingsService.cs
 ├── ViewModels/
 │   ├── LoginViewModel.cs
 │   ├── MainViewModel.cs
+│   ├── ProgramEditorViewModel.cs
 │   ├── PunchingViewModel.cs
 │   ├── DatabaseViewModel.cs
 │   ├── SettingsViewModel.cs
@@ -190,6 +219,8 @@ CopaFormGui/
 │   └── AlarmViewModel.cs
 ├── Views/
 │   ├── LoginWindow.xaml
+│   ├── ProgramEditorView.xaml
+│   ├── ProgramEditorView.xaml.cs
 │   ├── PunchingView.xaml
 │   ├── DatabaseView.xaml
 │   ├── SettingsView.xaml
