@@ -19,16 +19,20 @@ public partial class App : Application
         Services = services.BuildServiceProvider();
 
         var licenseService = Services.GetRequiredService<ILicenseService>();
-        if (licenseService.IsLicenseValid())
+        var licenseResult = licenseService.ValidateCurrentMachineLicense();
+        if (!licenseResult.IsValid)
         {
-            var loginWindow = Services.GetRequiredService<LoginWindow>();
-            loginWindow.Show();
+            MessageBox.Show(
+                $"Application is not licensed for this machine.\n\n{licenseResult.ErrorMessage}",
+                "License Required",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown(-1);
+            return;
         }
-        else
-        {
-            var activationWindow = Services.GetRequiredService<LicenseActivationWindow>();
-            activationWindow.Show();
-        }
+
+        var loginWindow = Services.GetRequiredService<LoginWindow>();
+        loginWindow.Show();
     }
 
     private static void ConfigureServices(ServiceCollection services)
@@ -40,7 +44,6 @@ public partial class App : Application
 
         // ViewModels
         services.AddSingleton<LoginViewModel>();
-        services.AddSingleton<LicenseActivationViewModel>();
         services.AddSingleton<OverviewViewModel>();
         services.AddSingleton<DatabaseViewModel>();
         services.AddSingleton<SettingsViewModel>();
@@ -55,7 +58,6 @@ public partial class App : Application
 
         // Views
         services.AddTransient<LoginWindow>();
-        services.AddTransient<LicenseActivationWindow>();
         services.AddSingleton<MainWindow>();
     }
 }

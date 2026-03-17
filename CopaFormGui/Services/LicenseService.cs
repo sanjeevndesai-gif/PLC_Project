@@ -1,121 +1,115 @@
 using System.IO;
-using System.Management;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Win32;
 using CopaFormGui.Models;
 
 namespace CopaFormGui.Services;
 
 public class LicenseService : ILicenseService
 {
-    private static readonly string LicenseFolder =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CopaFormGui");
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-    private static readonly string LicensePath = Path.Combine(LicenseFolder, "license.json");
+    private static readonly string ProgramDataFolder =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "CopaFormGui");
 
-    // Internal secret used for HMAC key derivation — not a user-visible secret
-    private static readonly byte[] _hmacSeed = Encoding.UTF8.GetBytes("CopaFormGui-License-v1");
+    private static readonly string ProgramDataLicensePath = Path.Combine(ProgramDataFolder, "license.json");
+    private static readonly string LocalLicensePath = Path.Combine(AppContext.BaseDirectory, "license.json");
 
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+    public string GetCurrentMachineId()
+    {
+        var machineGuid = GetWindowsMachineGuid();
+        if (!string.IsNullOrWhiteSpace(machineGuid))
+            return machineGuid.ToUpperInvariant();
 
-    public string GetMachineId()
+        var fallback = $"{Environment.MachineName}|{Environment.UserDomainName}|{Environment.OSVersion.VersionString}";
+        return ComputeSha256Hex(fallback);
+    }
+
+    public LicenseValidationResult ValidateCurrentMachineLicense()
+    {
+        var licensePath = File.Exists(ProgramDataLicensePath) ? ProgramDataLicensePath : LocalLicensePath;
+        var currentMachineId = GetCurrentMachineId();
+
+        if (!File.Exists(licensePath))
+        {
+            return LicenseValidationResult.Fail(
+                $"License file not found.\nExpected: {ProgramDataLicensePath} or {LocalLicensePath}\n\n" +
+                $"Machine ID: {currentMachineId}");
+        }
+
+        LicenseFile? license;
+        try
+        {
+            var json = File.ReadAllText(licensePath);
+            license = JsonSerializer.Deserialize<LicenseFile>(json, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            return LicenseValidationResult.Fail($"License file could not be read: {ex.Message}");
+        }
+
+        if (license is null)
+            return LicenseValidationResult.Fail("License file is empty or invalid.");
+
+        if (!string.Equals(license.Product, "CopaFormGui", StringComparison.OrdinalIgnoreCase))
+            return LicenseValidationResult.Fail("License product does not match this application.");
+
+        if (!string.Equals(license.MachineId?.Trim(), currentMachineId, StringComparison.OrdinalIgnoreCase))
+        {
+            return LicenseValidationResult.Fail(
+                $"License is not valid for this system.\nLicensed Machine ID: {license.MachineId}\nCurrent Machine ID: {currentMachineId}");
+        }
+
+        if (license.ExpiresUtc.HasValue && DateTime.UtcNow > license.ExpiresUtc.Value.ToUniversalTime())
+            return LicenseValidationResult.Fail("License has expired.");
+
+        if (!VerifySignature(license))
+            return LicenseValidationResult.Fail("License signature is invalid.");
+
+        return LicenseValidationResult.Ok();
+    }
+
+    private static bool VerifySignature(LicenseFile license)
     {
         try
         {
-            var components = new List<string>();
+            if (LicenseCrypto.PublicKeyPem.Contains("REPLACE_WITH_YOUR_RSA_PUBLIC_KEY", StringComparison.Ordinal))
+                return false;
 
-            using var mbQuery = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_BaseBoard");
-            var mbObjects = mbQuery.Get();
-            foreach (ManagementObject obj in mbObjects)
-            {
-                components.Add(obj["SerialNumber"]?.ToString() ?? string.Empty);
-                break; // take only the first entry
-            }
+            var payload = LicenseCrypto.BuildPayload(license);
+            var payloadBytes = Encoding.UTF8.GetBytes(payload);
+            var signatureBytes = Convert.FromBase64String(license.Signature);
 
-            using var cpuQuery = new ManagementObjectSearcher("SELECT ProcessorId FROM Win32_Processor");
-            var cpuObjects = cpuQuery.Get();
-            foreach (ManagementObject obj in cpuObjects)
-            {
-                components.Add(obj["ProcessorId"]?.ToString() ?? string.Empty);
-                break; // take only the first entry
-            }
-
-            var raw = string.Join("|", components);
-            if (string.IsNullOrWhiteSpace(raw))
-                raw = Environment.MachineName;
-
-            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
-            return Convert.ToHexString(hash)[..16];
+            using var rsa = RSA.Create();
+            rsa.ImportFromPem(LicenseCrypto.PublicKeyPem);
+            return rsa.VerifyData(payloadBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
         }
         catch
         {
-            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(Environment.MachineName));
-            return Convert.ToHexString(hash)[..16];
+            return false;
         }
     }
 
-    public bool IsLicenseValid()
-    {
-        var info = LoadLicense();
-        if (info is null || !info.IsActivated || string.IsNullOrEmpty(info.LicenseKey))
-            return false;
-
-        return ValidateKey(info.MachineId, info.LicenseKey);
-    }
-
-    public bool ActivateLicense(string licenseKey)
-    {
-        if (string.IsNullOrWhiteSpace(licenseKey))
-            return false;
-
-        var machineId = GetMachineId();
-        if (!ValidateKey(machineId, licenseKey))
-            return false;
-
-        EnsureFolderExists();
-        var info = new LicenseInfo
-        {
-            MachineId = machineId,
-            LicenseKey = licenseKey,
-            IsActivated = true,
-            ActivatedAt = DateTime.UtcNow
-        };
-        File.WriteAllText(LicensePath, JsonSerializer.Serialize(info, JsonOptions));
-        return true;
-    }
-
-    private static bool ValidateKey(string machineId, string licenseKey)
-    {
-        var expected = ComputeExpectedKey(machineId);
-        return string.Equals(expected, licenseKey.Trim(), StringComparison.OrdinalIgnoreCase);
-    }
-
-    internal static string ComputeExpectedKey(string machineId)
-    {
-        // internal visibility is intentional: enables integration testing without exposing a public API
-        using var hmac = new HMACSHA256(_hmacSeed);
-        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(machineId));
-        return Convert.ToHexString(hash)[..24];
-    }
-
-    private static LicenseInfo? LoadLicense()
+    private static string? GetWindowsMachineGuid()
     {
         try
         {
-            if (File.Exists(LicensePath))
-            {
-                var json = File.ReadAllText(LicensePath);
-                return JsonSerializer.Deserialize<LicenseInfo>(json);
-            }
+            using var localMachineX64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            using var cryptographyKey = localMachineX64.OpenSubKey(@"SOFTWARE\Microsoft\Cryptography");
+            return cryptographyKey?.GetValue("MachineGuid")?.ToString();
         }
-        catch { /* Treat as unlicensed on error */ }
-        return null;
+        catch
+        {
+            return null;
+        }
     }
 
-    private static void EnsureFolderExists()
+    private static string ComputeSha256Hex(string value)
     {
-        if (!Directory.Exists(LicenseFolder))
-            Directory.CreateDirectory(LicenseFolder);
+        var bytes = Encoding.UTF8.GetBytes(value);
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash);
     }
 }
