@@ -25,6 +25,13 @@ public partial class ProgramEditorViewModel : ObservableObject
     [ObservableProperty]
     private PunchStep? _selectedStep;
 
+    // --- 2-D punch preview (virtual canvas 800 × 150) ---
+    [ObservableProperty] private ObservableCollection<PunchPreviewPoint> _previewPoints = new();
+    [ObservableProperty] private double _previewSheetLeft   = 80;
+    [ObservableProperty] private double _previewSheetTop    = 10;
+    [ObservableProperty] private double _previewSheetWidth  = 640;
+    [ObservableProperty] private double _previewSheetHeight = 110;
+
     // Step edit fields
     [ObservableProperty] private double _editX;
     [ObservableProperty] private double _editY;
@@ -79,11 +86,12 @@ public partial class ProgramEditorViewModel : ObservableObject
 
     partial void OnSelectedProgramChanged(PunchProgram? value)
     {
-        if (value is null) { Steps.Clear(); return; }
+        if (value is null) { Steps.Clear(); RefreshPreview(); return; }
         Steps = new ObservableCollection<PunchStep>(value.Steps);
         EditProgramName = value.ProgramName;
         EditDescription = value.Description;
         StatusMessage = $"Program {value.ProgramName} loaded – {value.Steps.Count} steps";
+        RefreshPreview();
     }
 
     partial void OnSelectedStepChanged(PunchStep? value)
