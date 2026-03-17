@@ -13,7 +13,6 @@ public partial class HandControlViewModel : ObservableObject
     // Current axis positions
     [ObservableProperty] private double _posX;
     [ObservableProperty] private double _posY;
-    [ObservableProperty] private double _posZ;
 
     // Selected jog step size (mm)
     [ObservableProperty] private double _jogStep = 1.0;
@@ -71,28 +70,12 @@ public partial class HandControlViewModel : ObservableObject
         StatusMessage = $"Jog Y- {JogStep:F3} mm  → Y = {PosY:F3}";
     }
 
-    // ── Jog Z ───────────────────────────────────────────────────────────────
-
-    [RelayCommand]
-    private void JogZPlus()
-    {
-        PosZ += JogStep;
-        StatusMessage = $"Jog Z+ {JogStep:F3} mm  → Z = {PosZ:F3}";
-    }
-
-    [RelayCommand]
-    private void JogZMinus()
-    {
-        PosZ -= JogStep;
-        StatusMessage = $"Jog Z- {JogStep:F3} mm  → Z = {PosZ:F3}";
-    }
-
     // ── Axis commands ────────────────────────────────────────────────────────
 
     [RelayCommand]
     private void HomeAll()
     {
-        PosX = 0; PosY = 0; PosZ = 0;
+        PosX = 0; PosY = 0;
         StatusMessage = "All axes homed to zero.";
     }
 
@@ -103,12 +86,9 @@ public partial class HandControlViewModel : ObservableObject
     private void HomeY() { PosY = 0; StatusMessage = "Y axis homed."; }
 
     [RelayCommand]
-    private void HomeZ() { PosZ = 0; StatusMessage = "Z axis homed."; }
-
-    [RelayCommand]
     private void ZeroAll()
     {
-        PosX = 0; PosY = 0; PosZ = 0;
+        PosX = 0; PosY = 0;
         StatusMessage = "Work-coordinate origin set at current position.";
     }
 

@@ -34,25 +34,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left: Step Size + Feed Override + Home buttons -->
+            <!-- Left: Feed Override + Home buttons -->
             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-
-                <!-- Step Size Selection -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="Jog Step Size (mm)" Style="{StaticResource SectionHeaderStyle}"/>
-                        <RadioButton Content="0.01 mm" GroupName="JogStep" Margin="0,4,0,0" FontSize="13"
-                                     IsChecked="{Binding JogStep, Converter={StaticResource EqualityToBool}, ConverterParameter=0.01, Mode=TwoWay}"/>
-                        <RadioButton Content="0.10 mm" GroupName="JogStep" Margin="0,4,0,0" FontSize="13"
-                                     IsChecked="{Binding JogStep, Converter={StaticResource EqualityToBool}, ConverterParameter=0.1, Mode=TwoWay}"/>
-                        <RadioButton Content="1.00 mm" GroupName="JogStep" Margin="0,4,0,0" FontSize="13"
-                                     IsChecked="{Binding JogStep, Converter={StaticResource EqualityToBool}, ConverterParameter=1, Mode=TwoWay}"/>
-                        <RadioButton Content="10.0 mm" GroupName="JogStep" Margin="0,4,0,0" FontSize="13"
-                                     IsChecked="{Binding JogStep, Converter={StaticResource EqualityToBool}, ConverterParameter=10, Mode=TwoWay}"/>
-                        <RadioButton Content="100  mm" GroupName="JogStep" Margin="0,4,0,0" FontSize="13"
-                                     IsChecked="{Binding JogStep, Converter={StaticResource EqualityToBool}, ConverterParameter=100, Mode=TwoWay}"/>
-                    </StackPanel>
-                </Border>
 
                 <!-- Feed Rate Override -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
@@ -86,13 +69,10 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0" Content="Home X" Command="{Binding HomeXCommand}"
                                     Style="{StaticResource SecondaryButtonStyle}" Height="30" Margin="0,0,4,0"/>
                             <Button Grid.Column="1" Content="Home Y" Command="{Binding HomeYCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Height="30" Margin="0,0,4,0"/>
-                            <Button Grid.Column="2" Content="Home Z" Command="{Binding HomeZCommand}"
                                     Style="{StaticResource SecondaryButtonStyle}" Height="30"/>
                         </Grid>
                         <Button Content="Set Work Zero (W0)" Command="{Binding ZeroAllCommand}"
@@ -119,7 +99,6 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <!-- X -->
                         <Border Grid.Column="0" Background="#E3F2FD" CornerRadius="6" Padding="16,12" Margin="0,0,8,0">
@@ -142,16 +121,6 @@
                                 <TextBlock Text="mm" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Border>
-                        <!-- Z -->
-                        <Border Grid.Column="2" Background="#FFF3E0" CornerRadius="6" Padding="16,12">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="Z Axis" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center" FontSize="14"/>
-                                <TextBlock Text="{Binding PosZ, StringFormat={}{0:F3}}"
-                                           FontSize="28" FontWeight="Bold" Foreground="#E65100"
-                                           HorizontalAlignment="Center"/>
-                                <TextBlock Text="mm" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
                     </Grid>
                 </Border>
 
@@ -161,7 +130,6 @@
                         <TextBlock Text="Axis Jog Controls" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,12"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
@@ -191,21 +159,6 @@
                                             Style="{StaticResource BaseButtonStyle}"
                                             Height="48" Width="100" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
                                     <Button Content="Y −" Command="{Binding JogYMinusCommand}"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            Height="48" Width="100" FontSize="16" FontWeight="Bold"/>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Z Jog -->
-                            <Border Grid.Column="2" Background="#F5F5F5" CornerRadius="6" Padding="12">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <TextBlock Text="Z Axis" FontSize="14" FontWeight="Bold" Foreground="#E65100"
-                                               HorizontalAlignment="Center" Margin="0,0,0,12"/>
-                                    <Button Content="Z +" Command="{Binding JogZPlusCommand}"
-                                            Background="#E65100" Foreground="White"
-                                            Style="{StaticResource BaseButtonStyle}"
-                                            Height="48" Width="100" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
-                                    <Button Content="Z −" Command="{Binding JogZMinusCommand}"
                                             Style="{StaticResource SecondaryButtonStyle}"
                                             Height="48" Width="100" FontSize="16" FontWeight="Bold"/>
                                 </StackPanel>

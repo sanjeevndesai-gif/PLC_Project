@@ -9,6 +9,7 @@ namespace CopaFormGui.ViewModels;
 public partial class ToolManagementViewModel : ObservableObject
 {
     private readonly IControllerService _controllerService;
+    private readonly IDataStoreService _dataStoreService;
 
     [ObservableProperty] private bool _isConnected;
 
@@ -24,18 +25,21 @@ public partial class ToolManagementViewModel : ObservableObject
     [ObservableProperty] private string _editToolType = "Round";
     [ObservableProperty] private double _editDiameter;
     [ObservableProperty] private double _editLength;
-    [ObservableProperty] private double _editStrokeLength;
-    [ObservableProperty] private int _editMaxStrokes;
-    [ObservableProperty] private int _editCurrentStrokes;
+    [ObservableProperty] private double _editWidth;
     [ObservableProperty] private string _editNotes = string.Empty;
 
     [ObservableProperty] private string _statusMessage = "Select a tool to edit.";
+    [ObservableProperty] private bool _isStatusSuccess;
 
-    public IEnumerable<string> ToolTypes { get; } = new[] { "Round", "Square", "Oblong", "Hex", "Triangle", "Custom" };
+    [ObservableProperty] private bool _isRoundTool = true;
+    [ObservableProperty] private bool _isSquareTool = false;
 
-    public ToolManagementViewModel(IControllerService controllerService)
+    public IEnumerable<string> ToolTypes { get; } = new[] { "Round", "Square" };
+
+    public ToolManagementViewModel(IControllerService controllerService, IDataStoreService dataStoreService)
     {
         _controllerService = controllerService;
+        _dataStoreService = dataStoreService;
         _controllerService.ConnectionStateChanged += (_, s) => IsConnected = s == ConnectionState.Connected;
         IsConnected = controllerService.IsConnected;
         LoadTools();
@@ -43,14 +47,22 @@ public partial class ToolManagementViewModel : ObservableObject
 
     private void LoadTools()
     {
+        var storedTools = _dataStoreService.LoadToolRecords();
+        if (storedTools.Count > 0)
+        {
+            Tools = new ObservableCollection<ToolRecord>(storedTools);
+            return;
+        }
+
         Tools = new ObservableCollection<ToolRecord>
         {
-            new() { ToolId = 1, ToolName = "Round Punch 10mm",  ToolType = "Round",    Diameter = 10.0, Length = 50.0, StrokeLength = 30.0, MaxStrokes = 5000, CurrentStrokes = 1230, Status = "OK" },
-            new() { ToolId = 2, ToolName = "Square Punch 8mm",  ToolType = "Square",   Diameter =  8.0, Length = 50.0, StrokeLength = 28.0, MaxStrokes = 4000, CurrentStrokes =  870, Status = "OK" },
-            new() { ToolId = 3, ToolName = "Oblong 15x8mm",     ToolType = "Oblong",   Diameter = 15.0, Length = 55.0, StrokeLength = 32.0, MaxStrokes = 3000, CurrentStrokes = 2990, Status = "Warn" },
-            new() { ToolId = 4, ToolName = "Round Punch 6mm",   ToolType = "Round",    Diameter =  6.0, Length = 45.0, StrokeLength = 25.0, MaxStrokes = 6000, CurrentStrokes =  350, Status = "OK" },
-            new() { ToolId = 5, ToolName = "Hex Punch 12mm",    ToolType = "Hex",      Diameter = 12.0, Length = 52.0, StrokeLength = 30.0, MaxStrokes = 4500, CurrentStrokes = 4490, Status = "Warn" },
+            new() { ToolId = 1, ToolName = "Round Punch 10mm",  ToolType = "Round",  Diameter = 10.0, Length = 0.0, Width = 0.0 },
+            new() { ToolId = 2, ToolName = "Square Punch 8x8", ToolType = "Square", Diameter = 0.0, Length = 8.0, Width = 8.0 },
+            new() { ToolId = 3, ToolName = "Round Punch 6mm",   ToolType = "Round",  Diameter = 6.0, Length = 0.0, Width = 0.0 },
+            new() { ToolId = 4, ToolName = "Square Punch 12x10", ToolType = "Square", Diameter = 0.0, Length = 12.0, Width = 10.0 },
         };
+
+        _dataStoreService.SaveToolRecords(Tools.ToList());
     }
 
     partial void OnSelectedToolChanged(ToolRecord? value)
@@ -58,13 +70,41 @@ public partial class ToolManagementViewModel : ObservableObject
         if (value is null) return;
         EditToolId = value.ToolId;
         EditToolName = value.ToolName;
-        EditToolType = value.ToolType;
+        EditToolType = NormalizeToolType(value.ToolType);
         EditDiameter = value.Diameter;
         EditLength = value.Length;
-        EditStrokeLength = value.StrokeLength;
-        EditMaxStrokes = value.MaxStrokes;
-        EditCurrentStrokes = value.CurrentStrokes;
+        EditWidth = value.Width;
         EditNotes = value.Notes;
+        SetToolTypeFlags(EditToolType);
+        IsStatusSuccess = false;
+        StatusMessage = "Edit the fields and click Save Tool.";
+    }
+
+    partial void OnEditToolTypeChanged(string value)
+    {
+        var normalizedType = NormalizeToolType(value);
+        if (!string.Equals(value, normalizedType, StringComparison.OrdinalIgnoreCase))
+        {
+            EditToolType = normalizedType;
+            return;
+        }
+
+        if (string.Equals(normalizedType, "Round", StringComparison.OrdinalIgnoreCase))
+        {
+            EditLength = 0;
+            EditWidth = 0;
+        }
+        else
+        {
+            EditDiameter = 0;
+        }
+        SetToolTypeFlags(normalizedType);
+    }
+
+    private void SetToolTypeFlags(string toolType)
+    {
+        IsRoundTool = string.Equals(toolType, "Round", StringComparison.OrdinalIgnoreCase);
+        IsSquareTool = string.Equals(toolType, "Square", StringComparison.OrdinalIgnoreCase);
     }
 
     [RelayCommand]
@@ -76,32 +116,43 @@ public partial class ToolManagementViewModel : ObservableObject
             ToolName = "New Tool",
             ToolType = "Round",
             Diameter = 10.0,
-            Length = 50.0,
-            StrokeLength = 30.0,
-            MaxStrokes = 5000,
-            Status = "OK"
+            Length = 0.0,
+            Width = 0.0
         };
         Tools.Add(tool);
         SelectedTool = tool;
         StatusMessage = "New tool added. Fill in the details and save.";
+        _dataStoreService.SaveToolRecords(Tools.ToList());
     }
 
     [RelayCommand]
     private void SaveTool()
     {
         if (SelectedTool is null) return;
-        SelectedTool.ToolName = EditToolName;
-        SelectedTool.ToolType = EditToolType;
-        SelectedTool.Diameter = EditDiameter;
-        SelectedTool.Length = EditLength;
-        SelectedTool.StrokeLength = EditStrokeLength;
-        SelectedTool.MaxStrokes = EditMaxStrokes;
-        SelectedTool.CurrentStrokes = EditCurrentStrokes;
-        SelectedTool.Notes = EditNotes;
-        StatusMessage = $"Tool '{EditToolName}' saved.";
-        // Refresh list view
         var idx = Tools.IndexOf(SelectedTool);
-        Tools[idx] = SelectedTool;
+        if (idx < 0)
+        {
+            StatusMessage = "Selected tool not found.";
+            return;
+        }
+
+        var normalizedType = NormalizeToolType(EditToolType);
+        var updatedTool = new ToolRecord
+        {
+            ToolId = SelectedTool.ToolId,
+            ToolName = EditToolName,
+            ToolType = normalizedType,
+            Diameter = normalizedType == "Round" ? EditDiameter : 0,
+            Length = normalizedType == "Square" ? EditLength : 0,
+            Width = normalizedType == "Square" ? EditWidth : 0,
+            Notes = EditNotes
+        };
+
+        Tools[idx] = updatedTool;
+        SelectedTool = updatedTool;
+        IsStatusSuccess = true;
+        StatusMessage = $"✓ Tool '{EditToolName}' saved successfully.";
+        _dataStoreService.SaveToolRecords(Tools.ToList());
     }
 
     [RelayCommand]
@@ -110,15 +161,19 @@ public partial class ToolManagementViewModel : ObservableObject
         if (SelectedTool is null) return;
         Tools.Remove(SelectedTool);
         SelectedTool = null;
+        IsStatusSuccess = false;
         StatusMessage = "Tool deleted.";
+        _dataStoreService.SaveToolRecords(Tools.ToList());
     }
 
-    [RelayCommand]
-    private void ResetStrokes()
+    private static string NormalizeToolType(string? rawType)
     {
-        if (SelectedTool is null) return;
-        SelectedTool.CurrentStrokes = 0;
-        EditCurrentStrokes = 0;
-        StatusMessage = $"Stroke count reset for '{SelectedTool.ToolName}'.";
+        var value = (rawType ?? string.Empty).Trim().ToLowerInvariant();
+
+        if (value.StartsWith("sq") || value.Contains("squ") || value.Contains("seq") || value == "square")
+            return "Square";
+
+        return "Round";
     }
+
 }

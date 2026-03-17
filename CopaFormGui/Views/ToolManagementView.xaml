@@ -7,12 +7,13 @@
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,6">
             <Grid>
                 <TextBlock Text="Tool Management" FontSize="18" FontWeight="Bold" Foreground="White"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -24,15 +25,43 @@
             </Grid>
         </Border>
 
-        <!-- Main Content: List + Edit Panel -->
-        <Grid Grid.Row="1">
+        <!-- Status Notification Banner (top, full width) -->
+        <Border Grid.Row="1" CornerRadius="4" Padding="14,8" Margin="0,0,0,6" BorderThickness="1">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#FFF3CD"/>
+                    <Setter Property="BorderBrush" Value="#FFC107"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsStatusSuccess}" Value="True">
+                            <Setter Property="Background" Value="#D4EDDA"/>
+                            <Setter Property="BorderBrush" Value="#28A745"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <TextBlock Text="{Binding StatusMessage}" FontSize="13" FontWeight="SemiBold" TextWrapping="Wrap">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="#856404"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsStatusSuccess}" Value="True">
+                                <Setter Property="Foreground" Value="#155724"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Border>
+
+        <!-- Main Content: List + Edit Panel (equal halves) -->
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Tool List -->
-            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,0" Padding="8">
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0" Padding="8">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" Text="Tool Library" Style="{StaticResource SectionHeaderStyle}" Margin="4,0,0,8"/>
                     <DataGrid ItemsSource="{Binding Tools}"
@@ -42,77 +71,125 @@
                               SelectionMode="Single"
                               IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"          Width="50"/>
-                            <DataGridTextColumn Header="Name"        Binding="{Binding ToolName}"        Width="*"/>
-                            <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"        Width="80"/>
-                            <DataGridTextColumn Header="Dia (mm)"   Binding="{Binding Diameter, StringFormat={}{0:F1}}"    Width="75"/>
-                            <DataGridTextColumn Header="Strokes"     Binding="{Binding CurrentStrokes}"  Width="70"/>
-                            <DataGridTextColumn Header="Max"         Binding="{Binding MaxStrokes}"      Width="70"/>
-                            <DataGridTextColumn Header="Status"      Binding="{Binding Status}"          Width="70"/>
+                            <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"                               Width="45"/>
+                            <DataGridTextColumn Header="Name"        Binding="{Binding ToolName}"                             Width="*"/>
+                            <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"                             Width="75"/>
+                            <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}"      Width="75"/>
+                            <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"        Width="85"/>
+                            <DataGridTextColumn Header="Width (mm)"  Binding="{Binding Width, StringFormat={}{0:F1}}"         Width="80"/>
+                            <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"                                Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
             </Border>
 
-            <!-- Edit Panel -->
-            <Border Grid.Column="1" Style="{StaticResource CardStyle}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="Tool Details" Style="{StaticResource SectionHeaderStyle}"/>
+            <!-- Edit Panel (no scroll needed — 2-col form layout) -->
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="6,0,0,0" Padding="16,12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                        <TextBlock Text="Tool Name" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditToolName, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="0" Text="Tool Details" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,10"/>
 
-                        <TextBlock Text="Tool Type" Style="{StaticResource FormLabelStyle}"/>
-                        <ComboBox ItemsSource="{Binding ToolTypes}"
-                                  SelectedItem="{Binding EditToolType}"
-                                  Padding="8,6" FontSize="13"
-                                  Margin="0,0,0,10"/>
+                    <!-- Row 1: Name + Type side by side -->
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Tool Name" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBox Text="{Binding EditToolName, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputTextBoxStyle}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Tool Type" Style="{StaticResource FormLabelStyle}"/>
+                            <ComboBox ItemsSource="{Binding ToolTypes}"
+                                      SelectedItem="{Binding EditToolType}"
+                                      Padding="8,6" FontSize="13"/>
+                        </StackPanel>
+                    </Grid>
 
-                        <TextBlock Text="Diameter (mm)" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditDiameter, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+                    <!-- Row 2: Diameter (Round) OR Length + Width (Square) -->
+                    <Grid Grid.Row="2" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Length (mm)" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditLength, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+                        <!-- Round: Diameter only -->
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="3"
+                                    Visibility="{Binding IsRoundTool, Converter={StaticResource BoolToVisibility}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Diameter (mm)" Style="{StaticResource FormLabelStyle}"/>
+                                    <TextBox Text="{Binding EditDiameter, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputTextBoxStyle}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
 
-                        <TextBlock Text="Stroke Length (mm)" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditStrokeLength, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
+                        <!-- Square: Length + Width side by side -->
+                        <StackPanel Grid.Column="0" Grid.ColumnSpan="3"
+                                    Visibility="{Binding IsSquareTool, Converter={StaticResource BoolToVisibility}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Length (mm)" Style="{StaticResource FormLabelStyle}"/>
+                                    <TextBox Text="{Binding EditLength, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputTextBoxStyle}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Width (mm)" Style="{StaticResource FormLabelStyle}"/>
+                                    <TextBox Text="{Binding EditWidth, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource InputTextBoxStyle}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
 
-                        <TextBlock Text="Max Strokes" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditMaxStrokes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
-
-                        <TextBlock Text="Current Strokes" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditCurrentStrokes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
-
+                    <!-- Row 3: Notes -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
                         <TextBlock Text="Notes" Style="{StaticResource FormLabelStyle}"/>
                         <TextBox Text="{Binding EditNotes, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource InputTextBoxStyle}"
                                  TextWrapping="Wrap" Height="60"
-                                 AcceptsReturn="True" Margin="0,0,0,16"/>
-
-                        <Button Content="Save Tool"     Command="{Binding SaveToolCommand}"
-                                Style="{StaticResource SuccessButtonStyle}" Height="36" Margin="0,0,0,6"/>
-                        <Button Content="Reset Strokes" Command="{Binding ResetStrokesCommand}"
-                                Style="{StaticResource WarningButtonStyle}" Height="32" Margin="0,0,0,6"/>
-                        <Button Content="Delete Tool"   Command="{Binding DeleteToolCommand}"
-                                Style="{StaticResource DangerButtonStyle}"  Height="32"/>
-
-                        <TextBlock Text="{Binding StatusMessage}" Margin="0,12,0,0"
-                                   FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
-                                   TextWrapping="Wrap"/>
+                                 AcceptsReturn="True"/>
                     </StackPanel>
-                </ScrollViewer>
+
+                    <!-- Row 4: spacer -->
+                    <Grid Grid.Row="4"/>
+
+                    <!-- Row 5: Action Buttons -->
+                    <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Delete Tool" Command="{Binding DeleteToolCommand}"
+                                Style="{StaticResource DangerButtonStyle}" Height="34" Width="110" Margin="0,0,8,0"/>
+                        <Button Content="Save Tool" Command="{Binding SaveToolCommand}"
+                                Style="{StaticResource SuccessButtonStyle}" Height="34" Width="110"/>
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
 
         <!-- Bottom Actions -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,6,0,0">
             <StackPanel Orientation="Horizontal">
                 <Button Content="+ Add Tool" Command="{Binding AddToolCommand}"
                         Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>

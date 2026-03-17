@@ -11,18 +11,17 @@ public enum MachineMode { Manual, Auto, Homing }
 public partial class PunchingViewModel : ObservableObject
 {
     private readonly IControllerService _controllerService;
+    private readonly IDataStoreService _dataStoreService;
 
     [ObservableProperty] private bool _isConnected;
 
     // Axis positions
     [ObservableProperty] private double _posX;
     [ObservableProperty] private double _posY;
-    [ObservableProperty] private double _posZ;
 
     // Target positions
     [ObservableProperty] private double _targetX;
     [ObservableProperty] private double _targetY;
-    [ObservableProperty] private double _targetZ;
 
     [ObservableProperty] private MachineMode _currentMode = MachineMode.Manual;
     [ObservableProperty] private bool _isRunning;
@@ -44,9 +43,10 @@ public partial class PunchingViewModel : ObservableObject
 
     private System.Timers.Timer? _positionUpdateTimer;
 
-    public PunchingViewModel(IControllerService controllerService)
+    public PunchingViewModel(IControllerService controllerService, IDataStoreService dataStoreService)
     {
         _controllerService = controllerService;
+        _dataStoreService = dataStoreService;
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = controllerService.IsConnected;
         LoadSamplePrograms();
@@ -63,15 +63,24 @@ public partial class PunchingViewModel : ObservableObject
 
     private void LoadSamplePrograms()
     {
+        var storedPrograms = _dataStoreService.LoadPunchPrograms();
+        if (storedPrograms.Count > 0)
+        {
+            Programs = new ObservableCollection<PunchProgram>(storedPrograms);
+            return;
+        }
+
         Programs = new ObservableCollection<PunchProgram>
         {
             new() { ProgramId = 1, ProgramName = "PROG_001", Description = "Flange Pattern A", CreatedBy = "Admin",
-                Steps = Enumerable.Range(1, 8).Select(i => new PunchStep { StepNumber = i, X = i * 50.0, Y = 100.0, Z = 0.0, ToolId = 1 }).ToList() },
+                Steps = Enumerable.Range(1, 8).Select(i => new PunchStep { StepNumber = i, X = i * 50.0, Y = 100.0, ToolId = 1 }).ToList() },
             new() { ProgramId = 2, ProgramName = "PROG_002", Description = "Bracket Pattern B", CreatedBy = "Admin",
-                Steps = Enumerable.Range(1, 12).Select(i => new PunchStep { StepNumber = i, X = i * 40.0, Y = 200.0, Z = 0.0, ToolId = 2 }).ToList() },
+                Steps = Enumerable.Range(1, 12).Select(i => new PunchStep { StepNumber = i, X = i * 40.0, Y = 200.0, ToolId = 2 }).ToList() },
             new() { ProgramId = 3, ProgramName = "PROG_003", Description = "Panel Pattern C",  CreatedBy = "Operator",
-                Steps = Enumerable.Range(1, 16).Select(i => new PunchStep { StepNumber = i, X = (i % 4) * 60.0, Y = (i / 4) * 60.0, Z = 0.0, ToolId = 1 }).ToList() },
+                Steps = Enumerable.Range(1, 16).Select(i => new PunchStep { StepNumber = i, X = (i % 4) * 60.0, Y = (i / 4) * 60.0, ToolId = 1 }).ToList() },
         };
+
+        _dataStoreService.SavePunchPrograms(Programs.ToList());
     }
 
     private void StartPositionPolling()
@@ -93,7 +102,6 @@ public partial class PunchingViewModel : ObservableObject
         if (!IsConnected) return;
         PosX = await _controllerService.ReadRegisterAsync(100);
         PosY = await _controllerService.ReadRegisterAsync(101);
-        PosZ = await _controllerService.ReadRegisterAsync(102);
     }
 
     [RelayCommand]
@@ -107,7 +115,7 @@ public partial class PunchingViewModel : ObservableObject
     {
         CurrentMode = MachineMode.Homing;
         StatusMessage = "Homing all axes...";
-        PosX = 0; PosY = 0; PosZ = 0;
+        PosX = 0; PosY = 0;
         StatusMessage = "Homing complete.";
         CurrentMode = MachineMode.Manual;
     }
@@ -149,8 +157,8 @@ public partial class PunchingViewModel : ObservableObject
     private void MoveToTarget()
     {
         if (!IsConnected) { StatusMessage = "Not connected."; return; }
-        PosX = TargetX; PosY = TargetY; PosZ = TargetZ;
-        StatusMessage = $"Moved to X:{TargetX:F2}  Y:{TargetY:F2}  Z:{TargetZ:F2}";
+        PosX = TargetX; PosY = TargetY;
+        StatusMessage = $"Moved to X:{TargetX:F2}  Y:{TargetY:F2}";
     }
 
     [RelayCommand]

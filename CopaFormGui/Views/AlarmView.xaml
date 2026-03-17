@@ -53,18 +53,6 @@
                     <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss dd/MM}}" Width="130"/>
                     <DataGridTextColumn Header="Code"        Binding="{Binding Code}"         Width="70"/>
                     <DataGridTextColumn Header="Description" Binding="{Binding Description}"  Width="*"/>
-                    <DataGridTemplateColumn Header="Severity" Width="90">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Border CornerRadius="3" Padding="4,2" HorizontalAlignment="Center"
-                                        Background="{Binding Severity, Converter={StaticResource AlarmSeverityToColor}}">
-                                    <TextBlock Text="{Binding Severity}" Foreground="White" FontSize="11" FontWeight="SemiBold"/>
-                                </Border>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridCheckBoxColumn Header="ACK"     Binding="{Binding IsAcknowledged}" Width="50"/>
-                    <DataGridTextColumn Header="ACK By"      Binding="{Binding AcknowledgedBy}" Width="90"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
@@ -72,10 +60,6 @@
         <!-- Action Buttons -->
         <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
             <StackPanel Orientation="Horizontal">
-                <Button Content="Acknowledge Selected" Command="{Binding AcknowledgeSelectedCommand}"
-                        Style="{StaticResource WarningButtonStyle}" Margin="0,0,8,0"/>
-                <Button Content="Acknowledge All"      Command="{Binding AcknowledgeAllCommand}"
-                        Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
                 <Button Content="Clear History"        Command="{Binding ClearHistoryCommand}"
                         Style="{StaticResource DangerButtonStyle}"  Margin="0,0,8,0"/>
                 <Button Content="Refresh"              Command="{Binding RefreshCommand}"

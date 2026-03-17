@@ -45,9 +45,6 @@
                                                  Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
                                         <TextBlock Text="Speed Y" Style="{StaticResource FormLabelStyle}"/>
                                         <TextBox Text="{Binding SpeedY, UpdateSourceTrigger=PropertyChanged}"
-                                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
-                                        <TextBlock Text="Speed Z" Style="{StaticResource FormLabelStyle}"/>
-                                        <TextBox Text="{Binding SpeedZ, UpdateSourceTrigger=PropertyChanged}"
                                                  Style="{StaticResource InputTextBoxStyle}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1">
@@ -57,9 +54,6 @@
                                                  Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
                                         <TextBlock Text="Y Hand" Style="{StaticResource FormLabelStyle}"/>
                                         <TextBox Text="{Binding SpeedYHand, UpdateSourceTrigger=PropertyChanged}"
-                                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
-                                        <TextBlock Text="Z Hand" Style="{StaticResource FormLabelStyle}"/>
-                                        <TextBox Text="{Binding SpeedZHand, UpdateSourceTrigger=PropertyChanged}"
                                                  Style="{StaticResource InputTextBoxStyle}"/>
                                     </StackPanel>
                                 </Grid>
@@ -88,8 +82,6 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Grid.ColumnSpan="4" Text="X Axis" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,4"/>
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Min:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center"/>
@@ -102,12 +94,6 @@
                                     <TextBox   Grid.Row="3" Grid.Column="1" Text="{Binding YMin}" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,8"/>
                                     <TextBlock Grid.Row="3" Grid.Column="2" Text="Max:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center"/>
                                     <TextBox   Grid.Row="3" Grid.Column="3" Text="{Binding YMax}" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,8"/>
-
-                                    <TextBlock Grid.Row="4" Grid.ColumnSpan="4" Text="Z Axis" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,4"/>
-                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Min:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center"/>
-                                    <TextBox   Grid.Row="5" Grid.Column="1" Text="{Binding ZMin}" Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
-                                    <TextBlock Grid.Row="5" Grid.Column="2" Text="Max:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center"/>
-                                    <TextBox   Grid.Row="5" Grid.Column="3" Text="{Binding ZMax}" Style="{StaticResource InputTextBoxStyle}"/>
                                 </Grid>
                             </StackPanel>
                         </Border>
@@ -119,19 +105,14 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" Margin="0,0,8,0">
                                         <TextBlock Text="Home X" Style="{StaticResource FormLabelStyle}"/>
                                         <TextBox Text="{Binding HomeX}" Style="{StaticResource InputTextBoxStyle}"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                                    <StackPanel Grid.Column="1">
                                         <TextBlock Text="Home Y" Style="{StaticResource FormLabelStyle}"/>
                                         <TextBox Text="{Binding HomeY}" Style="{StaticResource InputTextBoxStyle}"/>
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="Home Z" Style="{StaticResource FormLabelStyle}"/>
-                                        <TextBox Text="{Binding HomeZ}" Style="{StaticResource InputTextBoxStyle}"/>
                                     </StackPanel>
                                 </Grid>
                             </StackPanel>

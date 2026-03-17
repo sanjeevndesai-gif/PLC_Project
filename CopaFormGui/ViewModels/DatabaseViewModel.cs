@@ -9,6 +9,7 @@ namespace CopaFormGui.ViewModels;
 public partial class DatabaseViewModel : ObservableObject
 {
     private readonly IControllerService _controllerService;
+    private readonly IDataStoreService _dataStoreService;
 
     [ObservableProperty]
     private ObservableCollection<ToolRecord> _toolRecords = new();
@@ -25,9 +26,10 @@ public partial class DatabaseViewModel : ObservableObject
     [ObservableProperty]
     private bool _isConnected;
 
-    public DatabaseViewModel(IControllerService controllerService)
+    public DatabaseViewModel(IControllerService controllerService, IDataStoreService dataStoreService)
     {
         _controllerService = controllerService;
+        _dataStoreService = dataStoreService;
         _controllerService.ConnectionStateChanged += (_, s) => IsConnected = s == ConnectionState.Connected;
         IsConnected = controllerService.IsConnected;
         LoadSampleData();
@@ -35,17 +37,22 @@ public partial class DatabaseViewModel : ObservableObject
 
     private void LoadSampleData()
     {
+        var storedRecords = _dataStoreService.LoadToolRecords();
+        if (storedRecords.Count > 0)
+        {
+            ToolRecords = new ObservableCollection<ToolRecord>(storedRecords);
+            return;
+        }
+
         ToolRecords = new ObservableCollection<ToolRecord>
         {
-            new() { ToolId = 1, ToolName = "Round Punch 10mm",  ToolType = "Round",    Diameter = 10.0, Length = 50.0, StrokeLength = 30.0, MaxStrokes = 5000, CurrentStrokes = 1230, Status = "OK" },
-            new() { ToolId = 2, ToolName = "Square Punch 8mm",  ToolType = "Square",   Diameter =  8.0, Length = 50.0, StrokeLength = 28.0, MaxStrokes = 4000, CurrentStrokes =  870, Status = "OK" },
-            new() { ToolId = 3, ToolName = "Oblong 15x8mm",     ToolType = "Oblong",   Diameter = 15.0, Length = 55.0, StrokeLength = 32.0, MaxStrokes = 3000, CurrentStrokes = 2990, Status = "Warn" },
-            new() { ToolId = 4, ToolName = "Round Punch 6mm",   ToolType = "Round",    Diameter =  6.0, Length = 45.0, StrokeLength = 25.0, MaxStrokes = 6000, CurrentStrokes =  350, Status = "OK" },
-            new() { ToolId = 5, ToolName = "Hex Punch 12mm",    ToolType = "Hex",      Diameter = 12.0, Length = 52.0, StrokeLength = 30.0, MaxStrokes = 4500, CurrentStrokes = 4490, Status = "Warn" },
-            new() { ToolId = 6, ToolName = "Triangular 10mm",   ToolType = "Triangle", Diameter = 10.0, Length = 50.0, StrokeLength = 28.0, MaxStrokes = 3500, CurrentStrokes =  110, Status = "OK" },
-            new() { ToolId = 7, ToolName = "Round Punch 20mm",  ToolType = "Round",    Diameter = 20.0, Length = 60.0, StrokeLength = 35.0, MaxStrokes = 2000, CurrentStrokes =  760, Status = "OK" },
-            new() { ToolId = 8, ToolName = "Square Punch 15mm", ToolType = "Square",   Diameter = 15.0, Length = 55.0, StrokeLength = 32.0, MaxStrokes = 2500, CurrentStrokes = 2510, Status = "Replace" },
+            new() { ToolId = 1, ToolName = "Round Punch 10mm",   ToolType = "Round",  Diameter = 10.0, Length = 0.0,  Width = 0.0 },
+            new() { ToolId = 2, ToolName = "Square Punch 8x8",   ToolType = "Square", Diameter = 0.0,  Length = 8.0,  Width = 8.0 },
+            new() { ToolId = 3, ToolName = "Round Punch 6mm",    ToolType = "Round",  Diameter = 6.0,  Length = 0.0,  Width = 0.0 },
+            new() { ToolId = 4, ToolName = "Square Punch 12x10", ToolType = "Square", Diameter = 0.0,  Length = 12.0, Width = 10.0 },
         };
+
+        _dataStoreService.SaveToolRecords(ToolRecords.ToList());
     }
 
     [RelayCommand]
@@ -57,15 +64,13 @@ public partial class DatabaseViewModel : ObservableObject
             ToolName = "New Tool",
             ToolType = "Round",
             Diameter = 10.0,
-            Length = 50.0,
-            StrokeLength = 30.0,
-            MaxStrokes = 5000,
-            CurrentStrokes = 0,
-            Status = "OK"
+            Length = 0.0,
+            Width = 0.0
         };
         ToolRecords.Add(newRecord);
         SelectedRecord = newRecord;
-        StatusMessage = "New record added. Please fill in the details.";
+        StatusMessage = "New record added. Use only Round or Square tool type.";
+        _dataStoreService.SaveToolRecords(ToolRecords.ToList());
     }
 
     [RelayCommand]
@@ -76,13 +81,33 @@ public partial class DatabaseViewModel : ObservableObject
             ToolRecords.Remove(SelectedRecord);
             SelectedRecord = null;
             StatusMessage = "Record deleted.";
+            _dataStoreService.SaveToolRecords(ToolRecords.ToList());
         }
     }
 
     [RelayCommand]
     private void SaveDatabase()
     {
-        StatusMessage = "Database saved successfully.";
+        foreach (var record in ToolRecords)
+        {
+            var normalizedType = string.Equals(record.ToolType, "Square", StringComparison.OrdinalIgnoreCase)
+                ? "Square"
+                : "Round";
+
+            record.ToolType = normalizedType;
+            if (normalizedType == "Round")
+            {
+                record.Length = 0;
+                record.Width = 0;
+            }
+            else
+            {
+                record.Diameter = 0;
+            }
+        }
+
+        _dataStoreService.SaveToolRecords(ToolRecords.ToList());
+        StatusMessage = "Database saved successfully. Shape rules applied.";
     }
 
     [RelayCommand]

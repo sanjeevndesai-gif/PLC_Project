@@ -15,7 +15,6 @@ public partial class OverviewViewModel : ObservableObject
     // Axis positions
     [ObservableProperty] private double _posX;
     [ObservableProperty] private double _posY;
-    [ObservableProperty] private double _posZ;
 
     // Machine state
     [ObservableProperty] private string _machineMode = "Manual";
@@ -80,7 +79,6 @@ public partial class OverviewViewModel : ObservableObject
         if (!IsConnected) return;
         PosX = await _controllerService.ReadRegisterAsync(100);
         PosY = await _controllerService.ReadRegisterAsync(101);
-        PosZ = await _controllerService.ReadRegisterAsync(102);
         PunchForce = await _controllerService.ReadRegisterAsync(110);
         AirPressure = 5.8 + (PunchForce % 1.0);
         ProgressPct = TotalStrokes > 0 ? Math.Min(100.0, CompletedStrokes * 100.0 / TotalStrokes) : 0;

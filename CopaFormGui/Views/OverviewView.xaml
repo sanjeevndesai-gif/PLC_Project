@@ -35,7 +35,6 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Controller Status -->
@@ -69,18 +68,8 @@
                 </StackPanel>
             </Border>
 
-            <!-- Air Pressure -->
-            <Border Grid.Column="3" CornerRadius="8" Padding="14,12" Margin="0,0,6,0" Background="#FF6D00">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="Air Pressure" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
-                    <TextBlock Text="{Binding AirPressure, StringFormat={}{0:F1} bar}"
-                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Operating Range" FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
-                </StackPanel>
-            </Border>
-
             <!-- Alarms -->
-            <Border Grid.Column="4" CornerRadius="8" Padding="14,12" Background="#F57F17">
+            <Border Grid.Column="3" CornerRadius="8" Padding="14,12" Background="#F57F17">
                 <StackPanel HorizontalAlignment="Center">
                     <TextBlock Text="Alarms" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
                     <TextBlock Text="{Binding IsAlarmActive, Converter={StaticResource BoolToStatusText}}"
@@ -122,7 +111,7 @@
                     </Border>
 
                     <!-- Y -->
-                    <Border Background="#E8F5E9" CornerRadius="6" Padding="16,12" Margin="0,0,0,8">
+                    <Border Background="#E8F5E9" CornerRadius="6" Padding="16,12">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -138,22 +127,6 @@
                         </Grid>
                     </Border>
 
-                    <!-- Z -->
-                    <Border Background="#FFF3E0" CornerRadius="6" Padding="16,12">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Z" FontSize="36" FontWeight="Bold"
-                                       Foreground="#E65100" VerticalAlignment="Center" Margin="0,0,20,0"/>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding PosZ, StringFormat={}{0:F3}}"
-                                           FontSize="28" FontWeight="Bold" Foreground="#E65100"/>
-                                <TextBlock Text="mm" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
                 </StackPanel>
             </Border>
 

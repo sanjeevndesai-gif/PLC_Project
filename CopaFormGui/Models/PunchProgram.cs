@@ -5,7 +5,6 @@ public class PunchStep
     public int StepNumber { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
-    public double Z { get; set; }
     public int ToolId { get; set; }
     public string Operation { get; set; } = "Punch";
     public bool IsCompleted { get; set; }

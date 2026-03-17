@@ -31,7 +31,6 @@ public partial class MainViewModel : ObservableObject
     private readonly AlarmViewModel _alarmViewModel;
     private readonly ToolManagementViewModel _toolManagementViewModel;
     private readonly IOMonitorViewModel _ioMonitorViewModel;
-    private readonly ProductionViewModel _productionViewModel;
     private readonly ProgramEditorViewModel _programEditorViewModel;
 
     public MainViewModel(
@@ -44,7 +43,6 @@ public partial class MainViewModel : ObservableObject
         AlarmViewModel alarmViewModel,
         ToolManagementViewModel toolManagementViewModel,
         IOMonitorViewModel ioMonitorViewModel,
-        ProductionViewModel productionViewModel,
         ProgramEditorViewModel programEditorViewModel)
     {
         _controllerService = controllerService;
@@ -56,7 +54,6 @@ public partial class MainViewModel : ObservableObject
         _alarmViewModel = alarmViewModel;
         _toolManagementViewModel = toolManagementViewModel;
         _ioMonitorViewModel = ioMonitorViewModel;
-        _productionViewModel = productionViewModel;
         _programEditorViewModel = programEditorViewModel;
 
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
@@ -143,19 +140,26 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ShowProduction()
-    {
-        CurrentView = _productionViewModel;
-        CurrentViewName = "Production";
-        StatusBarMessage = "Production Counter & Shift History";
-    }
-
-    [RelayCommand]
     private void ShowProgramEditor()
     {
-        CurrentView = _programEditorViewModel;
-        CurrentViewName = "Program Editor";
-        StatusBarMessage = "CNC Punch Program Editor";
+        try
+        {
+            App.LogInfo("Navigating to Program Editor");
+            CurrentView = _programEditorViewModel;
+            CurrentViewName = "Program Editor";
+            StatusBarMessage = "CNC Punch Program Editor";
+            App.LogInfo("Program Editor navigation completed");
+        }
+        catch (Exception ex)
+        {
+            App.LogException("ShowProgramEditor", ex);
+            StatusBarMessage = "Program Editor open failed. Check app log.";
+        }
+    }
+
+    partial void OnCurrentViewChanged(ObservableObject? value)
+    {
+        App.LogInfo($"CurrentView changed: {value?.GetType().Name ?? "null"}");
     }
 
     [RelayCommand]

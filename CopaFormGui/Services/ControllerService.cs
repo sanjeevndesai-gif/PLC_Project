@@ -1,3 +1,5 @@
+using System.Net.Sockets;
+
 namespace CopaFormGui.Services;
 
 public class ControllerService : IControllerService
@@ -22,25 +24,40 @@ public class ControllerService : IControllerService
 
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
 
+    private const int ModbusPort = 502;
+    private const int ConnectTimeoutMs = 5000;
+
     public async Task<bool> ConnectAsync(string ipAddress, string userName, string password)
     {
         ConnectionState = ConnectionState.Connecting;
         try
         {
-            // Simulate connection attempt
-            await Task.Delay(1500);
-
-            // Validate basic inputs
             if (string.IsNullOrWhiteSpace(ipAddress) || string.IsNullOrWhiteSpace(userName))
             {
                 ConnectionState = ConnectionState.Error;
                 return false;
             }
 
-            // For demonstration purposes, simulate a successful connection
-            // In production, replace with actual PLC/controller communication (e.g., Modbus TCP)
+            // Real TCP connection to PLC on Modbus TCP port 502
+            using var client = new TcpClient();
+            using var cts = new CancellationTokenSource(ConnectTimeoutMs);
+            await client.ConnectAsync(ipAddress, ModbusPort, cts.Token);
+
+            if (!client.Connected)
+            {
+                ConnectionState = ConnectionState.Error;
+                return false;
+            }
+
+            _connectedIp = ipAddress;
             ConnectionState = ConnectionState.Connected;
             return true;
+        }
+        catch (OperationCanceledException)
+        {
+            // Timeout
+            ConnectionState = ConnectionState.Error;
+            return false;
         }
         catch
         {
@@ -48,6 +65,8 @@ public class ControllerService : IControllerService
             return false;
         }
     }
+
+    private string? _connectedIp;
 
     public void Disconnect()
     {

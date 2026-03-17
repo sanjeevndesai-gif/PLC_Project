@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
@@ -10,13 +11,13 @@ namespace CopaFormGui.Views;
 public partial class ProgramEditorView : System.Windows.Controls.UserControl
 {
     private ProgramEditorViewModel? _vm;
+    private INotifyCollectionChanged? _stepsCollection;
 
     public ProgramEditorView()
     {
         InitializeComponent();
     }
 
-    // Called by XAML Loaded="OnLoaded"
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         if (DataContext is ProgramEditorViewModel vm)
@@ -32,164 +33,186 @@ public partial class ProgramEditorView : System.Windows.Controls.UserControl
     private void AttachViewModel(ProgramEditorViewModel vm)
     {
         if (_vm is not null)
+        {
             _vm.PropertyChanged -= OnVmPropertyChanged;
+            DetachStepsCollectionHandler();
+        }
 
         _vm = vm;
         _vm.PropertyChanged += OnVmPropertyChanged;
-
-        // Build 3-D scene for whatever is already loaded
-        Rebuild3DScene(_vm.Steps);
+        AttachStepsCollectionHandler(_vm.Steps);
+        SafeRebuild3DScene();
     }
 
     private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // Rebuild the 3-D scene whenever the step list is replaced or selection changes
-        if ((e.PropertyName is nameof(ProgramEditorViewModel.Steps) or
-                               nameof(ProgramEditorViewModel.SelectedStep)) &&
-            _vm is not null)
+        if (_vm is null)
+            return;
+
+        if (e.PropertyName is nameof(ProgramEditorViewModel.Steps) or nameof(ProgramEditorViewModel.SelectedStep))
         {
-            Rebuild3DScene(_vm.Steps);
+            if (e.PropertyName == nameof(ProgramEditorViewModel.Steps))
+                AttachStepsCollectionHandler(_vm.Steps);
+
+            SafeRebuild3DScene();
         }
     }
 
-    // =========================================================================
-    // 3-D scene builder
-    // =========================================================================
+    private void AttachStepsCollectionHandler(IEnumerable<PunchStep> steps)
+    {
+        DetachStepsCollectionHandler();
+        if (steps is INotifyCollectionChanged notifyCollectionChanged)
+        {
+            _stepsCollection = notifyCollectionChanged;
+            _stepsCollection.CollectionChanged += OnStepsCollectionChanged;
+        }
+    }
+
+    private void DetachStepsCollectionHandler()
+    {
+        if (_stepsCollection is not null)
+            _stepsCollection.CollectionChanged -= OnStepsCollectionChanged;
+        _stepsCollection = null;
+    }
+
+    private void OnStepsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SafeRebuild3DScene();
+    }
+
+    private void SafeRebuild3DScene()
+    {
+        if (_vm is null)
+            return;
+
+        try
+        {
+            Rebuild3DScene(_vm.Steps);
+        }
+        catch (Exception ex)
+        {
+            _vm.StatusMessage = $"Program preview error: {ex.Message}";
+            App.LogException("ProgramEditorView.SafeRebuild3DScene", ex);
+        }
+    }
 
     private void Rebuild3DScene(IEnumerable<PunchStep> stepsEnumerable)
     {
-        // Remove all geometry models – keep the two lights (children 0 and 1)
+        if (Punch3DScene is null || Punch3DCamera is null)
+            return;
+
         while (Punch3DScene.Children.Count > 2)
             Punch3DScene.Children.RemoveAt(Punch3DScene.Children.Count - 1);
 
         var steps = stepsEnumerable.ToList();
-        if (steps.Count == 0) return;
+        if (steps.Count == 0)
+            return;
 
-        // ── Coordinate mapping ──────────────────────────────────────────────
         double xMin = steps.Min(s => s.X), xMax = steps.Max(s => s.X);
         double yMin = steps.Min(s => s.Y), yMax = steps.Max(s => s.Y);
-        double cx   = (xMin + xMax) / 2.0;
-        double cy   = (yMin + yMax) / 2.0;
+        double cx = (xMin + xMax) / 2.0;
+        double cy = (yMin + yMax) / 2.0;
         double range = Math.Max(Math.Max(xMax - xMin, yMax - yMin), 1.0);
-        double scale = 8.0 / range;          // fit data into ±4 WPF units
+        double scale = 8.0 / range;
 
-        // ── Sheet plate ─────────────────────────────────────────────────────
-        const double SheetPad   = 1.0;       // WPF units around punch cloud
-        const double SheetThick = 0.25;
-
-        double sw = (xMax - xMin) * scale + SheetPad * 2;
-        double sd = (yMax - yMin) * scale + SheetPad * 2;
+        const double sheetPad = 1.0;
+        const double sheetThick = 0.25;
+        double sw = (xMax - xMin) * scale + sheetPad * 2;
+        double sd = (yMax - yMin) * scale + sheetPad * 2;
 
         var sheetMat = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(190, 190, 195)));
         var sheetModel = new GeometryModel3D
         {
-            Geometry     = BuildBox(sw, SheetThick, sd),
-            Material     = sheetMat,
+            Geometry = BuildBox(sw, sheetThick, sd),
+            Material = sheetMat,
             BackMaterial = sheetMat,
-            Transform    = new TranslateTransform3D(0, -SheetThick / 2.0, 0)
+            Transform = new TranslateTransform3D(0, -sheetThick / 2.0, 0)
         };
         Punch3DScene.Children.Add(sheetModel);
 
-        // ── Punch cylinders ─────────────────────────────────────────────────
-        const double CylRadius = 0.20;
-        const double CylHeight = 0.45;
-
-        var normalMat   = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(220, 50, 50)));
+        const double cylRadius = 0.20;
+        const double cylHeight = 0.45;
+        var normalMat = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(220, 50, 50)));
         var selectedMat = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(255, 210, 0)));
 
         foreach (var step in steps)
         {
             double wx = (step.X - cx) * scale;
-            double wz = -(step.Y - cy) * scale;   // Y axis → −Z in WPF 3-D
+            double wz = -(step.Y - cy) * scale;
             bool isSel = step == _vm?.SelectedStep;
 
             var mat = isSel ? selectedMat : normalMat;
             var cyl = new GeometryModel3D
             {
-                Geometry     = BuildCylinder(CylRadius, CylHeight, 12),
-                Material     = mat,
+                Geometry = BuildCylinder(cylRadius, cylHeight, 12),
+                Material = mat,
                 BackMaterial = mat,
-                Transform    = new TranslateTransform3D(wx, CylHeight / 2.0, wz)
+                Transform = new TranslateTransform3D(wx, cylHeight / 2.0, wz)
             };
             Punch3DScene.Children.Add(cyl);
         }
 
-        // ── Camera ──────────────────────────────────────────────────────────
         double camD = Math.Max(sw, sd) * 0.9;
-        Punch3DCamera.Position       = new Point3D(0, camD, camD * 1.3);
-        Punch3DCamera.LookDirection  = new Vector3D(0, -camD, -camD * 1.3);
+        Punch3DCamera.Position = new Point3D(0, camD, camD * 1.3);
+        Punch3DCamera.LookDirection = new Vector3D(0, -camD, -camD * 1.3);
     }
 
-    // ── Mesh helpers ─────────────────────────────────────────────────────────
-
-    /// <summary>Axis-aligned box centred at origin, dimensions w × h × d.</summary>
     private static MeshGeometry3D BuildBox(double w, double h, double d)
     {
         double hw = w / 2, hh = h / 2, hd = d / 2;
-
         var p = new[]
         {
-            new Point3D(-hw, -hh, -hd), // 0
-            new Point3D( hw, -hh, -hd), // 1
-            new Point3D( hw,  hh, -hd), // 2
-            new Point3D(-hw,  hh, -hd), // 3
-            new Point3D(-hw, -hh,  hd), // 4
-            new Point3D( hw, -hh,  hd), // 5
-            new Point3D( hw,  hh,  hd), // 6
-            new Point3D(-hw,  hh,  hd), // 7
+            new Point3D(-hw, -hh, -hd), new Point3D(hw, -hh, -hd),
+            new Point3D(hw, hh, -hd), new Point3D(-hw, hh, -hd),
+            new Point3D(-hw, -hh, hd), new Point3D(hw, -hh, hd),
+            new Point3D(hw, hh, hd), new Point3D(-hw, hh, hd)
         };
 
         var mesh = new MeshGeometry3D();
         foreach (var pt in p) mesh.Positions.Add(pt);
 
-        // Six faces, each as two CCW triangles (with BackMaterial mirroring handles any winding)
         int[] idx =
         {
-            0,1,2, 0,2,3,   // front  (Z = -hd)
-            5,4,7, 5,7,6,   // back   (Z = +hd)
-            4,0,3, 4,3,7,   // left   (X = -hw)
-            1,5,6, 1,6,2,   // right  (X = +hw)
-            3,2,6, 3,6,7,   // top    (Y = +hh)
-            4,5,1, 4,1,0,   // bottom (Y = -hh)
+            0,1,2, 0,2,3,
+            5,4,7, 5,7,6,
+            4,0,3, 4,3,7,
+            1,5,6, 1,6,2,
+            3,2,6, 3,6,7,
+            4,5,1, 4,1,0
         };
         foreach (var i in idx) mesh.TriangleIndices.Add(i);
         return mesh;
     }
 
-    /// <summary>Upright cylinder centred at origin, capped top and bottom.</summary>
     private static MeshGeometry3D BuildCylinder(double radius, double height, int sides)
     {
         var mesh = new MeshGeometry3D();
         double hh = height / 2;
 
-        // Centre caps
-        mesh.Positions.Add(new Point3D(0, -hh, 0)); // 0 – bottom centre
-        mesh.Positions.Add(new Point3D(0,  hh, 0)); // 1 – top centre
+        mesh.Positions.Add(new Point3D(0, -hh, 0));
+        mesh.Positions.Add(new Point3D(0, hh, 0));
 
-        // Rim vertices (bottom then top, interleaved)
         for (int i = 0; i < sides; i++)
         {
             double a = 2 * Math.PI * i / sides;
             double x = radius * Math.Cos(a);
             double z = radius * Math.Sin(a);
-            mesh.Positions.Add(new Point3D(x, -hh, z)); // 2 + 2*i   bottom rim
-            mesh.Positions.Add(new Point3D(x,  hh, z)); // 2 + 2*i+1 top rim
+            mesh.Positions.Add(new Point3D(x, -hh, z));
+            mesh.Positions.Add(new Point3D(x, hh, z));
         }
 
         for (int i = 0; i < sides; i++)
         {
             int next = (i + 1) % sides;
-            int b0 = 2 + 2 * i,    b1 = 2 + 2 * next;
-            int t0 = b0 + 1,        t1 = b1 + 1;
+            int b0 = 2 + 2 * i, b1 = 2 + 2 * next;
+            int t0 = b0 + 1, t1 = b1 + 1;
 
-            // Side quad
             mesh.TriangleIndices.Add(b0); mesh.TriangleIndices.Add(b1); mesh.TriangleIndices.Add(t0);
             mesh.TriangleIndices.Add(t0); mesh.TriangleIndices.Add(b1); mesh.TriangleIndices.Add(t1);
-            // Bottom cap
-            mesh.TriangleIndices.Add(0);  mesh.TriangleIndices.Add(b1); mesh.TriangleIndices.Add(b0);
-            // Top cap
-            mesh.TriangleIndices.Add(1);  mesh.TriangleIndices.Add(t0); mesh.TriangleIndices.Add(t1);
+            mesh.TriangleIndices.Add(0); mesh.TriangleIndices.Add(b1); mesh.TriangleIndices.Add(b0);
+            mesh.TriangleIndices.Add(1); mesh.TriangleIndices.Add(t0); mesh.TriangleIndices.Add(t1);
         }
+
         return mesh;
     }
 }

@@ -15,18 +15,14 @@ public partial class SettingsViewModel : ObservableObject
     // Speed Settings
     [ObservableProperty] private double _speedX = 1000.0;
     [ObservableProperty] private double _speedY = 1000.0;
-    [ObservableProperty] private double _speedZ = 500.0;
     [ObservableProperty] private double _speedXHand = 200.0;
     [ObservableProperty] private double _speedYHand = 200.0;
-    [ObservableProperty] private double _speedZHand = 100.0;
 
     // Position Limits
     [ObservableProperty] private double _xMin = 0.0;
     [ObservableProperty] private double _xMax = 1000.0;
     [ObservableProperty] private double _yMin = 0.0;
     [ObservableProperty] private double _yMax = 600.0;
-    [ObservableProperty] private double _zMin = 0.0;
-    [ObservableProperty] private double _zMax = 200.0;
 
     // Tool Lengths
     [ObservableProperty] private double _toolLength1 = 50.0;
@@ -36,7 +32,6 @@ public partial class SettingsViewModel : ObservableObject
     // Home Positions
     [ObservableProperty] private double _homeX = 0.0;
     [ObservableProperty] private double _homeY = 0.0;
-    [ObservableProperty] private double _homeZ = 100.0;
 
     // Safety
     [ObservableProperty] private double _safetyHeight = 50.0;
@@ -56,13 +51,12 @@ public partial class SettingsViewModel : ObservableObject
 
     private void LoadFromSettings(MachineSettings s)
     {
-        SpeedX = s.SpeedX; SpeedY = s.SpeedY; SpeedZ = s.SpeedZ;
-        SpeedXHand = s.SpeedXHand; SpeedYHand = s.SpeedYHand; SpeedZHand = s.SpeedZHand;
+        SpeedX = s.SpeedX; SpeedY = s.SpeedY;
+        SpeedXHand = s.SpeedXHand; SpeedYHand = s.SpeedYHand;
         XMin = s.XMin; XMax = s.XMax;
         YMin = s.YMin; YMax = s.YMax;
-        ZMin = s.ZMin; ZMax = s.ZMax;
         ToolLength1 = s.ToolLength1; ToolLength2 = s.ToolLength2; ToolLength3 = s.ToolLength3;
-        HomeX = s.HomeX; HomeY = s.HomeY; HomeZ = s.HomeZ;
+        HomeX = s.HomeX; HomeY = s.HomeY;
         SafetyHeight = s.SafetyHeight; ClampForce = s.ClampForce;
     }
 
@@ -71,11 +65,11 @@ public partial class SettingsViewModel : ObservableObject
     {
         _settingsService.SaveSettings(new MachineSettings
         {
-            SpeedX = SpeedX, SpeedY = SpeedY, SpeedZ = SpeedZ,
-            SpeedXHand = SpeedXHand, SpeedYHand = SpeedYHand, SpeedZHand = SpeedZHand,
-            XMin = XMin, XMax = XMax, YMin = YMin, YMax = YMax, ZMin = ZMin, ZMax = ZMax,
+            SpeedX = SpeedX, SpeedY = SpeedY,
+            SpeedXHand = SpeedXHand, SpeedYHand = SpeedYHand,
+            XMin = XMin, XMax = XMax, YMin = YMin, YMax = YMax,
             ToolLength1 = ToolLength1, ToolLength2 = ToolLength2, ToolLength3 = ToolLength3,
-            HomeX = HomeX, HomeY = HomeY, HomeZ = HomeZ,
+            HomeX = HomeX, HomeY = HomeY,
             SafetyHeight = SafetyHeight, ClampForce = ClampForce
         });
         StatusMessage = "Settings saved successfully.";

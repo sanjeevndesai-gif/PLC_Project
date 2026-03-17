@@ -118,9 +118,12 @@
             <Style x:Key="InputPasswordBoxStyle" TargetType="PasswordBox">
                 <Setter Property="Padding"         Value="8,6"/>
                 <Setter Property="FontSize"        Value="13"/>
+                <Setter Property="Foreground"      Value="#212121"/>
+                <Setter Property="MinHeight"       Value="34"/>
                 <Setter Property="BorderBrush"     Value="{StaticResource BorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Background"      Value="White"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="PasswordBox">
@@ -128,8 +131,15 @@
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="4">
-                                <ScrollViewer x:Name="PART_ContentHost" Margin="2"/>
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                             </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

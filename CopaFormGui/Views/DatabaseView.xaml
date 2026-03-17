@@ -53,10 +53,7 @@
                     <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"         Width="90"  IsReadOnly="False"/>
                     <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}" Width="80"  IsReadOnly="False"/>
                     <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"   Width="90"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Stroke L."   Binding="{Binding StrokeLength, StringFormat={}{0:F1}}" Width="80" IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Max Strokes" Binding="{Binding MaxStrokes}"       Width="90"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Current"     Binding="{Binding CurrentStrokes}"   Width="70"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Status"      Binding="{Binding Status}"           Width="70"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Width (mm)"  Binding="{Binding Width, StringFormat={}{0:F1}}"    Width="90"  IsReadOnly="False"/>
                     <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"            Width="*"   IsReadOnly="False"/>
                 </DataGrid.Columns>
             </DataGrid>

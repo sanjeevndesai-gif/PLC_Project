@@ -81,8 +81,6 @@
                                 Style="{StaticResource SuccessButtonStyle}" Height="36" Margin="0,0,0,6"/>
                         <Button Content="&#x25FC; Stop" Command="{Binding StopProgramCommand}"
                                 Style="{StaticResource DangerButtonStyle}" Height="36" Margin="0,0,0,6"/>
-                        <Button Content="Single Punch" Command="{Binding SinglePunchCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}" Height="36" Margin="0,0,0,6"/>
                         <Button Content="&#x26A0; E-STOP" Command="{Binding EmergencyStopCommand}"
                                 Background="Red" Foreground="White" Height="44" FontWeight="Bold" FontSize="14"
                                 Style="{StaticResource BaseButtonStyle}"/>
@@ -109,7 +107,6 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <!-- X -->
                             <Border Grid.Column="0" Background="#E3F2FD" CornerRadius="6" Padding="12" Margin="0,0,8,0">
@@ -129,15 +126,6 @@
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
-                            <!-- Z -->
-                            <Border Grid.Column="2" Background="#FFF3E0" CornerRadius="6" Padding="12">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <TextBlock Text="Z Axis" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding PosZ, StringFormat={}{0:F3}}"
-                                               FontSize="22" FontWeight="Bold" Foreground="#E65100"
-                                               HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -152,8 +140,6 @@
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="X:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
@@ -162,10 +148,7 @@
                             <TextBlock Grid.Column="2" Text="Y:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                             <TextBox Grid.Column="3" Text="{Binding TargetY, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
-                            <TextBlock Grid.Column="4" Text="Z:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox Grid.Column="5" Text="{Binding TargetZ, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
-                            <Button Grid.Column="6" Content="Move" Command="{Binding MoveToTargetCommand}"
+                            <Button Grid.Column="4" Content="Move" Command="{Binding MoveToTargetCommand}"
                                     Style="{StaticResource PrimaryButtonStyle}" Width="80"/>
                         </Grid>
                     </StackPanel>

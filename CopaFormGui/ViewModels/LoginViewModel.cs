@@ -64,7 +64,7 @@ public partial class LoginViewModel : ObservableObject
         else
         {
             HasError = true;
-            StatusMessage = "Unable to Connect – Check for Connection";
+            StatusMessage = $"Cannot connect to PLC at {IpAddress}:502 — Check IP address, network cable, and that the PLC is powered on.";
         }
     }
 

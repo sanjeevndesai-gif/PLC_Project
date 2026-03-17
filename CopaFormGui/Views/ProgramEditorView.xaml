@@ -61,7 +61,7 @@
                                     <TextBlock Text="{Binding Description}" FontSize="11"
                                                Foreground="{StaticResource TextSecondaryBrush}"/>
                                     <TextBlock FontSize="10" Foreground="{StaticResource TextSecondaryBrush}">
-                                        <Run Text="{Binding TotalStrokes}"/>
+                                        <Run Text="{Binding TotalStrokes, Mode=OneWay}"/>
                                         <Run Text=" steps"/>
                                     </TextBlock>
                                 </StackPanel>
@@ -108,7 +108,6 @@
                             <DataGridTextColumn Header="#"    Binding="{Binding StepNumber}"                  Width="40"/>
                             <DataGridTextColumn Header="X"   Binding="{Binding X,  StringFormat={}{0:F3}}"   Width="80"/>
                             <DataGridTextColumn Header="Y"   Binding="{Binding Y,  StringFormat={}{0:F3}}"   Width="80"/>
-                            <DataGridTextColumn Header="Z"   Binding="{Binding Z,  StringFormat={}{0:F3}}"   Width="80"/>
                             <DataGridTextColumn Header="Tool" Binding="{Binding ToolId}"                      Width="50"/>
                             <DataGridTextColumn Header="Op"  Binding="{Binding Operation}"                   Width="*"/>
                             <DataGridCheckBoxColumn Header="Done" Binding="{Binding IsCompleted}"             Width="50"/>
@@ -129,10 +128,6 @@
 
                         <TextBlock Text="Y Position (mm)" Style="{StaticResource FormLabelStyle}"/>
                         <TextBox Text="{Binding EditY, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
-
-                        <TextBlock Text="Z Position (mm)" Style="{StaticResource FormLabelStyle}"/>
-                        <TextBox Text="{Binding EditZ, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource InputTextBoxStyle}" Margin="0,0,0,10"/>
 
                         <TextBlock Text="Tool ID" Style="{StaticResource FormLabelStyle}"/>
@@ -217,7 +212,6 @@
 
             <!-- ───────────────── 3-D PERSPECTIVE PREVIEW ───────────────── -->
             <TabItem Header="3D Punch Preview">
-                <!-- Viewport3D has no Background; wrap in a Border for the dark fill -->
                 <Border Background="#0D1B2A">
                     <Viewport3D x:Name="Punch3DViewport" ClipToBounds="True">
                         <Viewport3D.Camera>

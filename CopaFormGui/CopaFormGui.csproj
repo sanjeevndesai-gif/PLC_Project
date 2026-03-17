@@ -17,4 +17,31 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="ODT.PowerPmacComLib">
+      <HintPath>lib\PMAC\ODT.PowerPmacComLib.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="ODT.Common">
+      <HintPath>lib\PMAC\ODT.Common.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="ODT.PMACGlobal">
+      <HintPath>lib\PMAC\ODT.PMACGlobal.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Renci.SshNet">
+      <HintPath>lib\PMAC\Renci.SshNet.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>lib\PMAC\Ninject.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Prism">
+      <HintPath>lib\PMAC\Prism.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
 </Project>

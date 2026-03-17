@@ -7,6 +7,7 @@ public class ToolRecord
     public string ToolType { get; set; } = string.Empty;
     public double Diameter { get; set; }
     public double Length { get; set; }
+    public double Width { get; set; }
     public double StrokeLength { get; set; }
     public int MaxStrokes { get; set; }
     public int CurrentStrokes { get; set; }
