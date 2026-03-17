@@ -24,10 +24,14 @@ The Program Editor screen includes a live punch-hole visualisation panel with tw
 
 | Tab | What it shows |
 |-----|---------------|
-| **2D Punch Preview** | Sheet plate (white rectangle) on a blue canvas. Each punch step is drawn as a red circle, auto-scaled and centred. X/Y axis arrows in the lower-left. |
-| **3D Punch Preview** | Perspective `Viewport3D` scene: grey steel slab + red cylinders at every punch position. Selected step highlights in yellow. Uses WPF-native 3-D – no extra packages. |
+| **2D Punch Preview** | Light-blue canvas with a white sheet-plate rectangle. Each punch step is drawn as a red circle, auto-scaled and centred. X/Y axis arrows in the lower-left corner. |
+| **3D Punch Preview** | Dark-background `Viewport3D` perspective scene: grey steel slab + red punch-marker cylinders. Selected step highlights yellow. X/Y/Z axis labels shown. Uses WPF-native 3-D – no extra packages. |
 
 The preview updates automatically whenever a step is added, edited, saved, or deleted.
+
+| 2D Preview | 3D Preview |
+|:---:|:---:|
+| ![2D](https://github.com/user-attachments/assets/0011dfa9-9286-4bbd-978d-189fadeb407b) | ![3D](https://github.com/user-attachments/assets/d3d132e4-0879-462d-a08a-b3df58a7033f) |
 
 ## Publish EXE (Windows)
 
@@ -180,24 +184,24 @@ Axis travel limits (min/max for X, Y, Z) and home positions configuration.
 
 ### Screen 8 – Program Editor: 2D Punch Preview
 
-The Program Editor bottom panel now includes a **2D Punch Preview** tab.  
-It renders the sheet plate as a white rectangle on a blue canvas with all punch-hole
+The Program Editor bottom panel includes a **2D Punch Preview** tab.  
+It renders the sheet plate as a white rectangle on a light-blue canvas with all punch-hole
 positions drawn as red circles, automatically scaled and centred to fit.
-X/Y axis arrows appear in the lower-left corner.
+X/Y axis arrows appear in the lower-left corner.  
+The preview updates live whenever a step is added, edited, saved, or deleted.
 
-![Program Editor – 2D Punch Preview](https://github.com/user-attachments/assets/7e13ac88-5750-49bb-af8e-944c2b3730c7)
+![Program Editor – 2D Punch Preview](https://github.com/user-attachments/assets/0011dfa9-9286-4bbd-978d-189fadeb407b)
 
 ---
 
 ### Screen 9 – Program Editor: 3D Punch Preview
 
-Switch to the **3D Punch Preview** tab to see a perspective view of the same program.  
-The steel sheet is rendered as a 3-D slab (grey) with red cylinders standing at every
-punch position. Selected steps highlight in yellow. The scene uses WPF native
-`Viewport3D` — no third-party libraries required.  
-X / Y / Z axis labels are shown at the edges of the scene.
+Switch to the **3D Punch Preview** tab for a perspective view of the same program.  
+The steel sheet is rendered as a 3-D slab (grey) with red cylinders at every punch position.
+Selected steps highlight in yellow. The scene uses WPF native `Viewport3D` — no
+third-party libraries required. X / Y / Z axis labels are shown at the edges of the scene.
 
-![Program Editor – 3D Punch Preview](https://github.com/user-attachments/assets/d5ac5a3c-033c-43c0-957b-7443d2939a05)
+![Program Editor – 3D Punch Preview](https://github.com/user-attachments/assets/d3d132e4-0879-462d-a08a-b3df58a7033f)
 
 ---
 
