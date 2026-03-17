@@ -113,10 +113,10 @@ public partial class ProgramEditorViewModel : ObservableObject
         SelectedStep.Z = EditZ;
         SelectedStep.ToolId = EditToolId;
         SelectedStep.Operation = EditOperation;
-        // Refresh the list binding
         var idx = Steps.IndexOf(SelectedStep);
         if (idx >= 0) { Steps[idx] = SelectedStep; }
         StatusMessage = $"Step {SelectedStep.StepNumber} saved.";
+        RefreshPreview();
     }
 
     [RelayCommand]
@@ -133,6 +133,7 @@ public partial class ProgramEditorViewModel : ObservableObject
         SelectedProgram.Steps.Add(step);
         SelectedStep = step;
         StatusMessage = $"Step {step.StepNumber} added.";
+        RefreshPreview();
     }
 
     [RelayCommand]
@@ -141,10 +142,10 @@ public partial class ProgramEditorViewModel : ObservableObject
         if (SelectedStep is null) { StatusMessage = "No step selected."; return; }
         SelectedProgram?.Steps.Remove(SelectedStep);
         Steps.Remove(SelectedStep);
-        // Renumber
         for (int i = 0; i < Steps.Count; i++) Steps[i].StepNumber = i + 1;
         SelectedStep = null;
         StatusMessage = "Step deleted and list renumbered.";
+        RefreshPreview();
     }
 
     [RelayCommand]
@@ -170,5 +171,66 @@ public partial class ProgramEditorViewModel : ObservableObject
         SelectedProgram.Description = EditDescription;
         SelectedProgram.ModifiedDate = DateTime.Now;
         StatusMessage = $"Program {SelectedProgram.ProgramName} saved.";
+    }
+
+    // -------------------------------------------------------------------------
+    // 2-D preview – virtual canvas 800 × 150 px
+    // -------------------------------------------------------------------------
+    public void RefreshPreview()
+    {
+        // Reserve left margin for axis arrows; small margins on other sides
+        const double DrawLeft = 90, DrawTop = 12, DrawRight = 786, DrawBottom = 132;
+        double availW = DrawRight - DrawLeft;
+        double availH = DrawBottom - DrawTop;
+
+        var pts = Steps.ToList();
+
+        if (pts.Count == 0)
+        {
+            PreviewSheetLeft   = DrawLeft;
+            PreviewSheetTop    = DrawTop;
+            PreviewSheetWidth  = availW;
+            PreviewSheetHeight = availH;
+            PreviewPoints = new ObservableCollection<PunchPreviewPoint>();
+            return;
+        }
+
+        double xMin = pts.Min(s => s.X), xMax = pts.Max(s => s.X);
+        double yMin = pts.Min(s => s.Y), yMax = pts.Max(s => s.Y);
+
+        // Pad the bounding box so holes are never on the sheet edge
+        const double Pad = 15.0;
+        double pxMin = xMin - Pad, pxMax = xMax + Pad;
+        double pyMin = yMin - Pad, pyMax = yMax + Pad;
+        double dataW = pxMax - pxMin, dataH = pyMax - pyMin;
+
+        // Uniform scale – fit the sheet inside the available area
+        double scale = Math.Min(
+            dataW > 0 ? availW / dataW : 1.0,
+            dataH > 0 ? availH / dataH : 1.0);
+
+        double sheetW = dataW * scale;
+        double sheetH = dataH * scale;
+
+        // Centre the sheet inside the available drawing area
+        double sheetLeft = DrawLeft + (availW - sheetW) / 2;
+        double sheetTop  = DrawTop  + (availH - sheetH) / 2;
+
+        PreviewSheetLeft   = sheetLeft;
+        PreviewSheetTop    = sheetTop;
+        PreviewSheetWidth  = sheetW;
+        PreviewSheetHeight = sheetH;
+
+        var points = new ObservableCollection<PunchPreviewPoint>();
+        foreach (var s in pts)
+        {
+            points.Add(new PunchPreviewPoint
+            {
+                CanvasX    = sheetLeft + (s.X - pxMin) * scale,
+                CanvasY    = sheetTop  + (pyMax - s.Y) * scale,  // Y flipped
+                IsSelected = s == SelectedStep
+            });
+        }
+        PreviewPoints = points;
     }
 }

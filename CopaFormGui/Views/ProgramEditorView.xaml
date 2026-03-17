@@ -3,20 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             Loaded="OnLoaded">
     <Grid Margin="4">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>   <!-- header         -->
+            <RowDefinition Height="*"/>      <!-- main content   -->
+            <RowDefinition Height="200"/>    <!-- preview tabs   -->
+            <RowDefinition Height="Auto"/>   <!-- footer status  -->
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
+        <!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6"
+                Padding="16,10" Margin="0,0,0,8">
             <Grid>
                 <StackPanel>
-                    <TextBlock Text="Program Editor – CNC Punch Sequence" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock Text="Select a program then add, edit or delete steps" FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
+                    <TextBlock Text="Program Editor – CNC Punch Sequence"
+                               FontSize="18" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="Select a program then add, edit or delete steps"
+                               FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Ellipse Width="16" Height="16" Margin="0,0,6,0"
@@ -27,7 +32,7 @@
             </Grid>
         </Border>
 
-        <!-- Main Content -->
+        <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="220"/>
@@ -38,7 +43,8 @@
             <!-- Program List -->
             <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="Programs" Style="{StaticResource SectionHeaderStyle}" Margin="4,0,0,8"/>
+                    <TextBlock DockPanel.Dock="Top" Text="Programs"
+                               Style="{StaticResource SectionHeaderStyle}" Margin="4,0,0,8"/>
                     <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
                         <Button Content="+ New Program" Command="{Binding NewProgramCommand}"
                                 Style="{StaticResource PrimaryButtonStyle}" Height="32" Margin="0,0,0,4"/>
@@ -68,7 +74,6 @@
             <!-- Step Table -->
             <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,0,6,0" Padding="8">
                 <DockPanel>
-                    <!-- Program header edit row -->
                     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
                         <TextBlock Text="Program Details" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,6"/>
                         <Grid>
@@ -78,16 +83,21 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Name:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox  Grid.Column="1" Text="{Binding EditProgramName, UpdateSourceTrigger=PropertyChanged}"
-                                      Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
-                            <TextBlock Grid.Column="2" Text="Description:" Style="{StaticResource FormLabelStyle}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox  Grid.Column="3" Text="{Binding EditDescription, UpdateSourceTrigger=PropertyChanged}"
-                                      Style="{StaticResource InputTextBoxStyle}"/>
+                            <TextBlock Grid.Column="0" Text="Name:" Style="{StaticResource FormLabelStyle}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox   Grid.Column="1"
+                                       Text="{Binding EditProgramName, UpdateSourceTrigger=PropertyChanged}"
+                                       Style="{StaticResource InputTextBoxStyle}" Margin="0,0,12,0"/>
+                            <TextBlock Grid.Column="2" Text="Description:" Style="{StaticResource FormLabelStyle}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox   Grid.Column="3"
+                                       Text="{Binding EditDescription, UpdateSourceTrigger=PropertyChanged}"
+                                       Style="{StaticResource InputTextBoxStyle}"/>
                         </Grid>
                     </StackPanel>
 
-                    <TextBlock DockPanel.Dock="Top" Text="Steps" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,6"/>
+                    <TextBlock DockPanel.Dock="Top" Text="Steps"
+                               Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,6"/>
                     <DataGrid ItemsSource="{Binding Steps}"
                               SelectedItem="{Binding SelectedStep}"
                               AutoGenerateColumns="False"
@@ -95,13 +105,13 @@
                               SelectionMode="Single"
                               IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="#"    Binding="{Binding StepNumber}" Width="40"/>
-                            <DataGridTextColumn Header="X"   Binding="{Binding X, StringFormat={}{0:F3}}" Width="80"/>
-                            <DataGridTextColumn Header="Y"   Binding="{Binding Y, StringFormat={}{0:F3}}" Width="80"/>
-                            <DataGridTextColumn Header="Z"   Binding="{Binding Z, StringFormat={}{0:F3}}" Width="80"/>
-                            <DataGridTextColumn Header="Tool" Binding="{Binding ToolId}"    Width="50"/>
-                            <DataGridTextColumn Header="Op"  Binding="{Binding Operation}"  Width="*"/>
-                            <DataGridCheckBoxColumn Header="Done" Binding="{Binding IsCompleted}" Width="50"/>
+                            <DataGridTextColumn Header="#"    Binding="{Binding StepNumber}"                  Width="40"/>
+                            <DataGridTextColumn Header="X"   Binding="{Binding X,  StringFormat={}{0:F3}}"   Width="80"/>
+                            <DataGridTextColumn Header="Y"   Binding="{Binding Y,  StringFormat={}{0:F3}}"   Width="80"/>
+                            <DataGridTextColumn Header="Z"   Binding="{Binding Z,  StringFormat={}{0:F3}}"   Width="80"/>
+                            <DataGridTextColumn Header="Tool" Binding="{Binding ToolId}"                      Width="50"/>
+                            <DataGridTextColumn Header="Op"  Binding="{Binding Operation}"                   Width="*"/>
+                            <DataGridCheckBoxColumn Header="Done" Binding="{Binding IsCompleted}"             Width="50"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -134,21 +144,108 @@
                                   SelectedItem="{Binding EditOperation}"
                                   Padding="8,6" FontSize="13" Margin="0,0,0,16"/>
 
-                        <Button Content="Save Step" Command="{Binding SaveStepCommand}"
+                        <Button Content="Save Step"   Command="{Binding SaveStepCommand}"
                                 Style="{StaticResource SuccessButtonStyle}" Height="36" Margin="0,0,0,6"/>
-                        <Button Content="+ Add Step" Command="{Binding AddStepCommand}"
+                        <Button Content="+ Add Step"  Command="{Binding AddStepCommand}"
                                 Style="{StaticResource PrimaryButtonStyle}" Height="36" Margin="0,0,0,6"/>
                         <Button Content="Delete Step" Command="{Binding DeleteStepCommand}"
-                                Style="{StaticResource DangerButtonStyle}" Height="32"/>
+                                Style="{StaticResource DangerButtonStyle}"  Height="32"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
         </Grid>
 
-        <!-- Footer Status -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
+        <!-- ═══════════════ PREVIEW TABS (2-D flat  |  3-D perspective) ════════ -->
+        <TabControl Grid.Row="2" Margin="0,8,0,0"
+                    BorderThickness="1" BorderBrush="{StaticResource BorderBrush}">
+
+            <!-- ───────────────── 2-D FLAT PREVIEW ───────────────── -->
+            <TabItem Header="2D Punch Preview">
+                <Border Background="#E3F2FD" ClipToBounds="True">
+                    <!-- Virtual canvas 800×150: all coords are computed in the ViewModel -->
+                    <Viewbox Stretch="Fill">
+                        <Canvas Width="800" Height="150">
+
+                            <!-- Sheet plate outline -->
+                            <Rectangle Canvas.Left="{Binding PreviewSheetLeft}"
+                                       Canvas.Top="{Binding PreviewSheetTop}"
+                                       Width="{Binding PreviewSheetWidth}"
+                                       Height="{Binding PreviewSheetHeight}"
+                                       Fill="White" Stroke="#9E9E9E" StrokeThickness="1.5"/>
+
+                            <!-- Punch-hole circles from ViewModel -->
+                            <ItemsControl ItemsSource="{Binding PreviewPoints}"
+                                          Width="800" Height="150">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas Width="800" Height="150"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding CanvasX}"/>
+                                        <Setter Property="Canvas.Top"  Value="{Binding CanvasY}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Ellipse Width="12" Height="12" Margin="-6,-6,0,0"
+                                                 Stroke="#E53935" StrokeThickness="1.5"
+                                                 Fill="Transparent"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- X axis arrow -->
+                            <Line X1="16" Y1="136" X2="66" Y2="136"
+                                  Stroke="#1565C0" StrokeThickness="1.5"/>
+                            <Polygon Points="66,133 76,136 66,139" Fill="#1565C0"/>
+                            <TextBlock Canvas.Left="79" Canvas.Top="129" Text="X"
+                                       FontSize="11" FontWeight="Bold" Foreground="#1565C0"/>
+
+                            <!-- Y axis arrow -->
+                            <Line X1="16" Y1="136" X2="16" Y2="86"
+                                  Stroke="#1565C0" StrokeThickness="1.5"/>
+                            <Polygon Points="13,86 16,76 19,86" Fill="#1565C0"/>
+                            <TextBlock Canvas.Left="20" Canvas.Top="73" Text="Y"
+                                       FontSize="11" FontWeight="Bold" Foreground="#1565C0"/>
+
+                        </Canvas>
+                    </Viewbox>
+                </Border>
+            </TabItem>
+
+            <!-- ───────────────── 3-D PERSPECTIVE PREVIEW ───────────────── -->
+            <TabItem Header="3D Punch Preview">
+                <!-- Viewport3D has no Background; wrap in a Border for the dark fill -->
+                <Border Background="#0D1B2A">
+                    <Viewport3D x:Name="Punch3DViewport" ClipToBounds="True">
+                        <Viewport3D.Camera>
+                            <PerspectiveCamera x:Name="Punch3DCamera"
+                                               Position="0,6,10"
+                                               LookDirection="0,-4,-8"
+                                               UpDirection="0,1,0"
+                                               FieldOfView="50"/>
+                        </Viewport3D.Camera>
+                        <ModelVisual3D>
+                            <ModelVisual3D.Content>
+                                <Model3DGroup x:Name="Punch3DScene">
+                                    <AmbientLight  Color="#606060"/>
+                                    <DirectionalLight Color="#FFFFFF" Direction="0.5,-1,-0.8"/>
+                                </Model3DGroup>
+                            </ModelVisual3D.Content>
+                        </ModelVisual3D>
+                    </Viewport3D>
+                </Border>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- ═══════════════════════════ FOOTER STATUS ═══════════════════════════ -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
             <TextBlock Text="{Binding StatusMessage}" FontSize="12"
                        Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
         </Border>
+
     </Grid>
 </UserControl>

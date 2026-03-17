@@ -18,6 +18,17 @@ dotnet build CopaFormGui/CopaFormGui.csproj
 dotnet run --project CopaFormGui/CopaFormGui.csproj
 ```
 
+## Program Editor – 2D & 3D Punch Preview
+
+The Program Editor screen includes a live punch-hole visualisation panel with two tabs:
+
+| Tab | What it shows |
+|-----|---------------|
+| **2D Punch Preview** | Sheet plate (white rectangle) on a blue canvas. Each punch step is drawn as a red circle, auto-scaled and centred. X/Y axis arrows in the lower-left. |
+| **3D Punch Preview** | Perspective `Viewport3D` scene: grey steel slab + red cylinders at every punch position. Selected step highlights in yellow. Uses WPF-native 3-D – no extra packages. |
+
+The preview updates automatically whenever a step is added, edited, saved, or deleted.
+
 ## Publish EXE (Windows)
 
 ```bash
@@ -167,6 +178,29 @@ Axis travel limits (min/max for X, Y, Z) and home positions configuration.
 
 ---
 
+### Screen 8 – Program Editor: 2D Punch Preview
+
+The Program Editor bottom panel now includes a **2D Punch Preview** tab.  
+It renders the sheet plate as a white rectangle on a blue canvas with all punch-hole
+positions drawn as red circles, automatically scaled and centred to fit.
+X/Y axis arrows appear in the lower-left corner.
+
+![Program Editor – 2D Punch Preview](https://github.com/user-attachments/assets/7e13ac88-5750-49bb-af8e-944c2b3730c7)
+
+---
+
+### Screen 9 – Program Editor: 3D Punch Preview
+
+Switch to the **3D Punch Preview** tab to see a perspective view of the same program.  
+The steel sheet is rendered as a 3-D slab (grey) with red cylinders standing at every
+punch position. Selected steps highlight in yellow. The scene uses WPF native
+`Viewport3D` — no third-party libraries required.  
+X / Y / Z axis labels are shown at the edges of the scene.
+
+![Program Editor – 3D Punch Preview](https://github.com/user-attachments/assets/d5ac5a3c-033c-43c0-957b-7443d2939a05)
+
+---
+
 ## Project Structure
 
 ```
@@ -174,15 +208,21 @@ CopaFormGui/
 ├── Models/
 │   ├── AlarmRecord.cs
 │   ├── ConnectionSettings.cs
+│   ├── LicenseFile.cs
 │   ├── MachineSettings.cs
+│   ├── PunchPreviewPoint.cs
 │   ├── PunchProgram.cs
 │   └── ToolRecord.cs
 ├── Services/
 │   ├── IControllerService.cs / ControllerService.cs
+│   ├── ILicenseService.cs / LicenseService.cs
+│   ├── LicenseCrypto.cs
+│   ├── LicenseValidationResult.cs
 │   └── ISettingsService.cs  / SettingsService.cs
 ├── ViewModels/
 │   ├── LoginViewModel.cs
 │   ├── MainViewModel.cs
+│   ├── ProgramEditorViewModel.cs
 │   ├── PunchingViewModel.cs
 │   ├── DatabaseViewModel.cs
 │   ├── SettingsViewModel.cs
@@ -190,6 +230,8 @@ CopaFormGui/
 │   └── AlarmViewModel.cs
 ├── Views/
 │   ├── LoginWindow.xaml
+│   ├── ProgramEditorView.xaml
+│   ├── ProgramEditorView.xaml.cs
 │   ├── PunchingView.xaml
 │   ├── DatabaseView.xaml
 │   ├── SettingsView.xaml
