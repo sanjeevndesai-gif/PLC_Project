@@ -18,8 +18,17 @@ public partial class App : Application
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
 
-        var loginWindow = Services.GetRequiredService<LoginWindow>();
-        loginWindow.Show();
+        var licenseService = Services.GetRequiredService<ILicenseService>();
+        if (licenseService.IsLicenseValid())
+        {
+            var loginWindow = Services.GetRequiredService<LoginWindow>();
+            loginWindow.Show();
+        }
+        else
+        {
+            var activationWindow = Services.GetRequiredService<LicenseActivationWindow>();
+            activationWindow.Show();
+        }
     }
 
     private static void ConfigureServices(ServiceCollection services)
@@ -27,9 +36,11 @@ public partial class App : Application
         // Services
         services.AddSingleton<IControllerService, ControllerService>();
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<ILicenseService, LicenseService>();
 
         // ViewModels
         services.AddSingleton<LoginViewModel>();
+        services.AddSingleton<LicenseActivationViewModel>();
         services.AddSingleton<OverviewViewModel>();
         services.AddSingleton<DatabaseViewModel>();
         services.AddSingleton<SettingsViewModel>();
@@ -44,6 +55,7 @@ public partial class App : Application
 
         // Views
         services.AddTransient<LoginWindow>();
+        services.AddTransient<LicenseActivationWindow>();
         services.AddSingleton<MainWindow>();
     }
 }

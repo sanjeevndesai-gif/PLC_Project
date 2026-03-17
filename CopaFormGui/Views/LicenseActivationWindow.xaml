@@ -1,0 +1,81 @@
+<Window x:Class="CopaFormGui.Views.LicenseActivationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:CopaFormGui.ViewModels"
+        mc:Ignorable="d"
+        Title="Copa Form – License Activation"
+        Height="400" Width="460"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Banner -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Copa Form"
+                           FontSize="28" FontWeight="Bold"
+                           Foreground="White" HorizontalAlignment="Center"/>
+                <TextBlock Text="License Activation Required"
+                           FontSize="12" Foreground="#BBDEFB"
+                           HorizontalAlignment="Center" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Content -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="24,16,24,8">
+            <StackPanel>
+                <TextBlock Text="Product Activation"
+                           Style="{StaticResource SectionHeaderStyle}"
+                           Margin="0,0,0,12"/>
+
+                <!-- Machine ID (read-only) -->
+                <TextBlock Text="Machine ID" Style="{StaticResource FormLabelStyle}"/>
+                <TextBox Text="{Binding MachineId, Mode=OneWay}"
+                         Style="{StaticResource InputTextBoxStyle}"
+                         IsReadOnly="True"
+                         Background="#F0F0F0"
+                         Margin="0,0,0,4"/>
+                <TextBlock Text="Provide this ID to obtain your license key."
+                           FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                           Margin="0,0,0,12"/>
+
+                <!-- License Key -->
+                <TextBlock Text="License Key" Style="{StaticResource FormLabelStyle}"/>
+                <TextBox Text="{Binding LicenseKey, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource InputTextBoxStyle}"
+                         Margin="0,0,0,12"/>
+
+                <!-- Status / Error Message -->
+                <Border Background="#FFF3CD" CornerRadius="4" Padding="10,8"
+                        Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="#856404" FontSize="12" TextWrapping="Wrap"/>
+                </Border>
+
+                <Border Background="#D4EDDA" CornerRadius="4" Padding="10,8"
+                        Visibility="{Binding IsActivated, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding StatusMessage}"
+                               Foreground="#155724" FontSize="12" TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Margin="24,0,24,24">
+            <Button Content="Activate"
+                    Command="{Binding ActivateCommand}"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Height="40"
+                    IsDefault="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
