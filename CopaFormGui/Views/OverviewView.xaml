@@ -1,0 +1,251 @@
+<UserControl x:Class="CopaFormGui.Views.OverviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
+            <Grid>
+                <StackPanel>
+                    <TextBlock Text="Machine Overview" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="Real-time status of all machine systems" FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse Width="16" Height="16" Margin="0,0,6,0"
+                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
+                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
+                               Foreground="White" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Status Tiles Row -->
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Controller Status -->
+            <Border Grid.Column="0" CornerRadius="8" Padding="14,12" Margin="0,0,6,0"
+                    Background="{Binding IsConnected, Converter={StaticResource IOStateToBrush}}">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Controller" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
+                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
+                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding ControllerIp}" FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Machine Mode -->
+            <Border Grid.Column="1" CornerRadius="8" Padding="14,12" Margin="0,0,6,0" Background="#1565C0">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Mode" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
+                    <TextBlock Text="{Binding MachineMode}" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding IsMachineRunning, Converter={StaticResource BoolToStatusText}}"
+                               FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
+                </StackPanel>
+            </Border>
+
+            <!-- E-Stop -->
+            <Border Grid.Column="2" CornerRadius="8" Padding="14,12" Margin="0,0,6,0" Background="#DC3545">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="E-Stop" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
+                    <TextBlock Text="{Binding IsEStop, Converter={StaticResource BoolToStatusText}}"
+                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Emergency Stop" FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Air Pressure -->
+            <Border Grid.Column="3" CornerRadius="8" Padding="14,12" Margin="0,0,6,0" Background="#FF6D00">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Air Pressure" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
+                    <TextBlock Text="{Binding AirPressure, StringFormat={}{0:F1} bar}"
+                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Operating Range" FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Alarms -->
+            <Border Grid.Column="4" CornerRadius="8" Padding="14,12" Background="#F57F17">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Alarms" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
+                    <TextBlock Text="{Binding IsAlarmActive, Converter={StaticResource BoolToStatusText}}"
+                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding ActiveAlarmText}" FontSize="10" Foreground="White" HorizontalAlignment="Center"
+                               Opacity="0.8" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Main content: Axis + Job + Controller info -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="260"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Axis Positions -->
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+                <StackPanel>
+                    <TextBlock Text="Current Axis Positions (mm)" Style="{StaticResource SectionHeaderStyle}"/>
+
+                    <!-- X -->
+                    <Border Background="#E3F2FD" CornerRadius="6" Padding="16,12" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="X" FontSize="36" FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PosX, StringFormat={}{0:F3}}"
+                                           FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                                <TextBlock Text="mm" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Y -->
+                    <Border Background="#E8F5E9" CornerRadius="6" Padding="16,12" Margin="0,0,0,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Y" FontSize="36" FontWeight="Bold"
+                                       Foreground="#2E7D32" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PosY, StringFormat={}{0:F3}}"
+                                           FontSize="28" FontWeight="Bold" Foreground="#2E7D32"/>
+                                <TextBlock Text="mm" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Z -->
+                    <Border Background="#FFF3E0" CornerRadius="6" Padding="16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Z" FontSize="36" FontWeight="Bold"
+                                       Foreground="#E65100" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PosZ, StringFormat={}{0:F3}}"
+                                           FontSize="28" FontWeight="Bold" Foreground="#E65100"/>
+                                <TextBlock Text="mm" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Current Job + Progress -->
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+                <StackPanel>
+                    <TextBlock Text="Current Job" Style="{StaticResource SectionHeaderStyle}"/>
+
+                    <Border Background="#F5F5F5" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="{Binding CurrentJob}" FontSize="22" FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryBrush}"/>
+                            <TextBlock Text="Active Program" FontSize="11"
+                                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Completed" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBlock Text="{Binding CompletedStrokes}" FontSize="20" FontWeight="Bold"
+                                       Foreground="{StaticResource SuccessBrush}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Total" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBlock Text="{Binding TotalStrokes}" FontSize="20" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Progress" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,6"/>
+                    <ProgressBar Height="20" Maximum="100" Value="{Binding ProgressPct}"
+                                 Foreground="{StaticResource SuccessBrush}" Background="#E0E0E0" Margin="0,0,0,6"/>
+                    <TextBlock HorizontalAlignment="Center" FontSize="12">
+                        <Run Text="{Binding ProgressPct, StringFormat={}{0:F1}}"/>
+                        <Run Text="% complete"/>
+                    </TextBlock>
+
+                    <Separator Margin="0,12"/>
+
+                    <TextBlock Text="Punch Force" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,4"/>
+                    <ProgressBar Height="14" Maximum="100" Value="{Binding PunchForce}"
+                                 Foreground="{StaticResource AccentBrush}" Background="#E0E0E0"/>
+                    <TextBlock HorizontalAlignment="Right" FontSize="11"
+                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0">
+                        <Run Text="{Binding PunchForce, StringFormat={}{0:F1}}"/>
+                        <Run Text="kN"/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Controller Info + Quick Actions -->
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="Controller Info" Style="{StaticResource SectionHeaderStyle}"/>
+
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="IP Address:" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ControllerIp}"  FontSize="12" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Firmware:"   Style="{StaticResource FormLabelStyle}" Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FirmwareVersion}" FontSize="12" Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Connected:"  Style="{StaticResource FormLabelStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastConnected}"  FontSize="11" TextWrapping="Wrap"/>
+                    </Grid>
+
+                    <TextBlock Text="Quick Actions" Style="{StaticResource SectionHeaderStyle}"/>
+                    <Button Content="⚠ E-STOP" Command="{Binding EmergencyStopCommand}"
+                            Background="Red" Foreground="White" Height="44"
+                            FontWeight="Bold" FontSize="14"
+                            Style="{StaticResource BaseButtonStyle}" Margin="0,0,0,6"/>
+                    <Button Content="Reset Alarms" Command="{Binding ResetAlarmsCommand}"
+                            Style="{StaticResource WarningButtonStyle}" Height="34" Margin="0,0,0,6"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Footer Status -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12"
+                       Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,79 @@
+<UserControl x:Class="CopaFormGui.Views.DatabaseView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
+            <Grid>
+                <StackPanel>
+                    <TextBlock Text="Database" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="DataBase Option Clicked – Below Table Should be Displayed"
+                               FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Ellipse Width="16" Height="16" Margin="0,0,6,0"
+                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
+                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
+                               Foreground="White" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Notes Banner -->
+        <Border Grid.Row="1" Background="#E3F2FD" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#x1F4CB; " FontSize="14"/>
+                <StackPanel>
+                    <TextBlock Text="{Binding Notes}" FontSize="12" FontWeight="SemiBold" Foreground="#1565C0"/>
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Data Table -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8">
+            <DataGrid ItemsSource="{Binding ToolRecords}"
+                      SelectedItem="{Binding SelectedRecord}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      SelectionMode="Single">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"          Width="50"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Tool Name"   Binding="{Binding ToolName}"         Width="*"   IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"         Width="90"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}" Width="80"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"   Width="90"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Stroke L."   Binding="{Binding StrokeLength, StringFormat={}{0:F1}}" Width="80" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Max Strokes" Binding="{Binding MaxStrokes}"       Width="90"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Current"     Binding="{Binding CurrentStrokes}"   Width="70"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Status"      Binding="{Binding Status}"           Width="70"  IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"            Width="*"   IsReadOnly="False"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Action Buttons -->
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="+ Add Record"  Command="{Binding AddRecordCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
+                <Button Content="Delete"        Command="{Binding DeleteRecordCommand}"
+                        Style="{StaticResource DangerButtonStyle}"  Margin="0,0,8,0"/>
+                <Button Content="Save Database" Command="{Binding SaveDatabaseCommand}"
+                        Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0"/>
+                <Button Content="Refresh"       Command="{Binding RefreshDataCommand}"
+                        Style="{StaticResource SecondaryButtonStyle}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
