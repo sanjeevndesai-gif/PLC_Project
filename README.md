@@ -18,6 +18,94 @@ dotnet build CopaFormGui/CopaFormGui.csproj
 dotnet run --project CopaFormGui/CopaFormGui.csproj
 ```
 
+## Publish EXE (Windows)
+
+```bash
+dotnet publish CopaFormGui/CopaFormGui.csproj \
+	-c Release \
+	-r win-x64 \
+	-p:PublishSingleFile=true \
+	--self-contained false
+```
+
+Output executable:
+
+`CopaFormGui/bin/Release/net8.0-windows/win-x64/publish/CopaFormGui.exe`
+
+## Machine-Locked Licensing
+
+The app now validates a signed `license.json` at startup and only runs when:
+
+- `MachineId` in license matches current machine fingerprint.
+- Signature is valid against embedded public key.
+- Product matches `CopaFormGui`.
+- License is not expired (if `ExpiresUtc` is set).
+
+License lookup order:
+
+- `%ProgramData%\\CopaFormGui\\license.json`
+- App folder: `license.json`
+
+When license is missing/invalid, the app shows the current machine ID. Send that ID to your dev team for activation.
+
+## Dev Team: Key-Pair Setup (OpenSSL)
+
+Generate RSA keys (recommended 3072 bits):
+
+```bash
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out copa_private_key.pem
+openssl rsa -pubout -in copa_private_key.pem -out copa_public_key.pem
+```
+
+- Keep `copa_private_key.pem` only with dev/licensing team.
+- Copy the content of `copa_public_key.pem` into `CopaFormGui/Services/LicenseCrypto.cs` (`PublicKeyPem`).
+
+## Dev Team: Key-Pair Setup (.NET / PowerShell)
+
+Alternative without OpenSSL:
+
+```powershell
+pwsh -NoProfile -Command "$rsa=[System.Security.Cryptography.RSA]::Create(3072); [IO.File]::WriteAllText('copa_private_key.pem',$rsa.ExportRSAPrivateKeyPem()); [IO.File]::WriteAllText('copa_public_key.pem',$rsa.ExportSubjectPublicKeyInfoPem())"
+```
+
+## Dev Team Workflow: Issue License for One Machine
+
+1. Get target machine ID on customer system:
+
+```powershell
+powershell -NoProfile -Command "(Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Cryptography' -Name MachineGuid).MachineGuid"
+```
+
+2. Generate signed license on dev machine:
+
+```bash
+dotnet run --project CopaLicenseGenerator -- \
+  --machine-id "<TARGET_MACHINE_ID>" \
+  --customer "<CUSTOMER_NAME>" \
+  --private-key "<PATH_TO_PRIVATE_KEY_PEM>" \
+  --out "./license.json" \
+  --expires-utc "2027-12-31T23:59:59Z"
+```
+
+3. Deliver that `license.json` to installer package or deployment folder.
+
+## Installer Step: Copy License to ProgramData Automatically
+
+Use the post-install script:
+
+- `installer/Copy-LicenseToProgramData.ps1`
+
+Example command (run at end of installer):
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File ".\Copy-LicenseToProgramData.ps1" -InstallDir "C:\Program Files\CopaFormGui"
+```
+
+This copies:
+
+- source: `C:\Program Files\CopaFormGui\license.json`
+- target: `%ProgramData%\CopaFormGui\license.json`
+
 ## Default Connection Credentials
 
 | Field | Default |

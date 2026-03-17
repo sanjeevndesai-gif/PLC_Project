@@ -45,3 +45,10 @@ _ReSharper*/
 ## OS
 .DS_Store
 Thumbs.db
+
+## Licensing secrets/artifacts
+*.pem
+*.key
+private_key*.txt
+public_key*.txt
+license.json

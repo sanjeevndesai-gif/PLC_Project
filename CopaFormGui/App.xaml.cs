@@ -18,6 +18,19 @@ public partial class App : Application
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
 
+        var licenseService = Services.GetRequiredService<ILicenseService>();
+        var licenseResult = licenseService.ValidateCurrentMachineLicense();
+        if (!licenseResult.IsValid)
+        {
+            MessageBox.Show(
+                $"Application is not licensed for this machine.\n\n{licenseResult.ErrorMessage}",
+                "License Required",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown(-1);
+            return;
+        }
+
         var loginWindow = Services.GetRequiredService<LoginWindow>();
         loginWindow.Show();
     }
@@ -27,6 +40,7 @@ public partial class App : Application
         // Services
         services.AddSingleton<IControllerService, ControllerService>();
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<ILicenseService, LicenseService>();
 
         // ViewModels
         services.AddSingleton<LoginViewModel>();

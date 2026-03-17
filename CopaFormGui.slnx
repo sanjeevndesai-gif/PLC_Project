@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="CopaFormGui/CopaFormGui.csproj" />
+  <Project Path="CopaLicenseGenerator/CopaLicenseGenerator.csproj" />
 </Solution>
