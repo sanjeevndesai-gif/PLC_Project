@@ -18,21 +18,6 @@ dotnet build CopaFormGui/CopaFormGui.csproj
 dotnet run --project CopaFormGui/CopaFormGui.csproj
 ```
 
-## Program Editor – 2D & 3D Punch Preview
-
-The Program Editor screen includes a live punch-hole visualisation panel with two tabs:
-
-| Tab | What it shows |
-|-----|---------------|
-| **2D Punch Preview** | Light-blue canvas with a white sheet-plate rectangle. Each punch step is drawn as a red circle, auto-scaled and centred. X/Y axis arrows in the lower-left corner. |
-| **3D Punch Preview** | Dark-background `Viewport3D` perspective scene: grey steel slab + red punch-marker cylinders. Selected step highlights yellow. X/Y/Z axis labels shown. Uses WPF-native 3-D – no extra packages. |
-
-The preview updates automatically whenever a step is added, edited, saved, or deleted.
-
-| 2D Preview | 3D Preview |
-|:---:|:---:|
-| ![2D](https://github.com/user-attachments/assets/0011dfa9-9286-4bbd-978d-189fadeb407b) | ![3D](https://github.com/user-attachments/assets/d3d132e4-0879-462d-a08a-b3df58a7033f) |
-
 ## Publish EXE (Windows)
 
 ```bash
