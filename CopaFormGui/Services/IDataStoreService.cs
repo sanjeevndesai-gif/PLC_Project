@@ -9,4 +9,7 @@ public interface IDataStoreService
 
     List<PunchProgram> LoadPunchPrograms();
     void SavePunchPrograms(List<PunchProgram> programs);
+
+    List<SessionRecord> LoadSessions();
+    void SaveSessions(List<SessionRecord> sessions);
 }

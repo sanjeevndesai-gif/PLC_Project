@@ -120,6 +120,7 @@ public partial class App : Application
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IDataStoreService, DataStoreService>();
         services.AddSingleton<ILicenseService, LicenseService>();
+        services.AddSingleton<ISessionService, SessionService>();
 
         // ViewModels
         services.AddSingleton<LoginViewModel>();
@@ -132,6 +133,7 @@ public partial class App : Application
         services.AddSingleton<ToolManagementViewModel>();
         services.AddSingleton<IOMonitorViewModel>();
         services.AddSingleton<ProgramEditorViewModel>();
+        services.AddSingleton<SessionHistoryViewModel>();
         services.AddSingleton<MainViewModel>();
 
         // Views

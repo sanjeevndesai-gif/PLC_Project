@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:CopaFormGui.ViewModels"
         mc:Ignorable="d"
         Title="Copa Form – Connect to Controller"
-        Height="560" Width="440"
+        Height="620" Width="440"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         Background="#F5F5F5">
@@ -36,6 +36,12 @@
                 <TextBlock Text="Controller Connection"
                            Style="{StaticResource SectionHeaderStyle}"
                            Margin="0,0,0,16"/>
+
+                <!-- Operator Name -->
+                <TextBlock Text="Operator Name" Style="{StaticResource FormLabelStyle}"/>
+                <TextBox Text="{Binding OperatorName, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource InputTextBoxStyle}"
+                         Margin="0,0,0,12"/>
 
                 <!-- IP Address -->
                 <TextBlock Text="IP Address" Style="{StaticResource FormLabelStyle}"/>

@@ -12,6 +12,7 @@ public partial class PunchingViewModel : ObservableObject
 {
     private readonly IControllerService _controllerService;
     private readonly IDataStoreService _dataStoreService;
+    private readonly ISessionService _sessionService;
 
     [ObservableProperty] private bool _isConnected;
 
@@ -43,10 +44,11 @@ public partial class PunchingViewModel : ObservableObject
 
     private System.Timers.Timer? _positionUpdateTimer;
 
-    public PunchingViewModel(IControllerService controllerService, IDataStoreService dataStoreService)
+    public PunchingViewModel(IControllerService controllerService, IDataStoreService dataStoreService, ISessionService sessionService)
     {
         _controllerService = controllerService;
         _dataStoreService = dataStoreService;
+        _sessionService = sessionService;
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = controllerService.IsConnected;
         LoadSamplePrograms();
@@ -128,6 +130,7 @@ public partial class PunchingViewModel : ObservableObject
         TotalStrokes = SelectedProgram.TotalStrokes;
         CompletedStrokes = 0;
         ProgramName = SelectedProgram.ProgramName;
+        _sessionService.RecordProgramRun(ProgramName);
         StatusMessage = $"Running {ProgramName}...";
     }
 
@@ -167,5 +170,6 @@ public partial class PunchingViewModel : ObservableObject
         if (!IsConnected) { StatusMessage = "Not connected."; return; }
         StatusMessage = $"Single punch at X:{PosX:F2}  Y:{PosY:F2} with Tool {SelectedToolId}";
         CompletedStrokes++;
+        _sessionService.RecordPunch();
     }
 }

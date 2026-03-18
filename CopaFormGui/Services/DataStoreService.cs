@@ -11,6 +11,7 @@ public class DataStoreService : IDataStoreService
 
     private static readonly string ToolsPath = Path.Combine(DataFolder, "tool_records.json");
     private static readonly string ProgramsPath = Path.Combine(DataFolder, "punch_programs.json");
+    private static readonly string SessionsPath = Path.Combine(DataFolder, "sessions.json");
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -70,5 +71,30 @@ public class DataStoreService : IDataStoreService
     {
         if (!Directory.Exists(DataFolder))
             Directory.CreateDirectory(DataFolder);
+    }
+
+    public List<SessionRecord> LoadSessions()
+    {
+        try
+        {
+            if (File.Exists(SessionsPath))
+            {
+                var json = File.ReadAllText(SessionsPath);
+                return JsonSerializer.Deserialize<List<SessionRecord>>(json, JsonOptions) ?? new List<SessionRecord>();
+            }
+        }
+        catch
+        {
+            // Return empty list if file is missing or corrupt (same behaviour as other Load methods)
+        }
+
+        return new List<SessionRecord>();
+    }
+
+    public void SaveSessions(List<SessionRecord> sessions)
+    {
+        EnsureFolderExists();
+        var json = JsonSerializer.Serialize(sessions, JsonOptions);
+        File.WriteAllText(SessionsPath, json);
     }
 }

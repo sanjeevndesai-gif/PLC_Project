@@ -8,6 +8,7 @@ public partial class LoginViewModel : ObservableObject
 {
     private readonly IControllerService _controllerService;
     private readonly ISettingsService _settingsService;
+    private readonly ISessionService _sessionService;
 
     [ObservableProperty]
     private string _ipAddress = "172.20.0.200";
@@ -17,6 +18,9 @@ public partial class LoginViewModel : ObservableObject
 
     [ObservableProperty]
     private string _password = "deltatau";
+
+    [ObservableProperty]
+    private string _operatorName = string.Empty;
 
     [ObservableProperty]
     private string _statusMessage = string.Empty;
@@ -29,10 +33,11 @@ public partial class LoginViewModel : ObservableObject
 
     public event EventHandler<bool>? LoginCompleted; // true = connected, false = no device
 
-    public LoginViewModel(IControllerService controllerService, ISettingsService settingsService)
+    public LoginViewModel(IControllerService controllerService, ISettingsService settingsService, ISessionService sessionService)
     {
         _controllerService = controllerService;
         _settingsService = settingsService;
+        _sessionService = sessionService;
 
         var saved = _settingsService.LoadConnectionSettings();
         IpAddress = saved.IpAddress;
@@ -67,6 +72,7 @@ public partial class LoginViewModel : ObservableObject
                     UserName = UserName,
                     Password = Password ?? string.Empty
                 });
+                _sessionService.StartSession(OperatorName);
                 StatusMessage = "Connected successfully.";
                 LoginCompleted?.Invoke(this, true);
             }
@@ -96,6 +102,7 @@ public partial class LoginViewModel : ObservableObject
     private void NoDevice()
     {
         StatusMessage = "Opening without device...";
+        _sessionService.StartSession(OperatorName);
         LoginCompleted?.Invoke(this, false);
     }
 

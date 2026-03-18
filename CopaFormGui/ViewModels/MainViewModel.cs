@@ -7,6 +7,7 @@ namespace CopaFormGui.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IControllerService _controllerService;
+    private readonly ISessionService _sessionService;
 
     [ObservableProperty]
     private bool _isConnected;
@@ -32,9 +33,11 @@ public partial class MainViewModel : ObservableObject
     private readonly ToolManagementViewModel _toolManagementViewModel;
     private readonly IOMonitorViewModel _ioMonitorViewModel;
     private readonly ProgramEditorViewModel _programEditorViewModel;
+    private readonly SessionHistoryViewModel _sessionHistoryViewModel;
 
     public MainViewModel(
         IControllerService controllerService,
+        ISessionService sessionService,
         OverviewViewModel overviewViewModel,
         DatabaseViewModel databaseViewModel,
         SettingsViewModel settingsViewModel,
@@ -43,9 +46,11 @@ public partial class MainViewModel : ObservableObject
         AlarmViewModel alarmViewModel,
         ToolManagementViewModel toolManagementViewModel,
         IOMonitorViewModel ioMonitorViewModel,
-        ProgramEditorViewModel programEditorViewModel)
+        ProgramEditorViewModel programEditorViewModel,
+        SessionHistoryViewModel sessionHistoryViewModel)
     {
         _controllerService = controllerService;
+        _sessionService = sessionService;
         _overviewViewModel = overviewViewModel;
         _databaseViewModel = databaseViewModel;
         _settingsViewModel = settingsViewModel;
@@ -55,6 +60,7 @@ public partial class MainViewModel : ObservableObject
         _toolManagementViewModel = toolManagementViewModel;
         _ioMonitorViewModel = ioMonitorViewModel;
         _programEditorViewModel = programEditorViewModel;
+        _sessionHistoryViewModel = sessionHistoryViewModel;
 
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = _controllerService.IsConnected;
@@ -157,6 +163,14 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private void ShowSessionHistory()
+    {
+        CurrentView = _sessionHistoryViewModel;
+        CurrentViewName = "Session History";
+        StatusBarMessage = "Operator Session History";
+    }
+
     partial void OnCurrentViewChanged(ObservableObject? value)
     {
         App.LogInfo($"CurrentView changed: {value?.GetType().Name ?? "null"}");
@@ -165,6 +179,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Exit()
     {
+        _sessionService.EndSession();
         _controllerService.Disconnect();
         System.Windows.Application.Current.Shutdown();
     }
