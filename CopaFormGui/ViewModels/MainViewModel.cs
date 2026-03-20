@@ -72,7 +72,14 @@ public partial class MainViewModel : ObservableObject
 
     private void UpdateConnectionStatus()
     {
-        ConnectionStatusText = IsConnected ? "Connected" : "Disconnected";
+        ConnectionStatusText = _controllerService.ConnectionState switch
+        {
+            ConnectionState.Connected    => "Connected",
+            ConnectionState.Connecting   => "Connecting...",
+            ConnectionState.Reconnecting => "Reconnecting...",
+            ConnectionState.Error        => "Connection Error",
+            _                            => "Disconnected"
+        };
     }
 
     [RelayCommand]

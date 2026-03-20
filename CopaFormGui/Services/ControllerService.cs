@@ -86,14 +86,17 @@ public class ControllerService : IControllerService
             gpascii = connectResult.localClient;
             deviceProp = connectResult.localDeviceProp;
 
-            if (!connectResult.connected || !gpascii.SocketConnected)
+            if (!connectResult.connected || !gpascii.GpAsciiConnected)
             {
                 ConnectionState = ConnectionState.Error;
-                _lastConnectionError = "PLC connection was not established (ConnectGPAscii returned false or socket disconnected).";
+                _lastConnectionError = "PLC connection was not established (ConnectGPAscii returned false or PMAC protocol not connected).";
                 return false;
             }
 
             _connectedIp = ipAddress;
+            _savedUser = userName;
+            _savedPassword = password;
+            StopReconnect(); // cancel any in-progress reconnect loop
             ConnectionState = ConnectionState.Connected;
             _heartbeatFailureCount = 0;
             StartHeartbeat();
@@ -116,6 +119,10 @@ public class ControllerService : IControllerService
     }
 
     private string? _connectedIp;
+    private string? _savedUser;
+    private string? _savedPassword;
+    private CancellationTokenSource? _reconnectCts;
+    private const int ReconnectIntervalMs = 5000;
 
     private System.Timers.Timer? _heartbeatTimer;
     private const int HeartbeatIntervalMs = 3000;
@@ -140,7 +147,67 @@ public class ControllerService : IControllerService
         _heartbeatTimer = null;
     }
 
-    private void OnHeartbeat(object sender, ElapsedEventArgs e)
+    private void StopReconnect()
+    {
+        _reconnectCts?.Cancel();
+        _reconnectCts?.Dispose();
+        _reconnectCts = null;
+    }
+
+    private void StartReconnectLoop()
+    {
+        StopReconnect();
+
+        var ip   = _connectedIp;
+        var user = _savedUser;
+        var pass = _savedPassword;
+
+        if (string.IsNullOrWhiteSpace(ip) || string.IsNullOrWhiteSpace(user))
+        {
+            ConnectionState = ConnectionState.Disconnected;
+            return;
+        }
+
+        ConnectionState = ConnectionState.Reconnecting;
+        _reconnectCts = new CancellationTokenSource();
+        var token = _reconnectCts.Token;
+
+        Task.Run(async () =>
+        {
+            while (!token.IsCancellationRequested)
+            {
+                try   { await Task.Delay(ReconnectIntervalMs, token); }
+                catch (OperationCanceledException) { break; }
+
+                if (token.IsCancellationRequested) break;
+
+                try
+                {
+                    var success = await ConnectAsync(ip!, user!, pass ?? string.Empty);
+                    if (success)
+                    {
+                        // ConnectAsync already set state=Connected and started heartbeat.
+                        // Clean up the CTS — the loop is done.
+                        var cts = _reconnectCts;
+                        _reconnectCts = null;
+                        cts?.Dispose();
+                        break;
+                    }
+
+                    // ConnectAsync failed — reset state to Reconnecting and keep trying
+                    if (!token.IsCancellationRequested)
+                        ConnectionState = ConnectionState.Reconnecting;
+                }
+                catch
+                {
+                    if (!token.IsCancellationRequested)
+                        ConnectionState = ConnectionState.Reconnecting;
+                }
+            }
+        });
+    }
+
+    private async void OnHeartbeat(object sender, ElapsedEventArgs e)
     {
         if (Interlocked.Exchange(ref _heartbeatInProgress, 1) == 1) return;
 
@@ -148,8 +215,6 @@ public class ControllerService : IControllerService
         {
             if (ConnectionState != ConnectionState.Connected) return;
 
-            // Actively probe the PLC — SocketConnected is a TCP cache and never
-            // detects a dropped SSH/network connection until data is sent.
             var client = gpascii;
             if (client is null)
             {
@@ -157,29 +222,39 @@ public class ControllerService : IControllerService
                 return;
             }
 
-            var probeTask = Task.Run(() => client.AsyncGetResponse("VER"));
-            if (!probeTask.Wait(HeartbeatProbeTimeoutMs))
+            // AsyncGetResponse only returns Ok when the command is *sent* (queued in the SSH
+            // buffer), NOT when the PMAC actually responds.  If the controller goes offline
+            // while the SSH socket stays open, AsyncGetResponse keeps returning Ok and the
+            // heartbeat never detects the drop.
+            //
+            // AsyncGetResponseEx returns Task<Tuple<Status,string>> and awaits the real PMAC
+            // reply, so a timeout or missing response is detected correctly.
+            try
             {
-                RegisterHeartbeatFailure();
-                return;
-            }
+                var probeTask = client.AsyncGetResponseEx("VER");
+                var winner = await Task.WhenAny(probeTask, Task.Delay(HeartbeatProbeTimeoutMs));
 
-            var status = probeTask.Result;
-            bool alive = status == ODT.PowerPmacComLib.Status.Ok;
+                if (winner != probeTask)
+                {
+                    // Timed out — no response from PMAC
+                    RegisterHeartbeatFailure();
+                    return;
+                }
 
-            if (alive)
-            {
-                _heartbeatFailureCount = 0;
+                var result = await probeTask;
+                bool alive = result.Item1 == ODT.PowerPmacComLib.Status.Ok
+                             && !string.IsNullOrWhiteSpace(result.Item2);
+
+                if (alive)
+                    _heartbeatFailureCount = 0;
+                else
+                    RegisterHeartbeatFailure();
             }
-            else
+            catch
             {
+                // Any exception (SSH error, protocol error) means the link is dead
                 RegisterHeartbeatFailure();
             }
-        }
-        catch
-        {
-            // Any exception means the link is dead
-            RegisterHeartbeatFailure();
         }
         finally
         {
@@ -201,18 +276,23 @@ public class ControllerService : IControllerService
         StopHeartbeat();
         _heartbeatFailureCount = 0;
         _lastConnectionError = "Connection to PLC was lost unexpectedly.";
+        DisconnectPMAC();
         gpascii = null;
         deviceProp = null;
-        _connectedIp = null;
-        ConnectionState = ConnectionState.Disconnected;
+        // Keep _connectedIp / _savedUser / _savedPassword so the reconnect loop can retry.
+        StartReconnectLoop();
     }
 
     public void Disconnect()
     {
         StopHeartbeat();
+        StopReconnect();       // cancel any background reconnect attempt
         DisconnectPMAC();
-
+        gpascii = null;
+        deviceProp = null;
         _connectedIp = null;
+        _savedUser = null;
+        _savedPassword = null;
         _lastConnectionError = null;
         ConnectionState = ConnectionState.Disconnected;
     }
