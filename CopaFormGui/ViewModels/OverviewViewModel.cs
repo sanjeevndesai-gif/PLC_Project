@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CopaFormGui.Services;
@@ -38,6 +39,14 @@ public partial class OverviewViewModel : ObservableObject
     [ObservableProperty] private string _firmwareVersion = "v3.1.4";
     [ObservableProperty] private string _lastConnected = "—";
     [ObservableProperty] private string _statusMessage = "Ready";
+
+    // POC test I/O
+    [ObservableProperty] private string _testVariableName = "P100";
+    [ObservableProperty] private string _testWriteValue = "0";
+    [ObservableProperty] private string _testReadValue = "—";
+    [ObservableProperty] private bool _isTestWriteFailed;
+
+    private CancellationTokenSource? _writeDebounceCts;
 
     // Quick-status tiles
     public string ModeColor => IsMachineRunning ? "#28A745" : "#1565C0";
@@ -80,8 +89,82 @@ public partial class OverviewViewModel : ObservableObject
         PosX = await _controllerService.ReadRegisterAsync(100);
         PosY = await _controllerService.ReadRegisterAsync(101);
         PunchForce = await _controllerService.ReadRegisterAsync(110);
+
+        var testValue = await _controllerService.ReadResponseAsync(TestVariableName);
+        if (!string.IsNullOrWhiteSpace(testValue))
+        {
+            TestReadValue = testValue;
+        }
+
         AirPressure = 5.8 + (PunchForce % 1.0);
         ProgressPct = TotalStrokes > 0 ? Math.Min(100.0, CompletedStrokes * 100.0 / TotalStrokes) : 0;
+    }
+
+    partial void OnTestWriteValueChanged(string value)
+    {
+        if (!IsConnected) return;
+        DebounceWriteTestValue(value);
+    }
+
+    partial void OnTestVariableNameChanged(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            TestVariableName = "P100";
+    }
+
+    private void DebounceWriteTestValue(string rawValue)
+    {
+        _writeDebounceCts?.Cancel();
+        _writeDebounceCts?.Dispose();
+        _writeDebounceCts = new CancellationTokenSource();
+        var token = _writeDebounceCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(350, token);
+                if (token.IsCancellationRequested) return;
+                await WriteTestValueInternalAsync(rawValue);
+            }
+            catch (OperationCanceledException)
+            {
+                // User is still typing.
+            }
+        }, token);
+    }
+
+    private async Task WriteTestValueInternalAsync(string rawValue)
+    {
+        if (!double.TryParse(rawValue, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedValue))
+        {
+            IsTestWriteFailed = true;
+            return;
+        }
+
+        var success = await _controllerService.WriteVariableAsync(TestVariableName, parsedValue);
+        IsTestWriteFailed = !success;
+        if (success)
+        {
+            var latestValue = await _controllerService.ReadResponseAsync(TestVariableName);
+            if (!string.IsNullOrWhiteSpace(latestValue))
+                TestReadValue = latestValue;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ReadTestVariableAsync()
+    {
+        var value = await _controllerService.ReadResponseAsync(TestVariableName);
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            TestReadValue = value;
+            IsTestWriteFailed = false;
+        }
+        else
+        {
+            IsTestWriteFailed = true;
+        }
     }
 
     [RelayCommand]

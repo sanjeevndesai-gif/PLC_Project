@@ -18,6 +18,9 @@ public interface IControllerService
 
     Task<bool> ConnectAsync(string ipAddress, string userName, string password);
     void Disconnect();
+    Task<string?> ReadResponseAsync(string commandOrVariable);
+    Task<double?> ReadVariableAsync(string variableName);
+    Task<bool> WriteVariableAsync(string variableName, double value);
     Task<bool> ReadCoilAsync(int address);
     Task<double> ReadRegisterAsync(int address);
     Task WriteCoilAsync(int address, bool value);

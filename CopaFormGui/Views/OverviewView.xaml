@@ -204,6 +204,27 @@
                         <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastConnected}"  FontSize="11" TextWrapping="Wrap"/>
                     </Grid>
 
+                        <TextBlock Text="POC Test I/O" Style="{StaticResource SectionHeaderStyle}"/>
+                        <Border Background="#F7F9FC" CornerRadius="6" Padding="10" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Variable" Style="{StaticResource FormLabelStyle}"/>
+                                <TextBox Text="{Binding TestVariableName, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" Height="28"/>
+
+                                <TextBlock Text="Write Value (auto write while typing)" Style="{StaticResource FormLabelStyle}"/>
+                                <TextBox Text="{Binding TestWriteValue, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" Height="28"/>
+
+                                <TextBlock Text="Read Value" Style="{StaticResource FormLabelStyle}"/>
+                                <TextBlock Text="{Binding TestReadValue}" FontSize="14" FontWeight="SemiBold" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="Write failed. Check connection/value format."
+                                           Foreground="#D32F2F" FontSize="11"
+                                           Visibility="{Binding IsTestWriteFailed, Converter={StaticResource BoolToVisibility}}"/>
+
+                                <Button Content="Read Now" Command="{Binding ReadTestVariableCommand}"
+                                        Style="{StaticResource BaseButtonStyle}" Height="30" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+
                     <TextBlock Text="Quick Actions" Style="{StaticResource SectionHeaderStyle}"/>
                     <Button Content="⚠ E-STOP" Command="{Binding EmergencyStopCommand}"
                             Background="Red" Foreground="White" Height="44"

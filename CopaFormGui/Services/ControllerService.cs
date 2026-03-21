@@ -1,4 +1,6 @@
 using ODT.PowerPmacComLib;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Timers;
 
 namespace CopaFormGui.Services;
@@ -7,7 +9,7 @@ public class ControllerService : IControllerService
 {
     private ConnectionState _connectionState = ConnectionState.Disconnected;
     private readonly Random _random = new();
-    private IAsyncGpasciiCommunicationInterface? gpascii;
+    private ISyncGpasciiCommunicationInterface? gpascii;
     private deviceProperties? deviceProp;
     private string? _lastConnectionError;
 
@@ -58,7 +60,7 @@ public class ControllerService : IControllerService
 
             var connectTask = Task.Run(() =>
             {
-                var localClient = Connect.CreateAsyncGpascii(
+                var localClient = Connect.CreateSyncGpascii(
                     CommunicationGlobals.ConnectionTypes.SSH,
                     null);
 
@@ -70,7 +72,7 @@ public class ControllerService : IControllerService
                     Password = password
                 };
 
-                var connected = localClient.ConnectGPAscii(
+                var connected = localClient.ConnectGpAscii(
                     localDeviceProp.IPAddress,
                     localDeviceProp.PortNumber,
                     localDeviceProp.User,
@@ -122,7 +124,9 @@ public class ControllerService : IControllerService
     private string? _savedUser;
     private string? _savedPassword;
     private CancellationTokenSource? _reconnectCts;
+    private readonly SemaphoreSlim _pmacCommandLock = new(1, 1);
     private const int ReconnectIntervalMs = 5000;
+    private const int CommandTimeoutMs = 2000;
 
     private System.Timers.Timer? _heartbeatTimer;
     private const int HeartbeatIntervalMs = 3000;
@@ -222,27 +226,11 @@ public class ControllerService : IControllerService
                 return;
             }
 
-            // AsyncGetResponse only returns Ok when the command is *sent* (queued in the SSH
-            // buffer), NOT when the PMAC actually responds.  If the controller goes offline
-            // while the SSH socket stays open, AsyncGetResponse keeps returning Ok and the
-            // heartbeat never detects the drop.
-            //
-            // AsyncGetResponseEx returns Task<Tuple<Status,string>> and awaits the real PMAC
-            // reply, so a timeout or missing response is detected correctly.
             try
             {
-                var probeTask = client.AsyncGetResponseEx("VER");
-                var winner = await Task.WhenAny(probeTask, Task.Delay(HeartbeatProbeTimeoutMs));
-
-                if (winner != probeTask)
-                {
-                    // Timed out — no response from PMAC
-                    RegisterHeartbeatFailure();
-                    return;
-                }
-
-                var result = await probeTask;
-                bool alive = result.Item1 == ODT.PowerPmacComLib.Status.Ok
+                var result = await ExecuteCommandAsync(client, "VER", HeartbeatProbeTimeoutMs);
+                bool alive = result is not null
+                             && result.Item1 == ODT.PowerPmacComLib.Status.Ok
                              && !string.IsNullOrWhiteSpace(result.Item2);
 
                 if (alive)
@@ -348,10 +336,61 @@ public class ControllerService : IControllerService
         return Task.FromResult(_random.NextDouble() > 0.5);
     }
 
-    public Task<double> ReadRegisterAsync(int address)
+    public async Task<string?> ReadResponseAsync(string commandOrVariable)
     {
-        // Stub: replace with real PLC read
-        return Task.FromResult(_random.NextDouble() * 100.0);
+        if (!IsConnected || string.IsNullOrWhiteSpace(commandOrVariable) || gpascii is null)
+            return null;
+
+        foreach (var command in BuildReadCommands(commandOrVariable))
+        {
+            try
+            {
+                var response = await ExecuteCommandAsync(gpascii, command, CommandTimeoutMs);
+                if (response is null || response.Item1 != ODT.PowerPmacComLib.Status.Ok)
+                    continue;
+
+                var normalized = NormalizeControllerResponse(response.Item2);
+                if (!string.IsNullOrWhiteSpace(normalized))
+                    return normalized;
+            }
+            catch
+            {
+                // Try next syntax variant.
+            }
+        }
+
+        return null;
+    }
+
+    public async Task<double?> ReadVariableAsync(string variableName)
+    {
+        var response = await ReadResponseAsync(variableName);
+        return TryParseDoubleFromResponse(response ?? string.Empty, out var value) ? value : null;
+    }
+
+    public async Task<bool> WriteVariableAsync(string variableName, double value)
+    {
+        if (!IsConnected || string.IsNullOrWhiteSpace(variableName) || gpascii is null)
+            return false;
+
+        var cmd = string.Format(CultureInfo.InvariantCulture, "{0}={1}", variableName.Trim(), value);
+
+        try
+        {
+            var response = await ExecuteCommandAsync(gpascii, cmd, CommandTimeoutMs);
+            return response is not null && response.Item1 == ODT.PowerPmacComLib.Status.Ok;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<double> ReadRegisterAsync(int address)
+    {
+        // Map register reads to PMAC P-variables for now (e.g., 100 -> P100)
+        var value = await ReadVariableAsync($"P{address}");
+        return value ?? 0.0;
     }
 
     public Task WriteCoilAsync(int address, bool value)
@@ -360,9 +399,68 @@ public class ControllerService : IControllerService
         return Task.CompletedTask;
     }
 
-    public Task WriteRegisterAsync(int address, double value)
+    public async Task WriteRegisterAsync(int address, double value)
     {
-        // Stub: replace with real PLC write
-        return Task.CompletedTask;
+        await WriteVariableAsync($"P{address}", value);
+    }
+
+    private async Task<Tuple<ODT.PowerPmacComLib.Status, string>?> ExecuteCommandAsync(
+        ISyncGpasciiCommunicationInterface client,
+        string command,
+        int timeoutMs)
+    {
+        await _pmacCommandLock.WaitAsync();
+        try
+        {
+            var commandTask = Task.Run(() =>
+            {
+                var status = client.GetResponse(command, out var response);
+                return Tuple.Create(status, response ?? string.Empty);
+            });
+
+            var winner = await Task.WhenAny(commandTask, Task.Delay(timeoutMs));
+            if (winner != commandTask)
+                return null;
+
+            return await commandTask;
+        }
+        finally
+        {
+            _pmacCommandLock.Release();
+        }
+    }
+
+    private static IEnumerable<string> BuildReadCommands(string commandOrVariable)
+    {
+        var trimmed = commandOrVariable.Trim();
+        if (trimmed.StartsWith("echo ", StringComparison.OrdinalIgnoreCase))
+        {
+            yield return trimmed;
+            yield break;
+        }
+
+        yield return trimmed;
+        yield return $"echo 7 {trimmed}";
+    }
+
+    private static string NormalizeControllerResponse(string response)
+    {
+        return (response ?? string.Empty)
+            .Replace("\r", " ")
+            .Replace("\n", " ")
+            .Trim();
+    }
+
+    private static bool TryParseDoubleFromResponse(string response, out double value)
+    {
+        var match = Regex.Match(response ?? string.Empty, @"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?");
+        if (match.Success &&
+            double.TryParse(match.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+        {
+            return true;
+        }
+
+        value = 0;
+        return false;
     }
 }

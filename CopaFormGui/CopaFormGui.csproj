@@ -9,12 +9,23 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>CopaFormGui</RootNamespace>
     <AssemblyName>CopaFormGui</AssemblyName>
+    <ApplicationIcon>Assets\CopaForm.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\CopaForm.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="lib\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="lib\PMAC\DKeyLib64.dll" Link="dkeylib64.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="lib\PMAC\DKeyLib32.dll" Link="dkeylib32.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

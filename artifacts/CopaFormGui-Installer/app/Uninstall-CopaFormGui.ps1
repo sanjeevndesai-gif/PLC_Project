@@ -1,0 +1,44 @@
+param(
+    [string]$InstallRoot = ${env:ProgramFiles},
+    [string]$ProductFolderName = "CopaFormGui",
+    [string]$LicenseFileName = "license.json"
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+function Test-IsAdministrator {
+    $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+if (-not (Test-IsAdministrator)) {
+    Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", ('"{0}"' -f $PSCommandPath),
+        "-InstallRoot", ('"{0}"' -f $InstallRoot),
+        "-ProductFolderName", ('"{0}"' -f $ProductFolderName),
+        "-LicenseFileName", ('"{0}"' -f $LicenseFileName)
+    )
+    exit 0
+}
+
+$installDir = Join-Path $InstallRoot $ProductFolderName
+$programDataDir = Join-Path $env:ProgramData $ProductFolderName
+$desktopShortcut = Join-Path ([Environment]::GetFolderPath("Desktop")) "Copa Form GUI.lnk"
+
+if (Test-Path -Path $installDir) {
+    Remove-Item -Path $installDir -Recurse -Force
+}
+
+if (Test-Path -Path $programDataDir) {
+    Remove-Item -Path $programDataDir -Recurse -Force
+}
+
+if (Test-Path -Path $desktopShortcut) {
+    Remove-Item -Path $desktopShortcut -Force
+}
+
+Write-Host "Copa Form GUI removed."

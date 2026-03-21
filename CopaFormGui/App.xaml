@@ -28,6 +28,42 @@
             <SolidColorBrush x:Key="DangerBrush"       Color="#DC3545"/>
             <SolidColorBrush x:Key="WarningBrush"      Color="#FFC107"/>
             <SolidColorBrush x:Key="ToolbarBrush"      Color="#263238"/>
+            <SolidColorBrush x:Key="LogoDeepBrush"     Color="#0C3A67"/>
+            <SolidColorBrush x:Key="LogoMidBrush"      Color="#1565C0"/>
+            <SolidColorBrush x:Key="LogoAccentBrush"   Color="#F28C28"/>
+            <SolidColorBrush x:Key="LogoLightBrush"    Color="#EAF4FF"/>
+
+            <DrawingImage x:Key="CopaLogoImage">
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="{StaticResource LogoMidBrush}">
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry Figures="M 32,4 L 56,18 L 56,46 L 32,60 L 8,46 L 8,18 Z"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource LogoDeepBrush}">
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry Figures="M 32,6 L 53,19 L 53,44 L 32,56 L 11,44 L 11,19 Z"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource LogoAccentBrush}">
+                            <GeometryDrawing.Geometry>
+                                <PathGeometry Figures="M 22,12 L 42,12 L 38,27 L 26,27 Z"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource LogoLightBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="18,28,28,13" RadiusX="2" RadiusY="2"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                        <GeometryDrawing Brush="{StaticResource LogoAccentBrush}">
+                            <GeometryDrawing.Geometry>
+                                <RectangleGeometry Rect="17,44,30,5" RadiusX="1.5" RadiusY="1.5"/>
+                            </GeometryDrawing.Geometry>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
 
             <!-- Base Button Style -->
             <Style x:Key="BaseButtonStyle" TargetType="Button">
@@ -161,6 +197,11 @@
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
                 <Setter Property="Margin"     Value="0,0,0,8"/>
+            </Style>
+
+            <Style x:Key="BrandCaptionStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="Foreground" Value="#CFE2FF"/>
             </Style>
 
             <!-- Card Border Style -->

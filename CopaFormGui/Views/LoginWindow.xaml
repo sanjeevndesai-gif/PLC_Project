@@ -21,12 +21,18 @@
         <!-- Header Banner -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Width="74" Height="74" CornerRadius="18" Background="#0D3C6B" Padding="10" Margin="0,0,0,10">
+                    <Image Source="{StaticResource CopaLogoImage}" Stretch="Uniform"/>
+                </Border>
                 <TextBlock Text="Copa Form"
                            FontSize="28" FontWeight="Bold"
                            Foreground="White" HorizontalAlignment="Center"/>
                 <TextBlock Text="CNC Punching Machine Controller"
                            FontSize="12" Foreground="#BBDEFB"
                            HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                <TextBlock Text="CLIENT TEST BUILD"
+                           Style="{StaticResource BrandCaptionStyle}"
+                           HorizontalAlignment="Center" Margin="0,8,0,0"/>
             </StackPanel>
         </Border>
 
