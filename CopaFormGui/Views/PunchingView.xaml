@@ -10,186 +10,202 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
-            <Grid>
-                <TextBlock Text="Punching Operations" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Ellipse Width="16" Height="16" Margin="0,0,6,0"
-                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
-                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
-                               Foreground="White" FontSize="12" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Content -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0" Margin="0,0,0,6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="290"/>
+                <ColumnDefinition Width="330"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left Panel: scrollable so all buttons are always reachable -->
-            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,8,0">
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
                 <StackPanel>
+                    <TextBlock Text="Name" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Text="{Binding ProgramName, UpdateSourceTrigger=PropertyChanged}" Height="26" Margin="0,2,0,8"/>
 
-                    <!-- Program List -->
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                        <StackPanel>
-                            <TextBlock Text="Programs" Style="{StaticResource SectionHeaderStyle}"/>
-                            <ListBox ItemsSource="{Binding Programs}"
-                                     SelectedItem="{Binding SelectedProgram}"
-                                     Height="160"
-                                     BorderThickness="1"
-                                     BorderBrush="{StaticResource BorderBrush}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Margin="4,2">
-                                            <TextBlock Text="{Binding ProgramName}" FontWeight="SemiBold" FontSize="13"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="11"
-                                                       Foreground="{StaticResource TextSecondaryBrush}"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                    <TextBlock Text="Material" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Text="{Binding Material, UpdateSourceTrigger=PropertyChanged}" Height="26" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="Comment" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Text="{Binding Comment, UpdateSourceTrigger=PropertyChanged}" Height="26" Margin="0,2,0,8"/>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                            <TextBlock Text="Length" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBox Text="{Binding Length, UpdateSourceTrigger=PropertyChanged}" Height="26" Margin="0,2,0,0"/>
                         </StackPanel>
-                    </Border>
-
-                    <!-- Machine Mode -->
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                        <StackPanel>
-                            <TextBlock Text="Machine Mode" Style="{StaticResource SectionHeaderStyle}"/>
-                            <UniformGrid Rows="1" Columns="3">
-                                <Button Content="Manual" Command="{Binding SetModeManualCommand}"
-                                        Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,4,0" Height="34"/>
-                                <Button Content="Auto"   Command="{Binding SetModeAutoCommand}"
-                                        Style="{StaticResource PrimaryButtonStyle}"   Margin="0,0,4,0" Height="34"/>
-                                <Button Content="Home"   Command="{Binding HomeAxesCommand}"
-                                        Style="{StaticResource WarningButtonStyle}"   Height="34"/>
-                            </UniformGrid>
-                            <TextBlock Margin="0,8,0,0">
-                                <Run Text="Mode: " FontWeight="SemiBold"/>
-                                <Run Text="{Binding CurrentMode}" Foreground="{StaticResource PrimaryBrush}"/>
-                            </TextBlock>
+                        <StackPanel Grid.Column="1" Margin="0,0,6,0">
+                            <TextBlock Text="Width" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBox Text="{Binding Width, UpdateSourceTrigger=PropertyChanged}" Height="26" Margin="0,2,0,0"/>
                         </StackPanel>
-                    </Border>
-
-                    <!-- Run Controls -->
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                        <StackPanel>
-                            <TextBlock Text="Run Controls" Style="{StaticResource SectionHeaderStyle}"/>
-                            <Button Content="▶  Start Program" Command="{Binding StartProgramCommand}"
-                                    Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="0,0,0,6"/>
-                            <Button Content="■  Stop" Command="{Binding StopProgramCommand}"
-                                    Style="{StaticResource DangerButtonStyle}"  Height="38" Margin="0,0,0,6"/>
-                            <Button Content="⚠  E-STOP" Command="{Binding EmergencyStopCommand}"
-                                    Background="Red" Foreground="White" FontSize="15" FontWeight="Bold"
-                                    Height="48" Margin="0,0,0,6"
-                                    Style="{StaticResource BaseButtonStyle}"/>
-                            <Button Content="Reset E-Stop" Command="{Binding ResetEStopCommand}"
-                                    Style="{StaticResource WarningButtonStyle}" Height="34"
-                                    Visibility="{Binding IsEmergencyStop, Converter={StaticResource BoolToVisibility}}"/>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Thickness" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBox Text="{Binding Thickness, UpdateSourceTrigger=PropertyChanged}" Height="26" Margin="0,2,0,0"/>
                         </StackPanel>
-                    </Border>
+                    </Grid>
 
+                    <TextBlock Text="Reference Bending" Style="{StaticResource FormLabelStyle}"/>
+                    <Grid Margin="0,2,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Height="26"
+                                 Text="{Binding ReferenceBending, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Button Grid.Column="1" Content="+" Width="24" Height="24" Margin="6,1,0,0"/>
+                        <Button Grid.Column="2" Content="-" Width="24" Height="24" Margin="4,1,0,0"/>
+                    </Grid>
+
+                    <UniformGrid Rows="1" Columns="2" Margin="0,8,0,0">
+                        <Button Content="Save" Command="{Binding SaveHeaderInfoCommand}" Style="{StaticResource SuccessButtonStyle}" Height="30" Margin="0,0,6,0"/>
+                        <Button Content="Clear" Command="{Binding ClearHeaderInfoCommand}" Style="{StaticResource WarningButtonStyle}" Height="30"/>
+                    </UniformGrid>
                 </StackPanel>
-            </ScrollViewer>
+            </Border>
 
-            <!-- Right Panel -->
-            <Grid Grid.Column="1">
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <DataGrid ItemsSource="{Binding PunchSteps}"
+                              SelectedItem="{Binding SelectedStep, Mode=TwoWay}"
+                              RowEditEnding="StepsDataGrid_RowEditEnding"
+                              CellEditEnding="StepsDataGrid_CellEditEnding"
+                              PreviewKeyDown="StepsDataGrid_PreviewKeyDown"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="True"
+                              CanUserDeleteRows="True"
+                              IsReadOnly="False"
+                              HeadersVisibility="Column"
+                              Height="176"
+                              SelectionUnit="FullRow"
+                              SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Binding="{Binding StepNumber}" Width="40" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="X" Binding="{Binding X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                            <DataGridTextColumn Header="Y" Binding="{Binding Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                            <DataGridTextColumn Header="Tool" Binding="{Binding ToolId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                            <DataGridTextColumn Header="Punch" Binding="{Binding Operation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1" Background="#53C8F0" BorderBrush="#2A9CCB" BorderThickness="1">
+            <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Axis Positions -->
-                <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="Current Axis Positions (mm)" Style="{StaticResource SectionHeaderStyle}"/>
-                        <UniformGrid Rows="1" Columns="2">
-                            <Border Background="#E3F2FD" CornerRadius="6" Padding="12" Margin="0,0,6,0">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <TextBlock Text="X Axis" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding PosX, StringFormat={}{0:F3}}"
-                                               FontSize="24" FontWeight="Bold"
-                                               Foreground="{StaticResource PrimaryBrush}"
-                                               HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <Border Background="#E8F5E9" CornerRadius="6" Padding="12" Margin="0,0,0,0">
-                                <StackPanel HorizontalAlignment="Center">
-                                    <TextBlock Text="Y Axis" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding PosY, StringFormat={}{0:F3}}"
-                                               FontSize="24" FontWeight="Bold" Foreground="#2E7D32"
-                                               HorizontalAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                        </UniformGrid>
+                <DockPanel Grid.Row="0" Margin="8,6,8,4">
+                    <TextBlock DockPanel.Dock="Left" Text="Top View Preview" FontSize="12" FontWeight="SemiBold" Foreground="#124A77" VerticalAlignment="Center"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="-" Width="28" Height="24" Command="{Binding ZoomOutPreviewCommand}" Margin="0,0,4,0"
+                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
+                        <TextBlock Width="56" TextAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#123D5C"
+                                   Text="{Binding PreviewZoom, StringFormat={}{0:F1}x}"/>
+                    <Button Content="+" Width="28" Height="24" Command="{Binding ZoomInPreviewCommand}" Margin="4,0,4,0"
+                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
+                    <Button Content="Reset" Width="52" Height="24" Command="{Binding ResetPreviewZoomCommand}"
+                        Background="#FFF3CD" Foreground="#8A6D3B" BorderBrush="#E3C766" BorderThickness="1" FontWeight="SemiBold"/>
                     </StackPanel>
-                </Border>
+                </DockPanel>
 
-                <!-- Move To Target -->
-                <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,8">
-                    <StackPanel>
-                        <TextBlock Text="Move To Target Position" Style="{StaticResource SectionHeaderStyle}"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="X:" Style="{StaticResource FormLabelStyle}"
-                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox   Grid.Column="1" Text="{Binding TargetX, UpdateSourceTrigger=PropertyChanged}"
-                                       Style="{StaticResource InputTextBoxStyle}" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Column="2" Text="Y:" Style="{StaticResource FormLabelStyle}"
-                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox   Grid.Column="3" Text="{Binding TargetY, UpdateSourceTrigger=PropertyChanged}"
-                                       Style="{StaticResource InputTextBoxStyle}" Margin="0,0,10,0"/>
-                            <Button    Grid.Column="4" Content="Move" Command="{Binding MoveToTargetCommand}"
-                                       Style="{StaticResource PrimaryButtonStyle}" Width="80"/>
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                <ScrollViewer Grid.Row="1"
+                              Margin="8,0,8,8"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              CanContentScroll="False"
+                              PanningMode="Both">
+                    <Canvas Width="520" Height="300"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RenderTransformOrigin="0.5,0.5">
+                        <Canvas.RenderTransform>
+                            <ScaleTransform ScaleX="{Binding PreviewZoom}" ScaleY="{Binding PreviewZoom}"/>
+                        </Canvas.RenderTransform>
 
-                <!-- Program Status -->
-                <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Program Status" Style="{StaticResource SectionHeaderStyle}"/>
-                        <!-- Stats row -->
-                        <UniformGrid Rows="1" Columns="3" Margin="0,0,0,10">
-                            <StackPanel>
-                                <TextBlock Text="Program" Style="{StaticResource FormLabelStyle}"/>
-                                <TextBlock Text="{Binding ProgramName}" FontSize="14" FontWeight="SemiBold"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <TextBlock Text="Completed" Style="{StaticResource FormLabelStyle}"/>
-                                <TextBlock Text="{Binding CompletedStrokes}" FontSize="14" FontWeight="SemiBold"
-                                           Foreground="{StaticResource SuccessBrush}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <TextBlock Text="Total" Style="{StaticResource FormLabelStyle}"/>
-                                <TextBlock Text="{Binding TotalStrokes}" FontSize="14" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </UniformGrid>
-                        <!-- Progress bar -->
-                        <ProgressBar Height="18"
-                                     Maximum="{Binding TotalStrokes}"
-                                     Value="{Binding CompletedStrokes}"
-                                     Foreground="{StaticResource SuccessBrush}"
-                                     Background="#E0E0E0"
-                                     Margin="0,0,0,10"/>
-                        <!-- Status message -->
-                        <TextBlock Text="{Binding StatusMessage}" FontSize="13"
-                                   Foreground="{StaticResource TextSecondaryBrush}"/>
-                    </StackPanel>
-                </Border>
+                        <Rectangle Canvas.Left="{Binding PreviewBackLeft}"
+                                   Canvas.Top="{Binding PreviewBackTop}"
+                                   Width="{Binding PreviewBoxWidth}"
+                                   Height="{Binding PreviewBoxHeight}"
+                                   Fill="#DCEBF7"
+                                   Stroke="#577D97"
+                                   StrokeThickness="2"
+                                   Opacity="0.9"/>
 
+                        <Rectangle Canvas.Left="{Binding PreviewFrontLeft}"
+                                   Canvas.Top="{Binding PreviewFrontTop}"
+                                   Width="{Binding PreviewBoxWidth}"
+                                   Height="{Binding PreviewBoxHeight}"
+                                   Fill="#F2EBE3"
+                                   Stroke="#202020"
+                                   StrokeThickness="3"/>
+
+                        <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackLeft}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackBottom}" Stroke="#202020" StrokeThickness="1.4"/>
+
+                        <ItemsControl ItemsSource="{Binding ToolPreviewShapes}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Ellipse Width="{Binding ShapeWidth}"
+                                                 Height="{Binding ShapeHeight}"
+                                                 Fill="{Binding FillColor}"
+                                                 Stroke="{Binding StrokeColor}"
+                                                                                                 StrokeThickness="2"
+                                                 Visibility="{Binding IsRound, Converter={StaticResource BoolToVisibility}}"/>
+                                        <Rectangle Width="{Binding ShapeWidth}"
+                                                   Height="{Binding ShapeHeight}"
+                                                   Fill="{Binding FillColor}"
+                                                   Stroke="{Binding StrokeColor}"
+                                                                                                     StrokeThickness="2"
+                                                   Visibility="{Binding IsSquare, Converter={StaticResource BoolToVisibility}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding LengthArrowY}" X2="{Binding PreviewFrontRight}" Y2="{Binding LengthArrowY}" Stroke="#1565C0" StrokeThickness="1.4"/>
+                        <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding LengthArrowY}" X2="{Binding PreviewFrontLeft}" Y2="{Binding PreviewFrontBottom}" Stroke="#1565C0" StrokeThickness="1.1"/>
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding LengthArrowY}" X2="{Binding PreviewFrontRight}" Y2="{Binding PreviewFrontBottom}" Stroke="#1565C0" StrokeThickness="1.1"/>
+
+                        <Line X1="{Binding WidthArrowX}" Y1="{Binding PreviewFrontTop}" X2="{Binding WidthArrowX}" Y2="{Binding PreviewFrontBottom}" Stroke="#1565C0" StrokeThickness="1.4"/>
+                        <Line X1="{Binding WidthArrowX}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewFrontLeft}" Y2="{Binding PreviewFrontTop}" Stroke="#1565C0" StrokeThickness="1.1"/>
+                        <Line X1="{Binding WidthArrowX}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewFrontLeft}" Y2="{Binding PreviewFrontBottom}" Stroke="#1565C0" StrokeThickness="1.1"/>
+
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}" Stroke="#CB4A4A" StrokeThickness="1.6"/>
+
+                        <TextBlock Canvas.Left="{Binding LengthLabelX}" Canvas.Top="{Binding LengthLabelY}" Text="{Binding LengthLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#0D3B66"/>
+                        <TextBlock Canvas.Left="{Binding WidthLabelX}" Canvas.Top="{Binding WidthLabelY}" Text="{Binding WidthLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#0D3B66"/>
+                        <TextBlock Canvas.Left="{Binding ThicknessLabelX}" Canvas.Top="{Binding ThicknessLabelY}" Text="{Binding ThicknessLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#7A1E1E"/>
+
+                        <Line X1="22" Y1="278" X2="88" Y2="278" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                        <Polygon Points="88,274 98,278 88,282" Fill="#0D3B66"/>
+                        <TextBlock Canvas.Left="102" Canvas.Top="270" Text="X" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+
+                        <Line X1="22" Y1="278" X2="22" Y2="218" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                        <Polygon Points="18,218 22,208 26,218" Fill="#0D3B66"/>
+                        <TextBlock Canvas.Left="28" Canvas.Top="206" Text="Y" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+                    </Canvas>
+                </ScrollViewer>
             </Grid>
-        </Grid>
+        </Border>
     </Grid>
 </UserControl>

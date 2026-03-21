@@ -13,6 +13,7 @@ public interface IControllerService
 {
     ConnectionState ConnectionState { get; }
     bool IsConnected { get; }
+    string? CurrentIpAddress { get; }
     string? LastConnectionError { get; }
     event EventHandler<ConnectionState>? ConnectionStateChanged;
 

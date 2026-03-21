@@ -12,16 +12,16 @@ public partial class DatabaseViewModel : ObservableObject
     private readonly IDataStoreService _dataStoreService;
 
     [ObservableProperty]
-    private ObservableCollection<ToolRecord> _toolRecords = new();
+    private ObservableCollection<PunchProgram> _programRecords = new();
 
     [ObservableProperty]
-    private ToolRecord? _selectedRecord;
+    private PunchProgram? _selectedRecord;
 
     [ObservableProperty]
-    private string _statusMessage = "Operator will Enter all the Data";
+    private string _statusMessage = "Saved punching records are shown here.";
 
     [ObservableProperty]
-    private string _notes = "Database Need to Save this file";
+    private string _notes = "Database view shows Punching screen saved data only.";
 
     [ObservableProperty]
     private bool _isConnected;
@@ -32,45 +32,39 @@ public partial class DatabaseViewModel : ObservableObject
         _dataStoreService = dataStoreService;
         _controllerService.ConnectionStateChanged += (_, s) => IsConnected = s == ConnectionState.Connected;
         IsConnected = controllerService.IsConnected;
-        LoadSampleData();
+        LoadProgramData();
     }
 
-    private void LoadSampleData()
+    private void LoadProgramData()
     {
-        var storedRecords = _dataStoreService.LoadToolRecords();
-        if (storedRecords.Count > 0)
-        {
-            ToolRecords = new ObservableCollection<ToolRecord>(storedRecords);
-            return;
-        }
+        var storedRecords = _dataStoreService.LoadPunchPrograms();
+        ProgramRecords = new ObservableCollection<PunchProgram>(storedRecords);
+    }
 
-        ToolRecords = new ObservableCollection<ToolRecord>
-        {
-            new() { ToolId = 1, ToolName = "Round Punch 10mm",   ToolType = "Round",  Diameter = 10.0, Length = 0.0,  Width = 0.0 },
-            new() { ToolId = 2, ToolName = "Square Punch 8x8",   ToolType = "Square", Diameter = 0.0,  Length = 8.0,  Width = 8.0 },
-            new() { ToolId = 3, ToolName = "Round Punch 6mm",    ToolType = "Round",  Diameter = 6.0,  Length = 0.0,  Width = 0.0 },
-            new() { ToolId = 4, ToolName = "Square Punch 12x10", ToolType = "Square", Diameter = 0.0,  Length = 12.0, Width = 10.0 },
-        };
-
-        _dataStoreService.SaveToolRecords(ToolRecords.ToList());
+    public void ReloadData()
+    {
+        LoadProgramData();
+        StatusMessage = "Data refreshed.";
     }
 
     [RelayCommand]
     private void AddRecord()
     {
-        var newRecord = new ToolRecord
+        var newRecord = new PunchProgram
         {
-            ToolId = ToolRecords.Count + 1,
-            ToolName = "New Tool",
-            ToolType = "Round",
-            Diameter = 10.0,
-            Length = 0.0,
-            Width = 0.0
+            ProgramId = ProgramRecords.Count > 0 ? ProgramRecords.Max(p => p.ProgramId) + 1 : 1,
+            ProgramName = "NEW_PROGRAM",
+            Material = string.Empty,
+            Comment = string.Empty,
+            Length = 0,
+            Width = 0,
+            Thickness = 0,
+            CreatedBy = "Operator"
         };
-        ToolRecords.Add(newRecord);
+        ProgramRecords.Add(newRecord);
         SelectedRecord = newRecord;
-        StatusMessage = "New record added. Use only Round or Square tool type.";
-        _dataStoreService.SaveToolRecords(ToolRecords.ToList());
+        StatusMessage = "New punching record added.";
+        _dataStoreService.SavePunchPrograms(ProgramRecords.ToList());
     }
 
     [RelayCommand]
@@ -78,42 +72,35 @@ public partial class DatabaseViewModel : ObservableObject
     {
         if (SelectedRecord != null)
         {
-            ToolRecords.Remove(SelectedRecord);
+            ProgramRecords.Remove(SelectedRecord);
             SelectedRecord = null;
             StatusMessage = "Record deleted.";
-            _dataStoreService.SaveToolRecords(ToolRecords.ToList());
+            _dataStoreService.SavePunchPrograms(ProgramRecords.ToList());
         }
     }
 
     [RelayCommand]
     private void SaveDatabase()
     {
-        foreach (var record in ToolRecords)
-        {
-            var normalizedType = string.Equals(record.ToolType, "Square", StringComparison.OrdinalIgnoreCase)
-                ? "Square"
-                : "Round";
+        foreach (var record in ProgramRecords)
+            record.ModifiedDate = DateTime.Now;
 
-            record.ToolType = normalizedType;
-            if (normalizedType == "Round")
-            {
-                record.Length = 0;
-                record.Width = 0;
-            }
-            else
-            {
-                record.Diameter = 0;
-            }
-        }
-
-        _dataStoreService.SaveToolRecords(ToolRecords.ToList());
-        StatusMessage = "Database saved successfully. Shape rules applied.";
+        _dataStoreService.SavePunchPrograms(ProgramRecords.ToList());
+        StatusMessage = "Punching database saved successfully.";
     }
 
     [RelayCommand]
     private void RefreshData()
     {
-        LoadSampleData();
-        StatusMessage = "Data refreshed.";
+        ReloadData();
+    }
+
+    [RelayCommand]
+    private void DeleteOldData()
+    {
+        ProgramRecords.Clear();
+        SelectedRecord = null;
+        _dataStoreService.SavePunchPrograms(new List<PunchProgram>());
+        StatusMessage = "All old database data deleted.";
     }
 }

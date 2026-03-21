@@ -20,12 +20,6 @@
                     <TextBlock Text="DataBase Option Clicked – Below Table Should be Displayed"
                                FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Ellipse Width="16" Height="16" Margin="0,0,6,0"
-                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
-                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
-                               Foreground="White" FontSize="12" VerticalAlignment="Center"/>
-                </StackPanel>
             </Grid>
         </Border>
 
@@ -42,35 +36,35 @@
 
         <!-- Data Table -->
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8">
-            <DataGrid ItemsSource="{Binding ToolRecords}"
+            <DataGrid ItemsSource="{Binding ProgramRecords}"
                       SelectedItem="{Binding SelectedRecord}"
+                      PreviewMouseDoubleClick="RecordsDataGrid_MouseDoubleClick"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
+                      IsReadOnly="True"
                       SelectionMode="Single">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"          Width="50"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Tool Name"   Binding="{Binding ToolName}"         Width="*"   IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"         Width="90"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}" Width="80"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"   Width="90"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Width (mm)"  Binding="{Binding Width, StringFormat={}{0:F1}}"    Width="90"  IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"            Width="*"   IsReadOnly="False"/>
+                    <DataGridTextColumn Header="ID"             Binding="{Binding ProgramId}" Width="50" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Name"           Binding="{Binding ProgramName}" Width="140" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Material"       Binding="{Binding Material}" Width="90" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Comment"        Binding="{Binding Comment}" Width="160" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Length (mm)"    Binding="{Binding Length, StringFormat={}{0:F3}}" Width="95" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Width (mm)"     Binding="{Binding Width, StringFormat={}{0:F3}}" Width="95" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Thickness (mm)" Binding="{Binding Thickness, StringFormat={}{0:F3}}" Width="105" IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Steps"          Binding="{Binding TotalStrokes, Mode=OneWay}" Width="60" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Created"        Binding="{Binding CreatedDate, StringFormat={}{0:dd-MMM-yyyy HH:mm}}" Width="140" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Updated"        Binding="{Binding ModifiedDate, StringFormat={}{0:dd-MMM-yyyy HH:mm}}" Width="140" IsReadOnly="True"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
 
-        <!-- Action Buttons -->
         <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
             <StackPanel Orientation="Horizontal">
-                <Button Content="+ Add Record"  Command="{Binding AddRecordCommand}"
-                        Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
-                <Button Content="Delete"        Command="{Binding DeleteRecordCommand}"
-                        Style="{StaticResource DangerButtonStyle}"  Margin="0,0,8,0"/>
-                <Button Content="Save Database" Command="{Binding SaveDatabaseCommand}"
-                        Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0"/>
-                <Button Content="Refresh"       Command="{Binding RefreshDataCommand}"
-                        Style="{StaticResource SecondaryButtonStyle}"/>
+                <Button Content="Delete Old Data"
+                        Command="{Binding DeleteOldDataCommand}"
+                        Style="{StaticResource DangerButtonStyle}"/>
             </StackPanel>
         </Border>
+
     </Grid>
 </UserControl>

@@ -52,3 +52,6 @@ Thumbs.db
 private_key*.txt
 public_key*.txt
 license.json
+
+## Temporary installer files
+~*.[Dd][Dd][Ff]

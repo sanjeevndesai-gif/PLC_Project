@@ -38,6 +38,7 @@ public class ControllerService : IControllerService
     }
 
     public bool IsConnected => ConnectionState == ConnectionState.Connected;
+    public string? CurrentIpAddress => _connectedIp;
     public string? LastConnectionError => _lastConnectionError;
 
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
@@ -49,6 +50,7 @@ public class ControllerService : IControllerService
     {
         ConnectionState = ConnectionState.Connecting;
         _lastConnectionError = null;
+        _connectedIp = ipAddress;
         try
         {
             if (string.IsNullOrWhiteSpace(ipAddress) || string.IsNullOrWhiteSpace(userName))
@@ -95,7 +97,6 @@ public class ControllerService : IControllerService
                 return false;
             }
 
-            _connectedIp = ipAddress;
             _savedUser = userName;
             _savedPassword = password;
             StopReconnect(); // cancel any in-progress reconnect loop

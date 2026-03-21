@@ -7,7 +7,6 @@
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -17,229 +16,207 @@
             <Grid>
                 <StackPanel>
                     <TextBlock Text="Machine Overview" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock Text="Real-time status of all machine systems" FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Ellipse Width="16" Height="16" Margin="0,0,6,0"
-                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
-                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
-                               Foreground="White" FontSize="12" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Status Tiles Row -->
-        <Grid Grid.Row="1" Margin="0,0,0,8">
+        <!-- Main content: Job + Controller info (no Axis) -->
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Controller Status -->
-            <Border Grid.Column="0" CornerRadius="8" Padding="14,12" Margin="0,0,6,0"
-                    Background="{Binding IsConnected, Converter={StaticResource IOStateToBrush}}">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="Controller" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
-                    <TextBlock Text="{Binding IsConnected, Converter={StaticResource BoolToStatusText}}"
-                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding ControllerIp}" FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Machine Mode -->
-            <Border Grid.Column="1" CornerRadius="8" Padding="14,12" Margin="0,0,6,0" Background="#1565C0">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="Mode" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
-                    <TextBlock Text="{Binding MachineMode}" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding IsMachineRunning, Converter={StaticResource BoolToStatusText}}"
-                               FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
-                </StackPanel>
-            </Border>
-
-            <!-- E-Stop -->
-            <Border Grid.Column="2" CornerRadius="8" Padding="14,12" Margin="0,0,6,0" Background="#DC3545">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="E-Stop" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
-                    <TextBlock Text="{Binding IsEStop, Converter={StaticResource BoolToStatusText}}"
-                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Emergency Stop" FontSize="10" Foreground="White" HorizontalAlignment="Center" Opacity="0.8"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Alarms -->
-            <Border Grid.Column="3" CornerRadius="8" Padding="14,12" Background="#F57F17">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="Alarms" FontSize="12" Foreground="White" HorizontalAlignment="Center" Opacity="0.85"/>
-                    <TextBlock Text="{Binding IsAlarmActive, Converter={StaticResource BoolToStatusText}}"
-                               FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding ActiveAlarmText}" FontSize="10" Foreground="White" HorizontalAlignment="Center"
-                               Opacity="0.8" TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- Main content: Axis + Job + Controller info -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="260"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Axis Positions -->
-            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
-                <StackPanel>
-                    <TextBlock Text="Current Axis Positions (mm)" Style="{StaticResource SectionHeaderStyle}"/>
+            <!-- Left side: 2D / 3D perspective preview (same pattern as Program Editor) -->
+            <TabControl Grid.Column="0" Margin="0,0,6,0"
+                        BorderThickness="1" BorderBrush="{StaticResource BorderBrush}">
 
-                    <!-- X -->
-                    <Border Background="#E3F2FD" CornerRadius="6" Padding="16,12" Margin="0,0,0,8">
+                <TabItem Header="2D Punch Preview">
+                    <Border Background="#53C8F0" BorderBrush="#2A9CCB" BorderThickness="1">
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="X" FontSize="36" FontWeight="Bold"
-                                       Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,20,0"/>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding PosX, StringFormat={}{0:F3}}"
-                                           FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
-                                <TextBlock Text="mm" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <DockPanel Grid.Row="0" Margin="8,6,8,4">
+                                <TextBlock DockPanel.Dock="Left" Text="Top View Preview" FontSize="12" FontWeight="SemiBold" Foreground="#124A77" VerticalAlignment="Center"/>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Content="-" Width="28" Height="24" Command="{Binding ZoomOutPreviewCommand}" Margin="0,0,4,0"
+                                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
+                                    <TextBlock Width="56" TextAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#123D5C"
+                                           Text="{Binding PreviewZoom, StringFormat={}{0:F1}x}"/>
+                                    <Button Content="+" Width="28" Height="24" Command="{Binding ZoomInPreviewCommand}" Margin="4,0,4,0"
+                                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
+                                    <Button Content="Reset" Width="52" Height="24" Command="{Binding ResetPreviewZoomCommand}"
+                                        Background="#FFF3CD" Foreground="#8A6D3B" BorderBrush="#E3C766" BorderThickness="1" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <ScrollViewer Grid.Row="1"
+                                          Margin="8,0,8,8"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          CanContentScroll="False"
+                                          PanningMode="Both">
+                                <Canvas Width="520" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        RenderTransformOrigin="0.5,0.5">
+                                    <Canvas.RenderTransform>
+                                        <ScaleTransform ScaleX="{Binding PreviewZoom}" ScaleY="{Binding PreviewZoom}"/>
+                                    </Canvas.RenderTransform>
+
+                                    <Rectangle Canvas.Left="{Binding PreviewSheetLeft}"
+                                               Canvas.Top="{Binding PreviewSheetTop}"
+                                               Width="{Binding PreviewSheetWidth}"
+                                               Height="{Binding PreviewSheetHeight}"
+                                               Fill="#DCEBF7"
+                                               Stroke="#577D97"
+                                               StrokeThickness="2"
+                                               Opacity="0.9"/>
+
+                                    <Rectangle Canvas.Left="{Binding PreviewSheetLeft}"
+                                               Canvas.Top="{Binding PreviewSheetTop}"
+                                               Width="{Binding PreviewSheetWidth}"
+                                               Height="{Binding PreviewSheetHeight}"
+                                               Fill="#F2EBE3"
+                                               Stroke="#202020"
+                                               StrokeThickness="3"/>
+
+                                    <ItemsControl ItemsSource="{Binding ToolPreviewShapes}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Ellipse Width="{Binding ShapeWidth}"
+                                                             Height="{Binding ShapeHeight}"
+                                                             Fill="{Binding FillColor}"
+                                                             Stroke="{Binding StrokeColor}"
+                                                             StrokeThickness="2"
+                                                             Visibility="{Binding IsRound, Converter={StaticResource BoolToVisibility}}"/>
+                                                    <Rectangle Width="{Binding ShapeWidth}"
+                                                               Height="{Binding ShapeHeight}"
+                                                               Fill="{Binding FillColor}"
+                                                               Stroke="{Binding StrokeColor}"
+                                                               StrokeThickness="2"
+                                                               Visibility="{Binding IsSquare, Converter={StaticResource BoolToVisibility}}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <Line X1="22" Y1="278" X2="88" Y2="278" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                                    <Polygon Points="88,274 98,278 88,282" Fill="#0D3B66"/>
+                                    <TextBlock Canvas.Left="102" Canvas.Top="270" Text="X" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+
+                                    <Line X1="22" Y1="278" X2="22" Y2="218" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                                    <Polygon Points="18,218 22,208 26,218" Fill="#0D3B66"/>
+                                    <TextBlock Canvas.Left="28" Canvas.Top="206" Text="Y" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+
+                                    <Border Canvas.Left="18" Canvas.Top="12" Background="#B3FFFFFF" BorderBrush="#7FA8C5" BorderThickness="1" CornerRadius="4" Padding="6,3">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="L:" FontWeight="SemiBold" Foreground="#0D3B66"/>
+                                            <TextBlock Text="{Binding RecentLengthText}" Margin="4,0,10,0" Foreground="#0D3B66"/>
+                                            <TextBlock Text="W:" FontWeight="SemiBold" Foreground="#0D3B66"/>
+                                            <TextBlock Text="{Binding RecentWidthText}" Margin="4,0,10,0" Foreground="#0D3B66"/>
+                                            <TextBlock Text="T:" FontWeight="SemiBold" Foreground="#7A1E1E"/>
+                                            <TextBlock Text="{Binding RecentThicknessText}" Margin="4,0,0,0" Foreground="#7A1E1E"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Canvas>
+                            </ScrollViewer>
                         </Grid>
                     </Border>
+                </TabItem>
 
-                    <!-- Y -->
-                    <Border Background="#E8F5E9" CornerRadius="6" Padding="16,12">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Y" FontSize="36" FontWeight="Bold"
-                                       Foreground="#2E7D32" VerticalAlignment="Center" Margin="0,0,20,0"/>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding PosY, StringFormat={}{0:F3}}"
-                                           FontSize="28" FontWeight="Bold" Foreground="#2E7D32"/>
-                                <TextBlock Text="mm" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            </StackPanel>
-                        </Grid>
+                <TabItem Header="3D Punch Preview">
+                    <Border Background="#0D1B2A">
+                        <Viewport3D x:Name="Overview3DViewport"
+                                    ClipToBounds="True"
+                                    Cursor="Hand"
+                                    MouseWheel="Overview3DViewport_MouseWheel"
+                                    MouseLeftButtonDown="Overview3DViewport_MouseLeftButtonDown"
+                                    MouseMove="Overview3DViewport_MouseMove"
+                                    MouseLeftButtonUp="Overview3DViewport_MouseLeftButtonUp"
+                                    MouseLeave="Overview3DViewport_MouseLeftButtonUp">
+                            <Viewport3D.Camera>
+                                <PerspectiveCamera x:Name="Overview3DCamera"
+                                                   Position="0,6,10"
+                                                   LookDirection="0,-4,-8"
+                                                   UpDirection="0,1,0"
+                                                   FieldOfView="50"/>
+                            </Viewport3D.Camera>
+                            <ModelVisual3D>
+                                <ModelVisual3D.Content>
+                                    <Model3DGroup x:Name="Overview3DScene">
+                                        <AmbientLight  Color="#606060"/>
+                                        <DirectionalLight Color="#FFFFFF" Direction="0.5,-1,-0.8"/>
+                                    </Model3DGroup>
+                                </ModelVisual3D.Content>
+                            </ModelVisual3D>
+                        </Viewport3D>
                     </Border>
+                </TabItem>
 
-                </StackPanel>
-            </Border>
+            </TabControl>
 
-            <!-- Current Job + Progress -->
-            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+            <!-- Properties panel -->
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="10">
                 <StackPanel>
-                    <TextBlock Text="Current Job" Style="{StaticResource SectionHeaderStyle}"/>
+                    <TextBlock Text="Properties" Style="{StaticResource SectionHeaderStyle}"/>
+                    <TextBlock Text="Comment:" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Height="26" Margin="0,2,0,8"
+                             Text="{Binding RecentComment}"
+                             IsReadOnly="True"/>
 
-                    <Border Background="#F5F5F5" CornerRadius="6" Padding="12" Margin="0,0,0,12">
-                        <StackPanel>
-                            <TextBlock Text="{Binding CurrentJob}" FontSize="22" FontWeight="Bold"
-                                       Foreground="{StaticResource PrimaryBrush}"/>
-                            <TextBlock Text="Active Program" FontSize="11"
-                                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"/>
-                        </StackPanel>
-                    </Border>
+                    <TextBlock Text="Material:" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Height="26" Margin="0,2,0,8"
+                             Text="{Binding RecentMaterial}"
+                             IsReadOnly="True"/>
 
-                    <Grid Margin="0,0,0,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Completed" Style="{StaticResource FormLabelStyle}"/>
-                            <TextBlock Text="{Binding CompletedStrokes}" FontSize="20" FontWeight="Bold"
-                                       Foreground="{StaticResource SuccessBrush}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="Total" Style="{StaticResource FormLabelStyle}"/>
-                            <TextBlock Text="{Binding TotalStrokes}" FontSize="20" FontWeight="Bold"/>
-                        </StackPanel>
-                    </Grid>
+                    <TextBlock Text="Length x width:" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Height="26" Margin="0,2,0,8"
+                             Text="{Binding RecentLengthWidth}"
+                             IsReadOnly="True"/>
 
-                    <TextBlock Text="Progress" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,6"/>
-                    <ProgressBar Height="20" Maximum="100" Value="{Binding ProgressPct}"
-                                 Foreground="{StaticResource SuccessBrush}" Background="#E0E0E0" Margin="0,0,0,6"/>
-                    <TextBlock HorizontalAlignment="Center" FontSize="12">
-                        <Run Text="{Binding ProgressPct, StringFormat={}{0:F1}}"/>
-                        <Run Text="% complete"/>
-                    </TextBlock>
-
-                    <Separator Margin="0,12"/>
-
-                    <TextBlock Text="Punch Force" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,4"/>
-                    <ProgressBar Height="14" Maximum="100" Value="{Binding PunchForce}"
-                                 Foreground="{StaticResource AccentBrush}" Background="#E0E0E0"/>
-                    <TextBlock HorizontalAlignment="Right" FontSize="11"
-                               Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0">
-                        <Run Text="{Binding PunchForce, StringFormat={}{0:F1}}"/>
-                        <Run Text="kN"/>
-                    </TextBlock>
-                </StackPanel>
-            </Border>
-
-            <!-- Controller Info + Quick Actions -->
-            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <TextBlock Text="Controller Info" Style="{StaticResource SectionHeaderStyle}"/>
-
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="IP Address:" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,8"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ControllerIp}"  FontSize="12" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Firmware:"   Style="{StaticResource FormLabelStyle}" Margin="0,0,0,8"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FirmwareVersion}" FontSize="12" Margin="0,0,0,8"/>
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Connected:"  Style="{StaticResource FormLabelStyle}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LastConnected}"  FontSize="11" TextWrapping="Wrap"/>
-                    </Grid>
-
-                        <TextBlock Text="POC Test I/O" Style="{StaticResource SectionHeaderStyle}"/>
-                        <Border Background="#F7F9FC" CornerRadius="6" Padding="10" Margin="0,0,0,16">
-                            <StackPanel>
-                                <TextBlock Text="Variable" Style="{StaticResource FormLabelStyle}"/>
-                                <TextBox Text="{Binding TestVariableName, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" Height="28"/>
-
-                                <TextBlock Text="Write Value (auto write while typing)" Style="{StaticResource FormLabelStyle}"/>
-                                <TextBox Text="{Binding TestWriteValue, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" Height="28"/>
-
-                                <TextBlock Text="Read Value" Style="{StaticResource FormLabelStyle}"/>
-                                <TextBlock Text="{Binding TestReadValue}" FontSize="14" FontWeight="SemiBold" Margin="0,2,0,8"/>
-
-                                <TextBlock Text="Write failed. Check connection/value format."
-                                           Foreground="#D32F2F" FontSize="11"
-                                           Visibility="{Binding IsTestWriteFailed, Converter={StaticResource BoolToVisibility}}"/>
-
-                                <Button Content="Read Now" Command="{Binding ReadTestVariableCommand}"
-                                        Style="{StaticResource BaseButtonStyle}" Height="30" Margin="0,6,0,0"/>
-                            </StackPanel>
-                        </Border>
-
-                    <TextBlock Text="Quick Actions" Style="{StaticResource SectionHeaderStyle}"/>
-                    <Button Content="⚠ E-STOP" Command="{Binding EmergencyStopCommand}"
-                            Background="Red" Foreground="White" Height="44"
-                            FontWeight="Bold" FontSize="14"
-                            Style="{StaticResource BaseButtonStyle}" Margin="0,0,0,6"/>
-                    <Button Content="Reset Alarms" Command="{Binding ResetAlarmsCommand}"
-                            Style="{StaticResource WarningButtonStyle}" Height="34" Margin="0,0,0,6"/>
+                    <TextBlock Text="Thickness:" Style="{StaticResource FormLabelStyle}"/>
+                    <TextBox Height="26" Margin="0,2,0,8"
+                             Text="{Binding RecentThickness}"
+                             IsReadOnly="True"/>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <!-- Footer Status -->
-        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
-            <TextBlock Text="{Binding StatusMessage}" FontSize="12"
-                       Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-        </Border>
+        <!-- Footer: Axis Positions in one line -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,8,0,0">
+            <!-- X Position -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,32,0">
+                <TextBlock Text="X:" FontSize="14" FontWeight="Bold" Foreground="#333" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PosX, StringFormat={}{0:F3}}"
+                               FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                    <TextBlock Text="mm" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="6,6,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Y Position -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,32,0">
+                <TextBlock Text="Y:" FontSize="14" FontWeight="Bold" Foreground="#333" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PosY, StringFormat={}{0:F3}}"
+                               FontSize="18" FontWeight="Bold" Foreground="#2E7D32"/>
+                    <TextBlock Text="mm" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="6,6,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CopaFormGui.Models;
 using CopaFormGui.Services;
 
 namespace CopaFormGui.ViewModels;
@@ -13,6 +14,9 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string _connectionStatusText = "Disconnected";
+
+    [ObservableProperty]
+    private string _controllerIp = "-";
 
     [ObservableProperty]
     private ObservableObject? _currentView;
@@ -31,7 +35,6 @@ public partial class MainViewModel : ObservableObject
     private readonly AlarmViewModel _alarmViewModel;
     private readonly ToolManagementViewModel _toolManagementViewModel;
     private readonly IOMonitorViewModel _ioMonitorViewModel;
-    private readonly ProgramEditorViewModel _programEditorViewModel;
 
     public MainViewModel(
         IControllerService controllerService,
@@ -42,8 +45,7 @@ public partial class MainViewModel : ObservableObject
         HandControlViewModel handControlViewModel,
         AlarmViewModel alarmViewModel,
         ToolManagementViewModel toolManagementViewModel,
-        IOMonitorViewModel ioMonitorViewModel,
-        ProgramEditorViewModel programEditorViewModel)
+        IOMonitorViewModel ioMonitorViewModel)
     {
         _controllerService = controllerService;
         _overviewViewModel = overviewViewModel;
@@ -54,7 +56,6 @@ public partial class MainViewModel : ObservableObject
         _alarmViewModel = alarmViewModel;
         _toolManagementViewModel = toolManagementViewModel;
         _ioMonitorViewModel = ioMonitorViewModel;
-        _programEditorViewModel = programEditorViewModel;
 
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = _controllerService.IsConnected;
@@ -80,11 +81,16 @@ public partial class MainViewModel : ObservableObject
             ConnectionState.Error        => "Connection Error",
             _                            => "Disconnected"
         };
+
+        ControllerIp = string.IsNullOrWhiteSpace(_controllerService.CurrentIpAddress)
+            ? "-"
+            : _controllerService.CurrentIpAddress!;
     }
 
     [RelayCommand]
     private void ShowOverview()
     {
+        _overviewViewModel.LoadFromPunchingOrDatabase(_punchingViewModel.GetCurrentProgramSnapshot());
         CurrentView = _overviewViewModel;
         CurrentViewName = "Overview";
         StatusBarMessage = "Machine Overview";
@@ -98,6 +104,14 @@ public partial class MainViewModel : ObservableObject
         StatusBarMessage = "Punching Operations";
     }
 
+    public void OpenPunchingRecord(PunchProgram record)
+    {
+        _punchingViewModel.OpenProgramFromDatabase(record);
+        CurrentView = _punchingViewModel;
+        CurrentViewName = "Punching";
+        StatusBarMessage = "Punching record opened from Database";
+    }
+
     [RelayCommand]
     private void ShowHandControl()
     {
@@ -109,6 +123,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ShowDatabase()
     {
+        _databaseViewModel.ReloadData();
         CurrentView = _databaseViewModel;
         CurrentViewName = "Database";
         StatusBarMessage = "Database – Operator will enter all the data";
@@ -144,24 +159,6 @@ public partial class MainViewModel : ObservableObject
         CurrentView = _ioMonitorViewModel;
         CurrentViewName = "I/O Monitor";
         StatusBarMessage = "PLC Digital I/O Monitor";
-    }
-
-    [RelayCommand]
-    private void ShowProgramEditor()
-    {
-        try
-        {
-            App.LogInfo("Navigating to Program Editor");
-            CurrentView = _programEditorViewModel;
-            CurrentViewName = "Program Editor";
-            StatusBarMessage = "CNC Punch Program Editor";
-            App.LogInfo("Program Editor navigation completed");
-        }
-        catch (Exception ex)
-        {
-            App.LogException("ShowProgramEditor", ex);
-            StatusBarMessage = "Program Editor open failed. Check app log.";
-        }
     }
 
     partial void OnCurrentViewChanged(ObservableObject? value)

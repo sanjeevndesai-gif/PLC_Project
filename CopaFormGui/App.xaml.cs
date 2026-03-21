@@ -131,7 +131,6 @@ public partial class App : Application
         services.AddSingleton<AlarmViewModel>();
         services.AddSingleton<ToolManagementViewModel>();
         services.AddSingleton<IOMonitorViewModel>();
-        services.AddSingleton<ProgramEditorViewModel>();
         services.AddSingleton<MainViewModel>();
 
         // Views
