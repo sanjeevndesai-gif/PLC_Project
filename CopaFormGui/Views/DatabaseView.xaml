@@ -51,7 +51,7 @@
                     <DataGridTextColumn Header="Length (mm)"    Binding="{Binding Length, StringFormat={}{0:F3}}" Width="95" IsReadOnly="False"/>
                     <DataGridTextColumn Header="Width (mm)"     Binding="{Binding Width, StringFormat={}{0:F3}}" Width="95" IsReadOnly="False"/>
                     <DataGridTextColumn Header="Thickness (mm)" Binding="{Binding Thickness, StringFormat={}{0:F3}}" Width="105" IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Steps"          Binding="{Binding TotalStrokes, Mode=OneWay}" Width="60" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Steps"          Binding="{Binding TotalStrokes}" Width="60" IsReadOnly="True"/>
                     <DataGridTextColumn Header="Created"        Binding="{Binding CreatedDate, StringFormat={}{0:dd-MMM-yyyy HH:mm}}" Width="140" IsReadOnly="True"/>
                     <DataGridTextColumn Header="Updated"        Binding="{Binding ModifiedDate, StringFormat={}{0:dd-MMM-yyyy HH:mm}}" Width="140" IsReadOnly="True"/>
                 </DataGrid.Columns>

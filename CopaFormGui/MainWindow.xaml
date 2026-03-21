@@ -68,32 +68,15 @@
 
         <!-- TOOLBAR -->
         <ToolBar DockPanel.Dock="Top" Background="{StaticResource ToolbarBrush}" Height="42">
-            <DockPanel LastChildFill="True" Width="100%">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
-                    <Border Background="#31424A" CornerRadius="6" Padding="8,4" Margin="2,0,8,0">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Image Source="{StaticResource CopaLogoImage}" Width="22" Height="22" Margin="0,0,8,0"/>
-                            <StackPanel>
-                                <TextBlock Text="Copa Form" Foreground="White" FontSize="12" FontWeight="Bold"/>
-                                <TextBlock Text="Punch Control" Style="{StaticResource BrandCaptionStyle}"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-                    <!-- TEST LABEL: Should always be visible if toolbar is rendering -->
-                    <TextBlock Text="TOOLBAR TEST LABEL" Foreground="Red" FontSize="16" FontWeight="Bold" Margin="16,0,0,0"/>
+            <Border Background="#31424A" CornerRadius="6" Padding="8,4" Margin="2,0,8,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="{StaticResource CopaLogoImage}" Width="22" Height="22" Margin="0,0,8,0"/>
+                    <StackPanel>
+                        <TextBlock Text="Copa Form" Foreground="White" FontSize="12" FontWeight="Bold"/>
+                        <TextBlock Text="Punch Control" Style="{StaticResource BrandCaptionStyle}"/>
+                    </StackPanel>
                 </StackPanel>
-                <DockPanel DockPanel.Dock="Right" HorizontalAlignment="Right" LastChildFill="False" Margin="0,0,8,0">
-                    <Border Background="#1A2633" Padding="10,2" CornerRadius="8" DockPanel.Dock="Right">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="14" Height="14" Margin="0,0,6,0"
-                                     Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
-                            <TextBlock Text="{Binding ConnectionStatusText}" Foreground="White" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="|" Foreground="#BBDEFB" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="{Binding ControllerIp}" Foreground="#BBDEFB" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-                </DockPanel>
-            </DockPanel>
+            </Border>
             <Button Command="{Binding ShowOverviewCommand}" ToolTip="Machine Overview" Margin="2,0"
                     Style="{StaticResource BaseButtonStyle}" Background="Transparent" Foreground="White">
                 <StackPanel Orientation="Horizontal">
@@ -142,6 +125,14 @@
                 </StackPanel>
             </Button>
             <Separator/>
+            <Button Command="{Binding ShowProgramEditorCommand}" ToolTip="Program Editor" Margin="2,0"
+                    Style="{StaticResource BaseButtonStyle}" Background="Transparent" Foreground="White">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#x1F4DD;" FontSize="14" Margin="0,0,4,0"/>
+                    <TextBlock Text="Programs" FontSize="12"/>
+                </StackPanel>
+            </Button>
+            <Separator/>
             <Button Command="{Binding ShowSettingsCommand}" ToolTip="Settings" Margin="2,0"
                     Style="{StaticResource BaseButtonStyle}" Background="Transparent" Foreground="White">
                 <StackPanel Orientation="Horizontal">
@@ -157,31 +148,27 @@
                     <TextBlock Text="Alarms" FontSize="12"/>
                 </StackPanel>
             </Button>
-            <DockPanel LastChildFill="False" HorizontalAlignment="Right" Margin="0,0,8,0">
-                <Border Background="#1A2633" Padding="10,2" CornerRadius="8" DockPanel.Dock="Right">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="14" Height="14" Margin="0,0,6,0"
-                                 Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
-                        <TextBlock Text="{Binding ConnectionStatusText}" Foreground="White" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                        <TextBlock Text="|" Foreground="#BBDEFB" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding ControllerIp}" Foreground="#BBDEFB" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
-                        <!-- DEBUG: Show DataContext type and property values -->
-                        <TextBlock Foreground="Yellow" FontSize="11" Margin="12,0,0,0">
-                            <TextBlock.Text>
-                                {Binding Path=., StringFormat=DBG: {0}, Converter={x:Static ObjectTypeConverter.Instance}}
-                            </TextBlock.Text>
-                        </TextBlock>
-                        <TextBlock Foreground="Orange" FontSize="11" Margin="6,0,0,0"
-                                   Text="DBG: IsConnected={Binding IsConnected}, Status={Binding ConnectionStatusText}, IP={Binding ControllerIp}"/>
-                    </StackPanel>
-                </Border>
-            </DockPanel>
+            <!-- Spacer pushes status to right -->
+            <TextBlock HorizontalAlignment="Right" Margin="40,0,0,0"/>
+            <!-- Controller Status -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0">
+                <Ellipse Width="14" Height="14" Margin="0,0,6,0"
+                         Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
+                <TextBlock Text="{Binding ConnectionStatusText}" Foreground="White" FontSize="12" VerticalAlignment="Center"/>
+            </StackPanel>
         </ToolBar>
 
         <!-- STATUS BAR -->
         <StatusBar DockPanel.Dock="Bottom" Background="{StaticResource PrimaryDarkBrush}" Height="24">
             <StatusBarItem>
                 <TextBlock Text="{Binding StatusBarMessage}" Foreground="White" FontSize="11"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="10" Height="10" Margin="0,0,4,0"
+                             Fill="{Binding IsConnected, Converter={StaticResource BoolToConnectionColor}}"/>
+                    <TextBlock Text="{Binding ConnectionStatusText}" Foreground="White" FontSize="11"/>
+                </StackPanel>
             </StatusBarItem>
         </StatusBar>
 
