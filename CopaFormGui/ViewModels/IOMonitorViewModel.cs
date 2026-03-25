@@ -44,17 +44,24 @@ public partial class IOMonitorViewModel : ObservableObject
         {
             new() { Address =  0, Name = "X1.00", Description = "E-Stop Input",           IsOutput = false, State = false },
             new() { Address =  1, Name = "X1.01", Description = "Machine Ready",           IsOutput = false, State = true  },
-            new() { Address =  2, Name = "X1.02", Description = "X Home Switch",           IsOutput = false, State = false },
-            new() { Address =  3, Name = "X1.03", Description = "Y Home Switch",           IsOutput = false, State = false },
             new() { Address =  5, Name = "X1.05", Description = "X+ Limit",                IsOutput = false, State = false },
             new() { Address =  6, Name = "X1.06", Description = "X- Limit",                IsOutput = false, State = false },
             new() { Address =  7, Name = "X1.07", Description = "Y+ Limit",                IsOutput = false, State = false },
             new() { Address =  8, Name = "X2.00", Description = "Y- Limit",                IsOutput = false, State = false },
             new() { Address = 11, Name = "X2.03", Description = "Punch Up Sensor",         IsOutput = false, State = true  },
             new() { Address = 12, Name = "X2.04", Description = "Punch Down Sensor",       IsOutput = false, State = false },
-            new() { Address = 13, Name = "X2.05", Description = "Clamp Open Sensor",       IsOutput = false, State = true  },
-            new() { Address = 14, Name = "X2.06", Description = "Clamp Close Sensor",      IsOutput = false, State = false },
             new() { Address = 15, Name = "X2.07", Description = "Sheet Present Sensor",    IsOutput = false, State = false },
+
+            // New sensors added below
+            new() { Address = 16, Name = "X3.00", Description = "Door Limit Switch",       IsOutput = false, State = false },
+            new() { Address = 17, Name = "X3.01", Description = "Foot Switch",            IsOutput = false, State = false },
+            new() { Address = 18, Name = "X3.02", Description = "Oil Level Low",          IsOutput = false, State = false },
+            new() { Address = 19, Name = "X3.03", Description = "Oil Level High",         IsOutput = false, State = false },
+            new() { Address = 20, Name = "X3.04", Description = "Control On",             IsOutput = false, State = false },
+            new() { Address = 21, Name = "X3.05", Description = "Control Off",            IsOutput = false, State = false },
+            new() { Address = 22, Name = "X3.06", Description = "Manual",                 IsOutput = false, State = false },
+            new() { Address = 23, Name = "X3.07", Description = "Auto",                   IsOutput = false, State = false },
+            new() { Address = 24, Name = "X3.10", Description = "Hydrolic On/Off",        IsOutput = false, State = false },
         };
 
         Outputs = new ObservableCollection<IOPoint>

@@ -15,7 +15,7 @@
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
             <Grid>
                 <StackPanel>
-                    <TextBlock Text="Hand Control – Manual Jog" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="Manual Jog" FontSize="18" FontWeight="Bold" Foreground="White"/>
                     <TextBlock Text="Use jog buttons to move each axis manually" FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
                 </StackPanel>
             </Grid>

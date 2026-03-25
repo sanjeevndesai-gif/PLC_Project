@@ -27,7 +27,7 @@ public partial class OverviewViewModel : ObservableObject
     [ObservableProperty] private double _previewSheetTop = 70;
     [ObservableProperty] private double _previewSheetWidth = 300;
     [ObservableProperty] private double _previewSheetHeight = 150;
-    [ObservableProperty] private double _previewZoom = 1.0;
+    [ObservableProperty] private double _previewZoom = 1.5;
 
     // Machine state
     [ObservableProperty] private string _machineMode = "Manual";
@@ -310,7 +310,7 @@ public partial class OverviewViewModel : ObservableObject
     [RelayCommand]
     private void ResetPreviewZoom()
     {
-        PreviewZoom = 1.0;
+        PreviewZoom = 1.5;
     }
 
     private static bool IsSquareToolType(string? rawType)

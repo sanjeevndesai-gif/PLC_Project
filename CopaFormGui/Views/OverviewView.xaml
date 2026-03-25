@@ -37,22 +37,12 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <DockPanel Grid.Row="0" Margin="8,6,8,4">
-                                <TextBlock DockPanel.Dock="Left" Text="Top View Preview" FontSize="12" FontWeight="SemiBold" Foreground="#124A77" VerticalAlignment="Center"/>
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                    <Button Content="-" Width="28" Height="24" Command="{Binding ZoomOutPreviewCommand}" Margin="0,0,4,0"
-                                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
-                                    <TextBlock Width="56" TextAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#123D5C"
-                                           Text="{Binding PreviewZoom, StringFormat={}{0:F1}x}"/>
-                                    <Button Content="+" Width="28" Height="24" Command="{Binding ZoomInPreviewCommand}" Margin="4,0,4,0"
-                                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
-                                    <Button Content="Reset" Width="52" Height="24" Command="{Binding ResetPreviewZoomCommand}"
-                                        Background="#FFF3CD" Foreground="#8A6D3B" BorderBrush="#E3C766" BorderThickness="1" FontWeight="SemiBold"/>
-                                </StackPanel>
-                            </DockPanel>
+                            <TextBlock Grid.Row="0" Margin="8,6,8,4" Text="Top View Preview" FontSize="12" FontWeight="SemiBold" Foreground="#124A77" VerticalAlignment="Center"/>
 
+                            <!-- Preview Area -->
                             <ScrollViewer Grid.Row="1"
                                           Margin="8,0,8,8"
                                           HorizontalScrollBarVisibility="Auto"
@@ -113,27 +103,51 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-
-                                    <Line X1="22" Y1="278" X2="88" Y2="278" Stroke="#0D3B66" StrokeThickness="1.6"/>
-                                    <Polygon Points="88,274 98,278 88,282" Fill="#0D3B66"/>
-                                    <TextBlock Canvas.Left="102" Canvas.Top="270" Text="X" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
-
-                                    <Line X1="22" Y1="278" X2="22" Y2="218" Stroke="#0D3B66" StrokeThickness="1.6"/>
-                                    <Polygon Points="18,218 22,208 26,218" Fill="#0D3B66"/>
-                                    <TextBlock Canvas.Left="28" Canvas.Top="206" Text="Y" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
-
-                                    <Border Canvas.Left="18" Canvas.Top="12" Background="#B3FFFFFF" BorderBrush="#7FA8C5" BorderThickness="1" CornerRadius="4" Padding="6,3">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="L:" FontWeight="SemiBold" Foreground="#0D3B66"/>
-                                            <TextBlock Text="{Binding RecentLengthText}" Margin="4,0,10,0" Foreground="#0D3B66"/>
-                                            <TextBlock Text="W:" FontWeight="SemiBold" Foreground="#0D3B66"/>
-                                            <TextBlock Text="{Binding RecentWidthText}" Margin="4,0,10,0" Foreground="#0D3B66"/>
-                                            <TextBlock Text="T:" FontWeight="SemiBold" Foreground="#7A1E1E"/>
-                                            <TextBlock Text="{Binding RecentThicknessText}" Margin="4,0,0,0" Foreground="#7A1E1E"/>
-                                        </StackPanel>
-                                    </Border>
                                 </Canvas>
                             </ScrollViewer>
+
+                            <!-- L/W/T Info Panel OUTSIDE Canvas -->
+                                                        <!-- Axis Graphic OUTSIDE Canvas -->
+                                                        <Canvas Grid.Row="2" Width="120" Height="90" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="16,0,0,8" IsHitTestVisible="False">
+                                                            <Line X1="22" Y1="78" X2="88" Y2="78" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                                                            <Polygon Points="88,74 98,78 88,82" Fill="#0D3B66"/>
+                                                            <TextBlock Canvas.Left="102" Canvas.Top="70" Text="X" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+                                                            <Line X1="22" Y1="78" X2="22" Y2="18" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                                                            <Polygon Points="18,18 22,8 26,18" Fill="#0D3B66"/>
+                                                            <TextBlock Canvas.Left="28" Canvas.Top="6" Text="Y" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+                                                        </Canvas>
+                            <Border Grid.Row="2" Width="320" Height="36" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                                    Background="#B3FFFFFF" BorderBrush="#7FA8C5" BorderThickness="1" CornerRadius="4" Padding="6,3" Margin="0,8,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="L:" FontWeight="SemiBold" Foreground="#0D3B66" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding RecentLengthText}" Foreground="#0D3B66" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="W:" FontWeight="SemiBold" Foreground="#0D3B66" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding RecentWidthText}" Foreground="#0D3B66" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="4" Text="T:" FontWeight="SemiBold" Foreground="#7A1E1E" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="5" Text="{Binding RecentThicknessText}" Foreground="#7A1E1E" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Zoom Controls OUTSIDE Canvas -->
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,16,8"
+                                        Background="#F8F9FAAA">
+                                <Button Content="-" Width="28" Height="24" Command="{Binding ZoomOutPreviewCommand}"
+                                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
+                                <TextBlock Width="56" TextAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="#123D5C"
+                                           Text="{Binding PreviewZoom, StringFormat={}{0:F1}x}"/>
+                                <Button Content="+" Width="28" Height="24" Command="{Binding ZoomInPreviewCommand}"
+                                        Background="#FFFFFF" Foreground="#0D3B66" BorderBrush="#5B9BD5" BorderThickness="1" FontWeight="Bold"/>
+                                <Button Content="Reset" Width="52" Height="24" Command="{Binding ResetPreviewZoomCommand}"
+                                        Background="#FFF3CD" Foreground="#8A6D3B" BorderBrush="#E3C766" BorderThickness="1" FontWeight="SemiBold"/>
+                            </StackPanel>
                         </Grid>
                     </Border>
                 </TabItem>
