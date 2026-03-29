@@ -84,7 +84,26 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Margin="8,6,8,4" Text="Top View Preview" FontSize="12" FontWeight="SemiBold" Foreground="#124A77" VerticalAlignment="Center"/>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Axis Graphic in top left corner -->
+                                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8,6,0,0">
+                                    <TextBlock Text="Top View Preview" FontSize="12" FontWeight="SemiBold" Foreground="#124A77" HorizontalAlignment="Left"/>
+                                    <Canvas Width="100" Height="100" Margin="0,1,0,0" IsHitTestVisible="False">
+                                        <!-- X axis (right, length 60) -->
+                                        <Line X1="20" Y1="20" X2="80" Y2="20" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                                        <Polygon Points="80,16 90,20 80,24" Fill="#0D3B66"/>
+                                        <TextBlock Canvas.Left="92" Canvas.Top="12" Text="X" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+                                        <!-- Y axis (down, length 60) -->
+                                        <Line X1="20" Y1="20" X2="20" Y2="80" Stroke="#0D3B66" StrokeThickness="1.6"/>
+                                        <Polygon Points="16,80 20,90 24,80" Fill="#0D3B66"/>
+                                        <TextBlock Canvas.Left="28" Canvas.Top="82" Text="Y" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
+                                    </Canvas>
+                                </StackPanel>
+                            </Grid>
 
                             <!-- Preview Area -->
                             <ScrollViewer Grid.Row="1"
@@ -151,15 +170,6 @@
                             </ScrollViewer>
 
                             <!-- L/W/T Info Panel OUTSIDE Canvas -->
-                                                        <!-- Axis Graphic OUTSIDE Canvas -->
-                                                        <Canvas Grid.Row="2" Width="120" Height="90" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="16,0,0,8" IsHitTestVisible="False">
-                                                            <Line X1="22" Y1="78" X2="88" Y2="78" Stroke="#0D3B66" StrokeThickness="1.6"/>
-                                                            <Polygon Points="88,74 98,78 88,82" Fill="#0D3B66"/>
-                                                            <TextBlock Canvas.Left="102" Canvas.Top="70" Text="X" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
-                                                            <Line X1="22" Y1="78" X2="22" Y2="18" Stroke="#0D3B66" StrokeThickness="1.6"/>
-                                                            <Polygon Points="18,18 22,8 26,18" Fill="#0D3B66"/>
-                                                            <TextBlock Canvas.Left="28" Canvas.Top="6" Text="Y" FontSize="11" FontWeight="Bold" Foreground="#0D3B66"/>
-                                                        </Canvas>
                             <Border Grid.Row="2" Width="320" Height="36" HorizontalAlignment="Center" VerticalAlignment="Bottom"
                                     Background="#B3FFFFFF" BorderBrush="#7FA8C5" BorderThickness="1" CornerRadius="4" Padding="6,3" Margin="0,8,0,0">
                                 <Grid>
