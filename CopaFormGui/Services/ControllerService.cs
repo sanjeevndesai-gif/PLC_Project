@@ -51,7 +51,7 @@ public class ControllerService : IControllerService
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
 
     private const int ModbusPort = 22;
-    private const int ConnectTimeoutMs = 15000;
+    private const int ConnectTimeoutMs = 30000;
 
     public async Task<bool> ConnectAsync(string ipAddress, string userName, string password)
     {

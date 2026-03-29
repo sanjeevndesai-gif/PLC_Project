@@ -1,11 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
 using CopaFormGui.Services;
 
 namespace CopaFormGui.ViewModels;
-
 public partial class HandControlViewModel : ObservableObject
 {
+    private readonly DispatcherTimer _axisPollTimer;
     // PMAC Jog/Home global variable mapping
     public async Task SetJogVariableAsync(string variable, int value)
     {
@@ -61,6 +62,28 @@ public partial class HandControlViewModel : ObservableObject
         _controllerService = controllerService;
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = controllerService.IsConnected;
+
+        _axisPollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        _axisPollTimer.Tick += async (s, e) => await PollAxisPositionsAsync();
+        _axisPollTimer.Start();
+    }
+
+    private async Task PollAxisPositionsAsync()
+    {
+        if (_controllerService.IsConnected)
+        {
+            var xRaw = await _controllerService.ReadVariableAsync("X_ABS_POS");
+            var yRaw = await _controllerService.ReadVariableAsync("Y_ABS_POS");
+            string debugMsg = $"PMAC X_ABS_POS: {xRaw?.ToString() ?? "null"}, Y_ABS_POS: {yRaw?.ToString() ?? "null"}";
+            if (xRaw.HasValue) PosX = xRaw.Value;
+            if (yRaw.HasValue) PosY = yRaw.Value;
+            StatusMessage = $"Connected | X: {PosX:F3} | Y: {PosY:F3} | {debugMsg}";
+        }
+        else
+        {
+            StatusMessage = "Not connected to PMAC";
+        }
+    // removed extra closing brace
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionState state)
