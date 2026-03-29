@@ -30,6 +30,9 @@ public partial class IOMonitorViewModel : ObservableObject
 
         // Subscribe to OutputValueChanged event
         CopaFormGui.Models.IOPoint.OutputValueChanged += OnOutputValueChanged;
+
+        // Fetch initial I/O states immediately
+        _ = RefreshStatesAsync();
     }
 
     private async void OnOutputValueChanged(CopaFormGui.Models.IOPoint point, string value)
@@ -37,7 +40,7 @@ public partial class IOMonitorViewModel : ObservableObject
         if (point.IsOutput && IsConnected)
         {
             // Send value ("1" or "0") to PMAC controller
-            await _controllerService.WriteOutputValueAsync(point.Address, value);
+            await _controllerService.WriteOutputValueAsync(point.Name, value);
             StatusMessage = $"Output {point.Name} set to {(value == "1" ? "ON" : "OFF")}";
         }
     }
@@ -46,9 +49,15 @@ public partial class IOMonitorViewModel : ObservableObject
     {
         IsConnected = state == ConnectionState.Connected;
         if (IsConnected)
+        {
             StartAutoRefresh();
+            // Fetch I/O states immediately after connecting
+            _ = RefreshStatesAsync();
+        }
         else
+        {
             StopAutoRefresh();
+        }
     }
 
     private void LoadPoints()
@@ -94,8 +103,18 @@ public partial class IOMonitorViewModel : ObservableObject
 
     private void StartAutoRefresh()
     {
-        _refreshTimer = new System.Timers.Timer(1000);
-        _refreshTimer.Elapsed += async (_, _) => await RefreshStatesAsync();
+        _refreshTimer = new System.Timers.Timer(200); // 200ms for near real-time updates
+        _refreshTimer.Elapsed += async (_, _) =>
+        {
+            try
+            {
+                await RefreshStatesAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[IOMonitor] Timer exception: {ex}");
+            }
+        };
         _refreshTimer.Start();
     }
 
@@ -110,10 +129,15 @@ public partial class IOMonitorViewModel : ObservableObject
     {
         if (!IsConnected) return;
         foreach (var pt in Inputs)
-            pt.State = await _controllerService.ReadCoilAsync(pt.Address);
+        {
+            var value = await _controllerService.ReadVariableAsync(pt.Name);
+            pt.State = value.HasValue && value.Value != 0;
+        }
         foreach (var pt in Outputs)
-            pt.State = await _controllerService.ReadCoilAsync(pt.Address);
-
+        {
+            var value = await _controllerService.ReadVariableAsync(pt.Name);
+            pt.State = value.HasValue && value.Value != 0;
+        }
         StatusMessage = $"Last refresh: {DateTime.Now:HH:mm:ss}";
     }
 

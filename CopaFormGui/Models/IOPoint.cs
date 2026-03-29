@@ -1,7 +1,10 @@
 namespace CopaFormGui.Models;
 
 /// <summary>Represents a single PLC digital I/O point.</summary>
-public class IOPoint
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+public class IOPoint : INotifyPropertyChanged
 {
     // Static event for output value changes (to be handled in ViewModel for actual PMAC call)
     public static event Action<IOPoint, string>? OutputValueChanged;
@@ -18,6 +21,7 @@ public class IOPoint
                 // Notify listeners (ViewModel) to send to PMAC
                 if (IsOutput)
                     OutputValueChanged?.Invoke(this, value);
+                OnPropertyChanged();
             }
         }
     }
@@ -37,8 +41,15 @@ public class IOPoint
                 // For outputs, trigger OutputValueChanged event with string value ("1" or "0")
                 if (IsOutput)
                     OutputValueChanged?.Invoke(this, value ? "1" : "0");
+                OnPropertyChanged();
             }
         }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     public bool IsOutput { get; set; }
 }

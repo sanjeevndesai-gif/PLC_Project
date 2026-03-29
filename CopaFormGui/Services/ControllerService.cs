@@ -7,12 +7,20 @@ namespace CopaFormGui.Services;
 
 public class ControllerService : IControllerService
 {
-    public async Task WriteOutputValueAsync(int address, string value)
+    public async Task WriteOutputValueAsync(string variableName, string value)
     {
-        // TODO: Implement actual logic to send value to PMAC controller
-        await Task.Delay(50); // Simulate async work
-        // You might want to parse the value and call WriteCoilAsync, WriteRegisterAsync, etc.
-        // Example: await WriteCoilAsync(address, value == "1" || value.ToLower() == "on");
+        if (!IsConnected || string.IsNullOrWhiteSpace(variableName)) return;
+
+        // Try to parse the value as a double (for numeric PMAC variables)
+        if (double.TryParse(value, out var doubleValue))
+        {
+            await WriteVariableAsync(variableName, doubleValue);
+        }
+        else
+        {
+            // Optionally handle boolean or string values for coils or other types
+            // await WriteCoilAsync(variableName, value == "1" || value.ToLower() == "on");
+        }
     }
     private ConnectionState _connectionState = ConnectionState.Disconnected;
     private readonly Random _random = new();
@@ -372,7 +380,9 @@ public class ControllerService : IControllerService
 
     public async Task<double?> ReadVariableAsync(string variableName)
     {
-        var response = await ReadResponseAsync(variableName);
+        // Always use 'echo 7 <variable>' for digital input reads to get a clean numeric response
+        var response = await ReadResponseAsync($"echo 7 {variableName}");
+        System.Diagnostics.Debug.WriteLine($"[PMAC] ReadVariableAsync: {variableName} => '{response}'");
         return TryParseDoubleFromResponse(response ?? string.Empty, out var value) ? value : null;
     }
 
