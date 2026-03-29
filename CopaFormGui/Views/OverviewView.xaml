@@ -46,8 +46,9 @@
                                 <CheckBox Grid.Row="2" Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center"/>
                             </Grid>
                             <Border Background="#F4F7FB" CornerRadius="6" Padding="2" Margin="0,0,0,12">
-                                <DataGrid AutoGenerateColumns="False" HeadersVisibility="Column" Height="100" Margin="0" BorderThickness="0" >
+                                <DataGrid AutoGenerateColumns="False" HeadersVisibility="Column" Height="100" Margin="0" BorderThickness="0" ItemsSource="{Binding RunPopupPunchRows}">
                                     <DataGrid.Columns>
+                                        <DataGridTextColumn Header="ToolId" Binding="{Binding ToolId}" Width="60"/>
                                         <DataGridTextColumn Header="Tool" Binding="{Binding Tool}" Width="60"/>
                                         <DataGridTextColumn Header="Punch" Binding="{Binding Punch}" Width="*"/>
                                     </DataGrid.Columns>
@@ -227,6 +228,12 @@
                     <TextBox Height="26" Margin="0,2,0,8"
                              Text="{Binding RecentThickness}"
                              IsReadOnly="True"/>
+
+                    <!-- Display last saved file content -->
+                    <TextBlock Text="Last Saved File Content:" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,0"/>
+                    <ScrollViewer Height="120" VerticalScrollBarVisibility="Auto" Margin="0,2,0,8">
+                        <TextBox Text="{Binding LastSavedFileContent}" IsReadOnly="True" TextWrapping="NoWrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" BorderThickness="1"/>
+                    </ScrollViewer>
                 </StackPanel>
             </Border>
         </Grid>

@@ -10,6 +10,12 @@ namespace CopaFormGui.ViewModels;
 
 public partial class OverviewViewModel : ObservableObject
 {
+    // Holds the content of the last saved punch program file for display
+    [ObservableProperty]
+    private string _lastSavedFileContent = string.Empty;
+    // For RunPopup DataGrid
+    [ObservableProperty]
+    private ObservableCollection<RunPopupPunchRow> _runPopupPunchRows = new();
     private readonly IControllerService _controllerService;
     private readonly IDataStoreService _dataStoreService;
     private System.Timers.Timer? _pollTimer;
@@ -156,6 +162,22 @@ public partial class OverviewViewModel : ObservableObject
         RecentWidthText = $"{safeWidth:F3} mm";
         RecentThicknessText = $"{safeThickness:F3} mm";
         RenderProgramPreview(program);
+
+        // Populate RunPopupPunchRows for the popup DataGrid
+        var toolsById = _dataStoreService
+            .LoadToolRecords()
+            .GroupBy(t => t.ToolId)
+            .ToDictionary(g => g.Key, g => g.Last());
+        var rows = new ObservableCollection<RunPopupPunchRow>();
+        foreach (var step in program.Steps)
+        {
+            string toolName = toolsById.TryGetValue(step.ToolId, out var tool) ? tool.ToolName : $"T{step.ToolId}";
+            string punchInfo = toolsById.TryGetValue(step.ToolId, out var t)
+                ? $"Dia {t.Diameter} L = {t.Length} w = {t.Width}"
+                : string.Empty;
+            rows.Add(new RunPopupPunchRow { ToolId = step.ToolId, Tool = toolName, Punch = punchInfo });
+        }
+        RunPopupPunchRows = rows;
     }
 
     private static bool HasUsableHeaderData(PunchProgram? program)

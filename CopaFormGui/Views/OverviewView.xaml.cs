@@ -61,7 +61,74 @@ public partial class OverviewView : System.Windows.Controls.UserControl
     private void RunPopupOk_Click(object sender, RoutedEventArgs e)
     {
         RunPopup.IsOpen = false;
-        MessageBox.Show("Run confirmed!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+
+        // Get the ViewModel
+        var vm = DataContext as CopaFormGui.ViewModels.OverviewViewModel;
+        if (vm == null)
+        {
+            MessageBox.Show("ViewModel not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        // Try to get the latest punch program from the database
+        var dataStoreServiceField = typeof(CopaFormGui.ViewModels.OverviewViewModel)
+            .GetField("_dataStoreService", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var dataStoreService = dataStoreServiceField?.GetValue(vm) as CopaFormGui.Services.IDataStoreService;
+        if (dataStoreService == null)
+        {
+            MessageBox.Show("DataStoreService not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        var programs = dataStoreService.LoadPunchPrograms();
+        if (programs == null || programs.Count == 0)
+        {
+            MessageBox.Show("No punch programs found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        // Use the latest program with steps
+        var latest = programs
+            .Where(p => p.Steps != null && p.Steps.Count > 0)
+            .OrderByDescending(p => p.ModifiedDate)
+            .ThenByDescending(p => p.CreatedDate)
+            .ThenByDescending(p => p.ProgramId)
+            .FirstOrDefault();
+        if (latest == null)
+        {
+            MessageBox.Show("No punch program with steps found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        // Build the file content
+        var lines = new System.Collections.Generic.List<string>();
+        lines.Add("OPEN PROG 99");
+        int n = 1;
+        foreach (var step in latest.Steps)
+        {
+            lines.Add($"N{n} X{step.X} Y{step.Y} F");
+            n++;
+        }
+        lines.Add("CLOSE");
+
+        // Use the program name from the database for the file name
+        string safeName = string.IsNullOrWhiteSpace(latest.ProgramName) ? "punch_program" : latest.ProgramName;
+        // Remove invalid filename characters
+        foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            safeName = safeName.Replace(c, '_');
+        string filePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), safeName + ".txt");
+        try
+        {
+            System.IO.File.WriteAllLines(filePath, lines);
+            // Read the file content and set it to the ViewModel property
+            string fileContent = System.IO.File.ReadAllText(filePath);
+            vm.LastSavedFileContent = fileContent;
+            MessageBox.Show($"Punch program written to:\n{filePath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (System.Exception ex)
+        {
+            MessageBox.Show($"Failed to write file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void RunPopupCancel_Click(object sender, RoutedEventArgs e)
