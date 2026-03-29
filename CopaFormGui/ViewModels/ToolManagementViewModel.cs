@@ -27,6 +27,7 @@ public partial class ToolManagementViewModel : ObservableObject
     [ObservableProperty] private double _editLength;
     [ObservableProperty] private double _editWidth;
     [ObservableProperty] private string _editNotes = string.Empty;
+    [ObservableProperty] private bool _editIsUsed = false;
 
     [ObservableProperty] private string _statusMessage = "Select a tool to edit.";
     [ObservableProperty] private bool _isStatusSuccess;
@@ -75,6 +76,7 @@ public partial class ToolManagementViewModel : ObservableObject
         EditLength = value.Length;
         EditWidth = value.Width;
         EditNotes = value.Notes;
+        EditIsUsed = value.IsUsed;
         SetToolTypeFlags(EditToolType);
         IsStatusSuccess = false;
         StatusMessage = "Edit the fields and click Save Tool.";
@@ -145,7 +147,8 @@ public partial class ToolManagementViewModel : ObservableObject
             Diameter = normalizedType == "Round" ? EditDiameter : 0,
             Length = normalizedType == "Square" ? EditLength : 0,
             Width = normalizedType == "Square" ? EditWidth : 0,
-            Notes = EditNotes
+            Notes = EditNotes,
+            IsUsed = EditIsUsed
         };
 
         Tools[idx] = updatedTool;
@@ -153,6 +156,16 @@ public partial class ToolManagementViewModel : ObservableObject
         IsStatusSuccess = true;
         StatusMessage = $"✓ Tool '{EditToolName}' saved successfully.";
         _dataStoreService.SaveToolRecords(Tools.ToList());
+
+        // Clear edit fields after save
+        EditToolId = 0;
+        EditToolName = string.Empty;
+        EditToolType = "Round";
+        EditDiameter = 0;
+        EditLength = 0;
+        EditWidth = 0;
+        EditNotes = string.Empty;
+        EditIsUsed = false;
     }
 
     [RelayCommand]
@@ -164,6 +177,16 @@ public partial class ToolManagementViewModel : ObservableObject
         IsStatusSuccess = false;
         StatusMessage = "Tool deleted.";
         _dataStoreService.SaveToolRecords(Tools.ToList());
+
+        // Clear edit fields after delete
+        EditToolId = 0;
+        EditToolName = string.Empty;
+        EditToolType = "Round";
+        EditDiameter = 0;
+        EditLength = 0;
+        EditWidth = 0;
+        EditNotes = string.Empty;
+        EditIsUsed = false;
     }
 
     private static string NormalizeToolType(string? rawType)

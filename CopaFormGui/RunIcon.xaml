@@ -1,0 +1,17 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <DrawingImage x:Key="RunIconImage">
+    <DrawingImage.Drawing>
+      <GeometryDrawing Brush="#1565C0">
+        <GeometryDrawing.Geometry>
+          <GeometryGroup>
+            <!-- Circle background -->
+            <EllipseGeometry Center="12,12" RadiusX="12" RadiusY="12"/>
+            <!-- Play triangle -->
+            <PathGeometry Figures="M10,7 L20,12 L10,17 Z"/>
+          </GeometryGroup>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+</ResourceDictionary>

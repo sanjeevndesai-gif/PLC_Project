@@ -10,6 +10,97 @@
 				"$msCompile"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Build CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet build CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Build CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet build CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Build CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet build CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
+		},
+		{
+			"label": "Run CopaFormGui Application",
+			"type": "shell",
+			"command": "dotnet run --project CopaFormGui/CopaFormGui.csproj",
+			"isBackground": false,
+			"group": "run"
 		}
 	]
 }

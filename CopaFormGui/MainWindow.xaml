@@ -25,9 +25,6 @@
         <DataTemplate DataType="{x:Type vm:DatabaseViewModel}">
             <views:DatabaseView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-            <views:SettingsView/>
-        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:AlarmViewModel}">
             <views:AlarmView/>
         </DataTemplate>

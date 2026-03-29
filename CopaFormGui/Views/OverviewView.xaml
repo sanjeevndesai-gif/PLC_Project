@@ -17,6 +17,49 @@
                 <StackPanel>
                     <TextBlock Text="Machine Overview" FontSize="18" FontWeight="Bold" Foreground="White"/>
                 </StackPanel>
+
+                <!-- Popup for RUN button -->
+                <Popup x:Name="RunPopup" Placement="Center" StaysOpen="False">
+                    <Border Style="{StaticResource CardStyle}" Width="600" Height="420" Padding="28" Background="White">
+                        <StackPanel>
+                            <TextBlock Text="Punching parts" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,16"/>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="80"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Length of the bar" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource FormLabelStyle}"/>
+                                <TextBox Width="90" Grid.Row="0" Grid.Column="1" Margin="4,0,0,8" Style="{StaticResource InputTextBoxStyle}"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Pasting"/>
+                                <TextBlock Text="Number of parts" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource FormLabelStyle}"/>
+                                <TextBox Width="90" Grid.Row="1" Grid.Column="1" Margin="4,0,0,8" Style="{StaticResource InputTextBoxStyle}"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Pasting"/>
+                                <TextBlock Text="Part off" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource FormLabelStyle}"/>
+                                <CheckBox Grid.Row="2" Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                            </Grid>
+                            <Border Background="#F4F7FB" CornerRadius="6" Padding="2" Margin="0,0,0,12">
+                                <DataGrid AutoGenerateColumns="False" HeadersVisibility="Column" Height="100" Margin="0" BorderThickness="0" >
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Tool" Binding="{Binding Tool}" Width="60"/>
+                                        <DataGridTextColumn Header="Punch" Binding="{Binding Punch}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                                <Button Content="✔" Width="44" Height="36" Click="RunPopupOk_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
+                                <Button Content="✖" Width="44" Height="36" Click="RunPopupCancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Popup>
             </Grid>
         </Border>
 
@@ -152,40 +195,18 @@
                     </Border>
                 </TabItem>
 
-                <TabItem Header="3D Punch Preview">
-                    <Border Background="#0D1B2A">
-                        <Viewport3D x:Name="Overview3DViewport"
-                                    ClipToBounds="True"
-                                    Cursor="Hand"
-                                    MouseWheel="Overview3DViewport_MouseWheel"
-                                    MouseLeftButtonDown="Overview3DViewport_MouseLeftButtonDown"
-                                    MouseMove="Overview3DViewport_MouseMove"
-                                    MouseLeftButtonUp="Overview3DViewport_MouseLeftButtonUp"
-                                    MouseLeave="Overview3DViewport_MouseLeftButtonUp">
-                            <Viewport3D.Camera>
-                                <PerspectiveCamera x:Name="Overview3DCamera"
-                                                   Position="0,6,10"
-                                                   LookDirection="0,-4,-8"
-                                                   UpDirection="0,1,0"
-                                                   FieldOfView="50"/>
-                            </Viewport3D.Camera>
-                            <ModelVisual3D>
-                                <ModelVisual3D.Content>
-                                    <Model3DGroup x:Name="Overview3DScene">
-                                        <AmbientLight  Color="#606060"/>
-                                        <DirectionalLight Color="#FFFFFF" Direction="0.5,-1,-0.8"/>
-                                    </Model3DGroup>
-                                </ModelVisual3D.Content>
-                            </ModelVisual3D>
-                        </Viewport3D>
-                    </Border>
-                </TabItem>
 
             </TabControl>
 
             <!-- Properties panel -->
             <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="10">
                 <StackPanel>
+                    <Button Width="80" Height="32" Margin="0,0,0,12" Click="RunButton_Click" Style="{StaticResource PrimaryButtonStyle}">
+                        <Grid Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Ellipse Width="24" Height="24" Fill="White" Opacity="0.2"/>
+                            <Path Data="M10,7 L20,12 L10,17 Z" Fill="White" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Width="14" Height="14"/>
+                        </Grid>
+                    </Button>
                     <TextBlock Text="Properties" Style="{StaticResource SectionHeaderStyle}"/>
                     <TextBlock Text="Comment:" Style="{StaticResource FormLabelStyle}"/>
                     <TextBox Height="26" Margin="0,2,0,8"

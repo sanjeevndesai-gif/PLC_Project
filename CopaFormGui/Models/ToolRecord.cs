@@ -13,4 +13,5 @@ public class ToolRecord
     public int CurrentStrokes { get; set; }
     public string Status { get; set; } = "OK";
     public string Notes { get; set; } = string.Empty;
+    public bool IsUsed { get; set; } = false; // Default to not used
 }

@@ -4,6 +4,19 @@
              xmlns:conv="clr-namespace:CopaFormGui.Converters">
     <Application.Resources>
         <ResourceDictionary>
+                        <!-- Run Icon -->
+                        <DrawingImage x:Key="RunIconImage">
+                            <DrawingImage.Drawing>
+                                <GeometryDrawing Brush="#1565C0">
+                                    <GeometryDrawing.Geometry>
+                                        <GeometryGroup>
+                                            <EllipseGeometry Center="12,12" RadiusX="12" RadiusY="12"/>
+                                            <PathGeometry Figures="M10,7 L20,12 L10,17 Z"/>
+                                        </GeometryGroup>
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                            </DrawingImage.Drawing>
+                        </DrawingImage>
             <!-- Converters -->
             <conv:BoolToConnectionColorConverter x:Key="BoolToConnectionColor"/>
             <conv:BoolToStatusTextConverter      x:Key="BoolToStatusText"/>

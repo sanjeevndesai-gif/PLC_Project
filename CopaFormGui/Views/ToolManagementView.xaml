@@ -50,8 +50,8 @@
         <!-- Main Content: List + Edit Panel (equal halves) -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="0.8*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Tool List -->
@@ -71,6 +71,7 @@
                             <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}"      Width="75"/>
                             <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"        Width="85"/>
                             <DataGridTextColumn Header="Width (mm)"  Binding="{Binding Width, StringFormat={}{0:F1}}"         Width="80"/>
+                            <DataGridCheckBoxColumn Header="Tool in Used"    Binding="{Binding IsUsed, Mode=TwoWay}"                  Width="60"/>
                             <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"                                Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
@@ -159,35 +160,40 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Row 3: Notes -->
+                    <!-- Row 3: Notes and Used checkbox -->
                     <StackPanel Grid.Row="3" Margin="0,0,0,10">
                         <TextBlock Text="Notes" Style="{StaticResource FormLabelStyle}"/>
                         <TextBox Text="{Binding EditNotes, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource InputTextBoxStyle}"
                                  TextWrapping="Wrap" Height="60"
                                  AcceptsReturn="True"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Center">
+                            <CheckBox IsChecked="{Binding EditIsUsed, Mode=TwoWay}"
+                                      VerticalAlignment="Center"
+                                      Margin="0,0,6,0"
+                                      Content="Tool in Used"
+                                      FontSize="14"
+                                      FontWeight="SemiBold"
+                                      Foreground="#1565C0"/>
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- Row 4: spacer -->
                     <Grid Grid.Row="4"/>
 
                     <!-- Row 5: Action Buttons -->
-                    <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="Delete Tool" Command="{Binding DeleteToolCommand}"
-                                Style="{StaticResource DangerButtonStyle}" Height="34" Width="110" Margin="0,0,8,0"/>
+                            Style="{StaticResource DangerButtonStyle}" Height="34" Width="110" Margin="0,0,8,0"/>
                         <Button Content="Save Tool" Command="{Binding SaveToolCommand}"
-                                Style="{StaticResource SuccessButtonStyle}" Height="34" Width="110"/>
-                    </StackPanel>
+                            Style="{StaticResource SuccessButtonStyle}" Height="34" Width="110" Margin="0,0,8,0"/>
+                        <Button Content="+ Add Tool" Command="{Binding AddToolCommand}"
+                            Style="{StaticResource PrimaryButtonStyle}" Height="34" Width="110"/>
+                        </StackPanel>
                 </Grid>
             </Border>
         </Grid>
 
-        <!-- Bottom Actions -->
-        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,6,0,0">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="+ Add Tool" Command="{Binding AddToolCommand}"
-                        Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
-            </StackPanel>
-        </Border>
+        <!-- Bottom Actions removed: '+ Add Tool' button moved to edit panel -->
     </Grid>
 </UserControl>
