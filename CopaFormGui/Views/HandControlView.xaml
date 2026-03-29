@@ -58,16 +58,20 @@
                     <StackPanel>
                         <TextBlock Text="Reference" Style="{StaticResource SectionHeaderStyle}"/>
                         <Button Content="Home All Axes"  Command="{Binding HomeAllCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}"  Height="34" Margin="0,0,0,6"/>
+                                Style="{StaticResource PrimaryButtonStyle}"  Height="34" Margin="0,0,0,6"
+                                PreviewMouseDown="HomeAllDownHandler"
+                                PreviewMouseUp="HomeAllUpHandler"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0" Content="Home X" Command="{Binding HomeXCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Height="30" Margin="0,0,4,0"/>
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="30" Margin="0,0,4,0"
+                                    Click="HomeXHandler"/>
                             <Button Grid.Column="1" Content="Home Y" Command="{Binding HomeYCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Height="30"/>
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="30"
+                                    Click="HomeYHandler"/>
                         </Grid>
                         <Button Content="Set Work Zero (W0)" Command="{Binding ZeroAllCommand}"
                                 Style="{StaticResource WarningButtonStyle}" Height="32" Margin="0,8,0,0"/>
@@ -134,12 +138,16 @@
                                     <TextBlock Text="X Axis" FontSize="14" FontWeight="Bold"
                                                Foreground="{StaticResource PrimaryBrush}"
                                                HorizontalAlignment="Center" Margin="0,0,0,12"/>
-                                    <Button Content="X +" Command="{Binding JogXPlusCommand}"
-                                            Style="{StaticResource PrimaryButtonStyle}"
-                                            Height="48" Width="100" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
-                                    <Button Content="X −" Command="{Binding JogXMinusCommand}"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            Height="48" Width="100" FontSize="16" FontWeight="Bold"/>
+                                    <Button Content="X +"
+        Style="{StaticResource PrimaryButtonStyle}"
+        Height="48" Width="100" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"
+        PreviewMouseDown="JogXPlusDownHandler"
+        PreviewMouseUp="JogXPlusUpHandler"/>
+                                    <Button Content="X −"
+        Style="{StaticResource SecondaryButtonStyle}"
+        Height="48" Width="100" FontSize="16" FontWeight="Bold"
+        PreviewMouseDown="JogXMinusDownHandler"
+        PreviewMouseUp="JogXMinusUpHandler"/>
                                 </StackPanel>
                             </Border>
 
@@ -148,13 +156,17 @@
                                 <StackPanel HorizontalAlignment="Center">
                                     <TextBlock Text="Y Axis" FontSize="14" FontWeight="Bold" Foreground="#2E7D32"
                                                HorizontalAlignment="Center" Margin="0,0,0,12"/>
-                                    <Button Content="Y +" Command="{Binding JogYPlusCommand}"
-                                            Background="#2E7D32" Foreground="White"
-                                            Style="{StaticResource BaseButtonStyle}"
-                                            Height="48" Width="100" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
-                                    <Button Content="Y −" Command="{Binding JogYMinusCommand}"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            Height="48" Width="100" FontSize="16" FontWeight="Bold"/>
+                                    <Button Content="Y +"
+        Background="#2E7D32" Foreground="White"
+        Style="{StaticResource BaseButtonStyle}"
+        Height="48" Width="100" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"
+        PreviewMouseDown="JogYPlusDownHandler"
+        PreviewMouseUp="JogYPlusUpHandler"/>
+                                    <Button Content="Y −"
+        Style="{StaticResource SecondaryButtonStyle}"
+        Height="48" Width="100" FontSize="16" FontWeight="Bold"
+        PreviewMouseDown="JogYMinusDownHandler"
+        PreviewMouseUp="JogYMinusUpHandler"/>
                                 </StackPanel>
                             </Border>
                         </Grid>

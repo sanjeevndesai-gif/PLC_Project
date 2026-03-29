@@ -6,6 +6,24 @@ namespace CopaFormGui.ViewModels;
 
 public partial class HandControlViewModel : ObservableObject
 {
+    // PMAC Jog/Home global variable mapping
+    public async Task SetJogVariableAsync(string variable, int value)
+    {
+        if (_controllerService.IsConnected)
+            await _controllerService.WriteVariableAsync(variable, value);
+    }
+
+    public async Task JogXPlusDown() => await SetJogVariableAsync("X_JOG_PLUS", 1);
+    public async Task JogXPlusUp()   => await SetJogVariableAsync("X_JOG_PLUS", 0);
+    public async Task JogXMinusDown() => await SetJogVariableAsync("X_JOG_MINUS", 1);
+    public async Task JogXMinusUp()   => await SetJogVariableAsync("X_JOG_MINUS", 0);
+    public async Task JogYPlusDown() => await SetJogVariableAsync("Y_JOG_PLUS", 1);
+    public async Task JogYPlusUp()   => await SetJogVariableAsync("Y_JOG_PLUS", 0);
+    public async Task JogYMinusDown() => await SetJogVariableAsync("Y_JOG_MINUS", 1);
+    public async Task JogYMinusUp()   => await SetJogVariableAsync("Y_JOG_MINUS", 0);
+
+    public async Task HomeXAsync() => await SetJogVariableAsync("X_HOME", 1);
+    public async Task HomeYAsync() => await SetJogVariableAsync("Y_HOME", 1);
     private readonly IControllerService _controllerService;
 
     [ObservableProperty] private bool _isConnected;
