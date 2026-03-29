@@ -25,6 +25,20 @@ public class IOPoint
     public int Address { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public bool State { get; set; }
+    private bool _state;
+    public bool State
+    {
+        get => _state;
+        set
+        {
+            if (_state != value)
+            {
+                _state = value;
+                // For outputs, trigger OutputValueChanged event with string value ("1" or "0")
+                if (IsOutput)
+                    OutputValueChanged?.Invoke(this, value ? "1" : "0");
+            }
+        }
+    }
     public bool IsOutput { get; set; }
 }

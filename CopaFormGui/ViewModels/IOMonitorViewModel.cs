@@ -36,10 +36,9 @@ public partial class IOMonitorViewModel : ObservableObject
     {
         if (point.IsOutput && IsConnected)
         {
-            // Example: send value to PMAC controller
-            // You may need to parse value and call the appropriate method
+            // Send value ("1" or "0") to PMAC controller
             await _controllerService.WriteOutputValueAsync(point.Address, value);
-            StatusMessage = $"Output {point.Name} set to {value}";
+            StatusMessage = $"Output {point.Name} set to {(value == "1" ? "ON" : "OFF")}";
         }
     }
 
@@ -130,7 +129,9 @@ public partial class IOMonitorViewModel : ObservableObject
     {
         if (point is null || !point.IsOutput) return;
         point.State = !point.State;
-        await _controllerService.WriteCoilAsync(point.Address, point.State);
+        // OutputValueChanged event will handle sending to PMAC
+        // Optionally, you can still call WriteCoilAsync for redundancy:
+        // await _controllerService.WriteCoilAsync(point.Address, point.State);
         StatusMessage = $"Output {point.Name} set to {(point.State ? "ON" : "OFF")}";
     }
 }
