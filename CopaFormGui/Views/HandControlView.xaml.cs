@@ -1,13 +1,33 @@
-namespace CopaFormGui.Views;
-
-public partial class HandControlView : System.Windows.Controls.UserControl
+namespace CopaFormGui.Views
 {
-    public HandControlView()
+    public partial class HandControlView : System.Windows.Controls.UserControl
     {
-        InitializeComponent();
-    }
+        public HandControlView()
+        {
+            InitializeComponent();
+        }
 
-    private ViewModels.HandControlViewModel? Vm => DataContext as ViewModels.HandControlViewModel;
+        private ViewModels.HandControlViewModel? Vm => DataContext as ViewModels.HandControlViewModel;
+
+        private async void HomeXDownHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Vm != null) await Vm.SetJogVariableAsync("X_HOME", 1);
+        }
+
+        private async void HomeXUpHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Vm != null) await Vm.SetJogVariableAsync("X_HOME", 0);
+        }
+
+        private async void HomeYDownHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Vm != null) await Vm.SetJogVariableAsync("Y_HOME", 1);
+        }
+
+        private async void HomeYUpHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Vm != null) await Vm.SetJogVariableAsync("Y_HOME", 0);
+        }
 
     private async void JogXPlusDownHandler(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
@@ -64,4 +84,5 @@ public partial class HandControlView : System.Windows.Controls.UserControl
             Vm.HomeFeedrate = tb.Text;
         }
     }
+}
 }
