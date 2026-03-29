@@ -3,7 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding RefreshUsedToolsCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -86,10 +92,30 @@
                             <DataGridTextColumn Header="#" Binding="{Binding StepNumber}" Width="40" IsReadOnly="True"/>
                             <DataGridTextColumn Header="X" Binding="{Binding X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
                             <DataGridTextColumn Header="Y" Binding="{Binding Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
-                            <DataGridTextColumn Header="Tool" Binding="{Binding ToolId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
-                            <DataGridTextColumn Header="Punch" Binding="{Binding Operation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                            <DataGridComboBoxColumn Header="Tool"
+                                                    SelectedValueBinding="{Binding ToolId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    SelectedValuePath="ToolId"
+                                                    DisplayMemberPath="ToolName"
+                                                    Width="110">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource" Value="{Binding DataContext.UsedTools, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                                        <Setter Property="DisplayMemberPath" Value="ToolName" />
+                                        <Setter Property="SelectedValuePath" Value="ToolId" />
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.EditingElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource" Value="{Binding DataContext.UsedTools, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                                        <Setter Property="DisplayMemberPath" Value="ToolName" />
+                                        <Setter Property="SelectedValuePath" Value="ToolId" />
+                                    </Style>
+                                </DataGridComboBoxColumn.EditingElementStyle>
+                            </DataGridComboBoxColumn>
+                            <DataGridTextColumn Header="Punch" Binding="{Binding ToolInfo}" IsReadOnly="True" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
+
                 </StackPanel>
             </Border>
         </Grid>

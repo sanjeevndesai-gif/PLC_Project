@@ -13,6 +13,68 @@ public enum MachineMode { Manual, Auto, Homing }
 
 public partial class PunchingViewModel : ObservableObject
 {
+    // Helper: Update ToolInfo for all PunchSteps
+    private void UpdateAllPunchStepToolInfo()
+    {
+        var toolLookup = UsedTools.ToDictionary(t => t.ToolId);
+        foreach (var step in PunchSteps)
+        {
+            UpdatePunchStepToolInfo(step, toolLookup);
+        }
+    }
+
+    private void UpdatePunchStepToolInfo(PunchStep step, Dictionary<int, ToolRecord>? toolLookup = null)
+    {
+        toolLookup ??= UsedTools.ToDictionary(t => t.ToolId);
+        if (toolLookup.TryGetValue(step.ToolId, out var tool))
+        {
+            // Always show all three values, even if zero, in the requested format
+            step.ToolInfo = $"Dia {tool.Diameter} L = {tool.Length} w = {tool.Width}";
+        }
+        else
+        {
+            step.ToolInfo = string.Empty;
+        }
+    }
+
+    private void SubscribePunchStepPropertyChanged(PunchStep step)
+    {
+        step.PropertyChanged -= PunchStep_PropertyChanged;
+        step.PropertyChanged += PunchStep_PropertyChanged;
+    }
+
+    private void UnsubscribePunchStepPropertyChanged(PunchStep step)
+    {
+        step.PropertyChanged -= PunchStep_PropertyChanged;
+    }
+
+    private void PunchStep_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (sender is PunchStep step && e.PropertyName == nameof(PunchStep.ToolId))
+        {
+            UpdatePunchStepToolInfo(step);
+        }
+    }
+    private ObservableCollection<ToolRecord> _usedTools = new();
+    public ObservableCollection<ToolRecord> UsedTools
+    {
+        get => _usedTools;
+        set => SetProperty(ref _usedTools, value);
+    }
+
+    public void RefreshUsedTools()
+    {
+        var allTools = _dataStoreService.LoadToolRecords();
+        var used = allTools.Where(t => t.IsUsed).ToList();
+        UsedTools = new ObservableCollection<ToolRecord>(used);
+        UpdateAllPunchStepToolInfo();
+    }
+
+    [RelayCommand]
+    private void RefreshUsedToolsCommand()
+    {
+        RefreshUsedTools();
+    }
     private readonly IControllerService _controllerService;
     private readonly IDataStoreService _dataStoreService;
 
@@ -94,6 +156,12 @@ public partial class PunchingViewModel : ObservableObject
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = controllerService.IsConnected;
         PunchSteps.CollectionChanged += OnPunchStepsCollectionChanged;
+        foreach (var step in PunchSteps)
+            SubscribePunchStepPropertyChanged(step);
+        // Subscribe to tool list changes
+        DataStoreService.ToolListChanged += RefreshUsedTools;
+        // Initialize UsedTools
+        RefreshUsedTools();
         LoadSamplePrograms();
         ClearEditorState();
         UpdateDimensionPreview();
@@ -103,10 +171,14 @@ public partial class PunchingViewModel : ObservableObject
     partial void OnSelectedProgramChanged(PunchProgram? value)
     {
         PunchSteps.CollectionChanged -= OnPunchStepsCollectionChanged;
+        foreach (var step in PunchSteps)
+            UnsubscribePunchStepPropertyChanged(step);
         PunchSteps = value is null
             ? new ObservableCollection<PunchStep>()
             : new ObservableCollection<PunchStep>(value.Steps);
         PunchSteps.CollectionChanged += OnPunchStepsCollectionChanged;
+        foreach (var step in PunchSteps)
+            SubscribePunchStepPropertyChanged(step);
 
         if (value is not null)
         {
@@ -132,11 +204,26 @@ public partial class PunchingViewModel : ObservableObject
 
     private void OnPunchStepsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        _ = sender;
-        _ = e;
+        if (e is not null)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (PunchStep oldStep in e.OldItems)
+                    UnsubscribePunchStepPropertyChanged(oldStep);
+            }
+            if (e.NewItems != null)
+            {
+                foreach (PunchStep newStep in e.NewItems)
+                {
+                    SubscribePunchStepPropertyChanged(newStep);
+                    UpdatePunchStepToolInfo(newStep);
+                }
+            }
+        }
         RenumberPunchSteps();
         SyncStepsToSelectedProgram();
         RefreshToolPreview();
+        UpdateAllPunchStepToolInfo();
     }
 
     private void RenumberPunchSteps()

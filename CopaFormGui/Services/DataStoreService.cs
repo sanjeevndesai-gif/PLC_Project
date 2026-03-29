@@ -1,11 +1,14 @@
+using System;
 using System.IO;
 using System.Text.Json;
 using CopaFormGui.Models;
 
-namespace CopaFormGui.Services;
-
-public class DataStoreService : IDataStoreService
+namespace CopaFormGui.Services
 {
+    public class DataStoreService : IDataStoreService
+    {
+        // Event to notify when tool list changes
+        public static event Action? ToolListChanged;
     private static readonly string DataFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CopaFormGui");
 
@@ -40,6 +43,7 @@ public class DataStoreService : IDataStoreService
         EnsureFolderExists();
         var json = JsonSerializer.Serialize(tools, JsonOptions);
         File.WriteAllText(ToolsPath, json);
+        ToolListChanged?.Invoke();
     }
 
     public List<PunchProgram> LoadPunchPrograms()
@@ -71,4 +75,5 @@ public class DataStoreService : IDataStoreService
         if (!Directory.Exists(DataFolder))
             Directory.CreateDirectory(DataFolder);
     }
+}
 }
