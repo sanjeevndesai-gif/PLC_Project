@@ -44,6 +44,18 @@ public partial class HandControlViewModel : ObservableObject
     // Available step sizes for the radio buttons
     public double[] StepSizes { get; } = { 0.01, 0.1, 1.0, 10.0, 100.0 };
 
+    [ObservableProperty]
+    private string _homeFeedrate;
+
+    partial void OnHomeFeedrateChanged(string value)
+    {
+        // Try parse and send to PMAC
+        if (double.TryParse(value, out var v))
+        {
+            _ = _controllerService.WriteVariableAsync("HOME_FEEDRATE", v);
+        }
+    }
+
     public HandControlViewModel(IControllerService controllerService)
     {
         _controllerService = controllerService;

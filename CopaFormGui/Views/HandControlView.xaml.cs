@@ -57,4 +57,11 @@ public partial class HandControlView : System.Windows.Controls.UserControl
     {
         if (Vm != null) await Vm.SetJogVariableAsync("XY_HOME", 0);
     }
+    private void HomeFeedrateChangedHandler(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (Vm != null && sender is System.Windows.Controls.TextBox tb)
+        {
+            Vm.HomeFeedrate = tb.Text;
+        }
+    }
 }

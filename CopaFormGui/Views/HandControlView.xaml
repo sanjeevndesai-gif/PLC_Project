@@ -73,19 +73,16 @@
                                     Style="{StaticResource SecondaryButtonStyle}" Height="30"
                                     Click="HomeYHandler"/>
                         </Grid>
-                        <Button Content="Set Work Zero (W0)" Command="{Binding ZeroAllCommand}"
-                                Style="{StaticResource WarningButtonStyle}" Height="32" Margin="0,8,0,0"/>
                     </StackPanel>
                 </Border>
 
-                <!-- E-Stop -->
-                <Button Content="⚠ E-STOP" Command="{Binding EmergencyStopCommand}"
-                        Background="Red" Foreground="White" Height="50"
-                        FontWeight="Bold" FontSize="16"
-                        Style="{StaticResource BaseButtonStyle}" Margin="0,0,0,6"/>
-                <Button Content="Reset E-Stop" Command="{Binding ResetEStopCommand}"
-                        Style="{StaticResource WarningButtonStyle}" Height="34"
-                        Visibility="{Binding IsEmergencyStop, Converter={StaticResource BoolToVisibility}}"/>
+                <!-- HOME FEEDRATE -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="HOME FEEDRATE:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBox Width="60" Height="28" VerticalAlignment="Center"
+                             Text="{Binding HomeFeedrate, UpdateSourceTrigger=PropertyChanged}"
+                             LostFocus="HomeFeedrateChangedHandler"/>
+                </StackPanel>
             </StackPanel>
 
             <!-- Right: Axis Position Displays + Jog Buttons -->
