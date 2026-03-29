@@ -27,6 +27,20 @@ public partial class IOMonitorViewModel : ObservableObject
         _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
         IsConnected = controllerService.IsConnected;
         LoadPoints();
+
+        // Subscribe to OutputValueChanged event
+        CopaFormGui.Models.IOPoint.OutputValueChanged += OnOutputValueChanged;
+    }
+
+    private async void OnOutputValueChanged(CopaFormGui.Models.IOPoint point, string value)
+    {
+        if (point.IsOutput && IsConnected)
+        {
+            // Example: send value to PMAC controller
+            // You may need to parse value and call the appropriate method
+            await _controllerService.WriteOutputValueAsync(point.Address, value);
+            StatusMessage = $"Output {point.Name} set to {value}";
+        }
     }
 
     private void OnConnectionStateChanged(object? sender, ConnectionState state)
@@ -42,41 +56,40 @@ public partial class IOMonitorViewModel : ObservableObject
     {
         Inputs = new ObservableCollection<IOPoint>
         {
-            new() { Address =  0, Name = "X1.00", Description = "E-Stop Input",           IsOutput = false, State = false },
-            new() { Address =  1, Name = "X1.01", Description = "Machine Ready",           IsOutput = false, State = true  },
-            new() { Address =  5, Name = "X1.05", Description = "X+ Limit",                IsOutput = false, State = false },
-            new() { Address =  6, Name = "X1.06", Description = "X- Limit",                IsOutput = false, State = false },
-            new() { Address =  7, Name = "X1.07", Description = "Y+ Limit",                IsOutput = false, State = false },
-            new() { Address =  8, Name = "X2.00", Description = "Y- Limit",                IsOutput = false, State = false },
-            new() { Address = 11, Name = "X2.03", Description = "Punch Up Sensor",         IsOutput = false, State = true  },
-            new() { Address = 12, Name = "X2.04", Description = "Punch Down Sensor",       IsOutput = false, State = false },
-            new() { Address = 15, Name = "X2.07", Description = "Sheet Present Sensor",    IsOutput = false, State = false },
-
-            // New sensors added below
-            new() { Address = 16, Name = "X3.00", Description = "Door Limit Switch",       IsOutput = false, State = false },
-            new() { Address = 17, Name = "X3.01", Description = "Foot Switch",            IsOutput = false, State = false },
-            new() { Address = 18, Name = "X3.02", Description = "Oil Level Low",          IsOutput = false, State = false },
-            new() { Address = 19, Name = "X3.03", Description = "Oil Level High",         IsOutput = false, State = false },
-            new() { Address = 20, Name = "X3.04", Description = "Control On",             IsOutput = false, State = false },
-            new() { Address = 21, Name = "X3.05", Description = "Control Off",            IsOutput = false, State = false },
-            new() { Address = 22, Name = "X3.06", Description = "Manual",                 IsOutput = false, State = false },
-            new() { Address = 23, Name = "X3.07", Description = "Auto",                   IsOutput = false, State = false },
-            new() { Address = 24, Name = "X3.10", Description = "Hydrolic On/Off",        IsOutput = false, State = false },
+            new() { Address = 0, Name = "X_NLIMIT_UI", Description = "X- Limit", IsOutput = false, State = false },
+            new() { Address = 1, Name = "X_PLIMIT_UI", Description = "X+ Limit", IsOutput = false, State = false },
+            new() { Address = 2, Name = "HYDRAULIC_DOWN_SENS_UI", Description = "Hydraulic Down Sensor", IsOutput = false, State = false },
+            new() { Address = 3, Name = "HYDRAULIC_UP_SENS_UI", Description = "Hydraulic Up Sensor", IsOutput = false, State = false },
+            new() { Address = 4, Name = "DOOR_LS_UI", Description = "Door Limit Switch", IsOutput = false, State = false },
+            new() { Address = 5, Name = "BUSBAR_CLAMP_RSW_UI", Description = "Busbar Clamp RSW", IsOutput = false, State = false },
+            new() { Address = 6, Name = "FOOT_SW_UI", Description = "Foot Switch", IsOutput = false, State = false },
+            new() { Address = 7, Name = "OIL_LEVEL_LOW_SENS_UI", Description = "Oil Level Low", IsOutput = false, State = false },
+            new() { Address = 8, Name = "OIL_LEVEL_HIGH_SENS_UI", Description = "Oil Level High", IsOutput = false, State = false },
+            new() { Address = 9, Name = "CONTROL_ON_PB_UI", Description = "Control On PB", IsOutput = false, State = false },
+            new() { Address = 10, Name = "CONTROLL_OFF_PB_UI", Description = "Control Off PB", IsOutput = false, State = false },
+            new() { Address = 11, Name = "MANUAL_PB_UI", Description = "Manual PB", IsOutput = false, State = false },
+            new() { Address = 12, Name = "AUTO_PB_UI", Description = "Auto PB", IsOutput = false, State = false },
+            new() { Address = 13, Name = "HYDRAULIC_ON_OFF_SW_UI", Description = "Hydraulic On/Off Switch", IsOutput = false, State = false },
+            new() { Address = 14, Name = "Emergency_PB_UI", Description = "Emergency PB", IsOutput = false, State = false },
+            new() { Address = 15, Name = "Y_NLIMIT_UI", Description = "Y- Limit", IsOutput = false, State = false },
+            new() { Address = 16, Name = "Y_PLIMIT_UI", Description = "Y+ Limit", IsOutput = false, State = false },
+            new() { Address = 17, Name = "BUSBAR_PRESENT_SENS_UI", Description = "Busbar Present Sensor", IsOutput = false, State = false },
         };
 
         Outputs = new ObservableCollection<IOPoint>
         {
-            new() { Address = 100, Name = "Y1.00", Description = "X Servo Enable",         IsOutput = true, State = false },
-            new() { Address = 101, Name = "Y1.01", Description = "Y Servo Enable",         IsOutput = true, State = false },
-            new() { Address = 103, Name = "Y1.03", Description = "Punch Solenoid",         IsOutput = true, State = false },
-            new() { Address = 104, Name = "Y1.04", Description = "Clamp Solenoid",         IsOutput = true, State = false },
-            new() { Address = 105, Name = "Y1.05", Description = "Machine Ready Lamp",     IsOutput = true, State = true  },
-            new() { Address = 106, Name = "Y1.06", Description = "Alarm Lamp",             IsOutput = true, State = false },
-            new() { Address = 107, Name = "Y1.07", Description = "Cycle Running Lamp",     IsOutput = true, State = false },
-            new() { Address = 108, Name = "Y2.00", Description = "Auto Mode Lamp",         IsOutput = true, State = false },
-            new() { Address = 109, Name = "Y2.01", Description = "Air Solenoid 1",         IsOutput = true, State = false },
-            new() { Address = 110, Name = "Y2.02", Description = "Air Solenoid 2",         IsOutput = true, State = false },
-            new() { Address = 111, Name = "Y2.03", Description = "Buzzer",                 IsOutput = true, State = false },
+            new() { Address = 0, Name = "HYDRAULIC_MOTOR_CMD_STATUS", Description = "Hydraulic Motor Cmd Status", IsOutput = true, State = false },
+            new() { Address = 1, Name = "SERVO_ON_CMD_STATUS", Description = "Servo On Cmd Status", IsOutput = true, State = false },
+            new() { Address = 2, Name = "OIL_COOLING_FAN_CMD_STATUS", Description = "Oil Cooling Fan Cmd Status", IsOutput = true, State = false },
+            new() { Address = 3, Name = "CONVEYOR_CMD_STATUS", Description = "Conveyor Cmd Status", IsOutput = true, State = false },
+            new() { Address = 4, Name = "BUSBAR_CLAMP_C1_STATUS", Description = "Busbar Clamp C1 Status", IsOutput = true, State = false },
+            new() { Address = 5, Name = "BUSBAR_CLAMP_C2_STATUS", Description = "Busbar Clamp C2 Status", IsOutput = true, State = false },
+            new() { Address = 6, Name = "HYDRAULIC_DOWN_CMD_STATUS", Description = "Hydraulic Down Cmd Status", IsOutput = true, State = false },
+            new() { Address = 7, Name = "HYDRAULIC_UP_CMD_STATUS", Description = "Hydraulic Up Cmd Status", IsOutput = true, State = false },
+            new() { Address = 8, Name = "BUSBAR_HOLD_CYL_STATUS", Description = "Busbar Hold Cylinder Status", IsOutput = true, State = false },
+            new() { Address = 9, Name = "CONTROL_ON_LAMP_STATUS", Description = "Control On Lamp Status", IsOutput = true, State = false },
+            new() { Address = 10, Name = "MANUAL_ON_LAMP_STATUS", Description = "Manual On Lamp Status", IsOutput = true, State = false },
+            new() { Address = 11, Name = "AUTO_ON_LAMP_STATUS", Description = "Auto On Lamp Status", IsOutput = true, State = false },
         };
     }
 

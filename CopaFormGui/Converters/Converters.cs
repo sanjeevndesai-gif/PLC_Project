@@ -21,7 +21,7 @@ public class BoolToConnectionColorConverter : IValueConverter
 public class BoolToStatusTextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => (value is bool b && b) ? "Connected" : "Disconnected";
+        => (value is bool b && b) ? "ON" : "OFF";
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotSupportedException();
@@ -95,9 +95,20 @@ public class EqualityToBoolConverter : IValueConverter
 public class IOStateToBrushConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        => (value is bool b && b)
+    {
+        // If parameter is 'input', use green for ON (true), gray for OFF (false)
+        if (parameter is string param && param == "input")
+        {
+            if (value is bool b && b)
+                return new SolidColorBrush(Color.FromRgb(0x28, 0xA7, 0x45)); // Green for ON
+            else
+                return new SolidColorBrush(Color.FromRgb(0xBD, 0xBD, 0xBD)); // Gray for OFF
+        }
+        // Default: LED indicator (keep as before)
+        return (value is bool b2 && b2)
             ? new SolidColorBrush(Color.FromRgb(0x28, 0xA7, 0x45))
             : new SolidColorBrush(Color.FromRgb(0xBD, 0xBD, 0xBD));
+    }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotSupportedException();

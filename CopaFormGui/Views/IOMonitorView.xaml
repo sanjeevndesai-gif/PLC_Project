@@ -91,16 +91,13 @@
                                                 <TextBlock Grid.Column="1" Text="{Binding Description}"
                                                        FontSize="12" VerticalAlignment="Center"
                                                        Foreground="{StaticResource TextPrimaryBrush}"/>
-                                                <Button Grid.Column="2"
+                                                <ToggleButton Grid.Column="2"
+                                                    IsChecked="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                     Content="{Binding State, Converter={StaticResource BoolToStatusText}}"
-                                                    Command="{Binding DataContext.ToggleOutputCommand,
-                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                    CommandParameter="{Binding}"
                                                     FontSize="11" FontWeight="SemiBold"
                                                     Height="24" Padding="4,2"
-                                                    Background="{Binding State, Converter={StaticResource IOStateToBrush}}"
-                                                    Foreground="White"
-                                                    Style="{StaticResource BaseButtonStyle}"/>
+                                                    Background="#E3F2FD"
+                                                    Foreground="#124A77"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

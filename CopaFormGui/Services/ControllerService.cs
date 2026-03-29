@@ -7,6 +7,13 @@ namespace CopaFormGui.Services;
 
 public class ControllerService : IControllerService
 {
+    public async Task WriteOutputValueAsync(int address, string value)
+    {
+        // TODO: Implement actual logic to send value to PMAC controller
+        await Task.Delay(50); // Simulate async work
+        // You might want to parse the value and call WriteCoilAsync, WriteRegisterAsync, etc.
+        // Example: await WriteCoilAsync(address, value == "1" || value.ToLower() == "on");
+    }
     private ConnectionState _connectionState = ConnectionState.Disconnected;
     private readonly Random _random = new();
     private ISyncGpasciiCommunicationInterface? gpascii;

@@ -11,6 +11,7 @@ public enum ConnectionState
 
 public interface IControllerService
 {
+    Task WriteOutputValueAsync(int address, string value);
     ConnectionState ConnectionState { get; }
     bool IsConnected { get; }
     string? CurrentIpAddress { get; }
