@@ -72,11 +72,16 @@ public partial class HandControlViewModel : ObservableObject
     {
         if (_controllerService.IsConnected)
         {
-            var xRaw = await _controllerService.ReadVariableAsync("X_ABS_POS");
-            var yRaw = await _controllerService.ReadVariableAsync("Y_ABS_POS");
-            string debugMsg = $"PMAC X_ABS_POS: {xRaw?.ToString() ?? "null"}, Y_ABS_POS: {yRaw?.ToString() ?? "null"}";
-            if (xRaw.HasValue) PosX = xRaw.Value;
-            if (yRaw.HasValue) PosY = yRaw.Value;
+            var xRaw = await _controllerService.ReadResponseAsync("X_ABS_POS");
+            var yRaw = await _controllerService.ReadResponseAsync("Y_ABS_POS");
+            double xVal, yVal;
+            bool xParsed = double.TryParse(xRaw, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out xVal);
+            bool yParsed = double.TryParse(yRaw, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out yVal);
+            string debugMsg = $"PMAC X_ABS_POS: {(xParsed ? xVal.ToString("F3") : "null")}, Y_ABS_POS: {(yParsed ? yVal.ToString("F3") : "null")}";
+            if (xParsed)
+                PosX = xVal;
+            if (yParsed)
+                PosY = yVal;
             StatusMessage = $"Connected | X: {PosX:F3} | Y: {PosY:F3} | {debugMsg}";
         }
         else
