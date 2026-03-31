@@ -28,8 +28,18 @@ public partial class PunchingViewModel : ObservableObject
         toolLookup ??= UsedTools.ToDictionary(t => t.ToolId);
         if (toolLookup.TryGetValue(step.ToolId, out var tool))
         {
-            // Always show all three values, even if zero, in the requested format
-            step.ToolInfo = $"Dia {tool.Diameter} L = {tool.Length} w = {tool.Width}";
+            // Show only Dia if L/W are zero, only L/W if Dia is zero, else show all
+            bool hasDia = tool.Diameter > 0;
+            bool hasL = tool.Length > 0;
+            bool hasW = tool.Width > 0;
+            if (hasDia && !hasL && !hasW)
+                step.ToolInfo = $"Dia {tool.Diameter}";
+            else if (!hasDia && hasL && hasW)
+                step.ToolInfo = $"L = {tool.Length} w = {tool.Width}";
+            else if (hasDia && (hasL || hasW))
+                step.ToolInfo = $"Dia {tool.Diameter} L = {tool.Length} w = {tool.Width}";
+            else
+                step.ToolInfo = string.Empty;
         }
         else
         {
