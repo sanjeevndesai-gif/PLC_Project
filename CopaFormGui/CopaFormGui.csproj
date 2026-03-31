@@ -56,4 +56,9 @@
     </Reference>
   </ItemGroup>
 
+  <!-- Post-build event to copy Release build to installer app folder -->
+  <Target Name="PostBuildCopyToInstaller" AfterTargets="Build">
+    <Exec Condition=" '$(Configuration)' == 'Release' " Command="copy /Y &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(ProjectDir)..\artifacts\CopaFormGui-Installer\app\$(TargetFileName)&quot;" />
+  </Target>
+
 </Project>
