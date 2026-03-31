@@ -16,10 +16,10 @@ public partial class IOMonitorViewModel : ObservableObject
     [ObservableProperty] private string _statusMessage = "Monitoring I/O points";
 
     [ObservableProperty]
-    private ObservableCollection<IOPoint> _inputs = new();
+    private ObservableCollection<IOPoint> _inputs = new ObservableCollection<IOPoint>();
 
     [ObservableProperty]
-    private ObservableCollection<IOPoint> _outputs = new();
+    private ObservableCollection<IOPoint> _outputs = new ObservableCollection<IOPoint>();
 
     public IOMonitorViewModel(IControllerService controllerService)
     {
@@ -138,17 +138,36 @@ public partial class IOMonitorViewModel : ObservableObject
     private async Task RefreshStatesAsync()
     {
         if (!IsConnected) return;
-        foreach (var pt in Inputs)
+        try
         {
-            var value = await _controllerService.ReadVariableAsync(pt.Name);
-            pt.State = value.HasValue && value.Value != 0;
+            foreach (var pt in Inputs?.Where(x => x != null) ?? Enumerable.Empty<IOPoint>())
+            {
+                var value = await _controllerService.ReadVariableAsync(pt.Name);
+                pt.State = value.HasValue && value.Value != 0;
+            }
+            // Only refresh outputs that are NOT in the manual list
+            var manualOutputs = new[]
+            {
+                "HYDRAULIC_DOWN_CMD_STATUS",
+                "CONVEYOR_CMD_STATUS",
+                "BUSBAR_CLAMP_C1_STATUS",
+                "BUSBAR_CLAMP_C2_STATUS",
+                "BUSBAR_HOLD_CYL_STATUS"
+            };
+            foreach (var pt in Outputs?.Where(x => x != null) ?? Enumerable.Empty<IOPoint>())
+            {
+                if (!manualOutputs.Contains(pt.Name))
+                {
+                    var value = await _controllerService.ReadVariableAsync(pt.Name);
+                    pt.State = value.HasValue && value.Value != 0;
+                }
+            }
+            StatusMessage = $"Last refresh: {DateTime.Now:HH:mm:ss}";
         }
-        foreach (var pt in Outputs)
+        catch (Exception ex)
         {
-            var value = await _controllerService.ReadVariableAsync(pt.Name);
-            pt.State = value.HasValue && value.Value != 0;
+            StatusMessage = $"I/O refresh error: {ex.Message}";
         }
-        StatusMessage = $"Last refresh: {DateTime.Now:HH:mm:ss}";
     }
 
     [RelayCommand]

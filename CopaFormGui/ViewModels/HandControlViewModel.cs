@@ -46,7 +46,7 @@ public partial class HandControlViewModel : ObservableObject
     public double[] StepSizes { get; } = { 0.01, 0.1, 1.0, 10.0, 100.0 };
 
     [ObservableProperty]
-    private string _homeFeedrate;
+    private string _homeFeedrate = string.Empty;
 
     partial void OnHomeFeedrateChanged(string value)
     {
