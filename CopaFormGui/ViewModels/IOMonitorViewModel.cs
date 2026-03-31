@@ -43,11 +43,29 @@ public partial class IOMonitorViewModel : ObservableObject
 
     private async void OnOutputValueChanged(CopaFormGui.Models.IOPoint point, string value)
     {
+        // Prevent double-sending for the five UI outputs, only handle others here
+        var manualUiOutputs = new[]
+        {
+            "HYDRAULIC_DOWN_CMD_UI",
+            "CONVEYOR_CMD_UI",
+            "BUSBAR_CLAMP_C1_UI",
+            "BUSBAR_CLAMP_C2_UI",
+            "BUSBAR_HOLD_CYL_UI"
+        };
         if (point.IsOutput && IsConnected)
         {
-            // Send value ("1" or "0") to PMAC controller
-            await _controllerService.WriteOutputValueAsync(point.Name, value);
-            StatusMessage = $"Output {point.Name} set to {(value == "1" ? "ON" : "OFF")}";
+            if (manualUiOutputs.Contains(point.Name))
+            {
+                // Always send for UI outputs
+                await _controllerService.WriteOutputValueAsync(point.Name, value);
+                StatusMessage = $"Output {point.Name} set to {(value == "1" ? "ON" : "OFF")}";
+            }
+            else
+            {
+                // Send value ("1" or "0") to PMAC controller
+                await _controllerService.WriteOutputValueAsync(point.Name, value);
+                StatusMessage = $"Output {point.Name} set to {(value == "1" ? "ON" : "OFF")}";
+            }
         }
     }
 
@@ -104,6 +122,11 @@ public partial class IOMonitorViewModel : ObservableObject
             new() { Address = 9, Name = "CONTROL_ON_LAMP_STATUS", Description = "Control On Lamp Status", IsOutput = true, State = false },
             new() { Address = 10, Name = "MANUAL_ON_LAMP_STATUS", Description = "Manual On Lamp Status", IsOutput = true, State = false },
             new() { Address = 11, Name = "AUTO_ON_LAMP_STATUS", Description = "Auto On Lamp Status", IsOutput = true, State = false },
+            new() { Address = 12, Name = "HYDRAULIC_DOWN_CMD_UI", Description = "Hydraulic Down", IsOutput = true, State = false },
+            new() { Address = 13, Name = "CONVEYOR_CMD_UI", Description = "Conveyor", IsOutput = true, State = false },
+            new() { Address = 14, Name = "BUSBAR_CLAMP_C1_UI", Description = "Busbar Clamp C1", IsOutput = true, State = false },
+            new() { Address = 15, Name = "BUSBAR_CLAMP_C2_UI", Description = "Busbar Clamp C2", IsOutput = true, State = false },
+            new() { Address = 16, Name = "BUSBAR_HOLD_CYL_UI", Description = "Busbar Hold", IsOutput = true, State = false },
         };
     }
 
@@ -145,18 +168,18 @@ public partial class IOMonitorViewModel : ObservableObject
                 var value = await _controllerService.ReadVariableAsync(pt.Name);
                 pt.State = value.HasValue && value.Value != 0;
             }
-            // Only refresh outputs that are NOT in the manual list
-            var manualOutputs = new[]
+            // Only refresh outputs that are NOT in the UI outputs list
+            var uiOutputs = new[]
             {
-                "HYDRAULIC_DOWN_CMD_STATUS",
-                "CONVEYOR_CMD_STATUS",
-                "BUSBAR_CLAMP_C1_STATUS",
-                "BUSBAR_CLAMP_C2_STATUS",
-                "BUSBAR_HOLD_CYL_STATUS"
+                "HYDRAULIC_DOWN_CMD_UI",
+                "CONVEYOR_CMD_UI",
+                "BUSBAR_CLAMP_C1_UI",
+                "BUSBAR_CLAMP_C2_UI",
+                "BUSBAR_HOLD_CYL_UI"
             };
             foreach (var pt in Outputs?.Where(x => x != null) ?? Enumerable.Empty<IOPoint>())
             {
-                if (!manualOutputs.Contains(pt.Name))
+                if (!uiOutputs.Contains(pt.Name))
                 {
                     var value = await _controllerService.ReadVariableAsync(pt.Name);
                     pt.State = value.HasValue && value.Value != 0;
@@ -178,13 +201,25 @@ public partial class IOMonitorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    /// <summary>
+    /// Manual output toggle for outputs that do NOT use a ToggleButton bound to State.
+    /// For the five UI outputs (Hydraulic Down, Conveyor, Busbar Clamp C1/C2, Busbar Hold),
+    /// the ToggleButton directly updates State and triggers the PMAC event automatically.
+    /// This command is only useful for other outputs if you want to provide a manual toggle button.
+    /// </summary>
     private async Task ToggleOutput(IOPoint? point)
     {
         if (point is null || !point.IsOutput) return;
-        point.State = !point.State;
-        // OutputValueChanged event will handle sending to PMAC
-        // Optionally, you can still call WriteCoilAsync for redundancy:
-        // await _controllerService.WriteCoilAsync(point.Address, point.State);
-        StatusMessage = $"Output {point.Name} set to {(point.State ? "ON" : "OFF")}";
+        if (IsConnected)
+        {
+            // Toggle the value to be sent
+            var newState = !point.State;
+            var value = newState ? "1" : "0";
+            await _controllerService.WriteOutputValueAsync(point.Name, value);
+            // Immediately read back from PMAC to ensure UI matches actual controller state
+            var pmacValue = await _controllerService.ReadVariableAsync(point.Name);
+            point.State = pmacValue.HasValue && pmacValue.Value != 0;
+            StatusMessage = $"Output {point.Name} set to {(point.State ? "ON" : "OFF")}";
+        }
     }
 }

@@ -10,7 +10,6 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <!-- Header -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
             <Grid>
@@ -82,7 +81,7 @@
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="18"/>
                                                 <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="80"/>
                                             </Grid.ColumnDefinitions>
                                             <!-- LED indicator -->
                                             <Ellipse Grid.Column="0" Width="12" Height="12"
@@ -92,11 +91,78 @@
                                             <TextBlock Grid.Column="1" Text="{Binding Description, TargetNullValue='(No Description)'}"
                                                        FontSize="12" VerticalAlignment="Center"
                                                        Foreground="{StaticResource TextPrimaryBrush}"/>
-                                            <TextBlock Grid.Column="2"
-                                                       Text="{Binding State, Converter={StaticResource BoolToStatusText}, TargetNullValue='OFF'}"
-                                                       FontSize="11" FontWeight="SemiBold"
-                                                       VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                       Foreground="{Binding State, Converter={StaticResource BoolToConnectionColor}, FallbackValue=Gray, TargetNullValue=Gray}"/>
+                                            <!-- ToggleButton for the five special outputs -->
+                                            <ContentControl Grid.Column="2">
+                                                <ContentControl.Style>
+                                                    <Style TargetType="ContentControl">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Name}" Value="HYDRAULIC_DOWN_CMD_UI">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <ToggleButton
+                                                                            Command="{Binding DataContext.ToggleOutputCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                            CommandParameter="{Binding}"
+                                                                            
+                                                                            Content="{Binding State, Converter={StaticResource BoolToStatusText}}"
+                                                                            Style="{StaticResource PrimaryToggleButtonStyle}"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Name}" Value="CONVEYOR_CMD_UI">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <ToggleButton
+                                                                            IsChecked="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                            Content="{Binding State, Converter={StaticResource BoolToStatusText}}"
+                                                                            Style="{StaticResource PrimaryToggleButtonStyle}"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Name}" Value="BUSBAR_CLAMP_C1_UI">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <ToggleButton
+                                                                            IsChecked="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                            Content="{Binding State, Converter={StaticResource BoolToStatusText}}"
+                                                                            Style="{StaticResource PrimaryToggleButtonStyle}"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Name}" Value="BUSBAR_CLAMP_C2_UI">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <ToggleButton
+                                                                            IsChecked="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                            Content="{Binding State, Converter={StaticResource BoolToStatusText}}"
+                                                                            Style="{StaticResource PrimaryToggleButtonStyle}"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Name}" Value="BUSBAR_HOLD_CYL_UI">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <ToggleButton
+                                                                            IsChecked="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                            Content="{Binding State, Converter={StaticResource BoolToStatusText}}"
+                                                                            Style="{StaticResource PrimaryToggleButtonStyle}"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                            <!-- Default: status text only for all other outputs -->
+                                                            <DataTrigger Binding="{Binding Name}" Value="">
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <TextBlock Text="{Binding State, Converter={StaticResource BoolToStatusText}}"
+                                                                                   FontSize="11" FontWeight="SemiBold"
+                                                                                   VerticalAlignment="Center" HorizontalAlignment="Right"
+                                                                                   Foreground="{Binding State, Converter={StaticResource BoolToConnectionColor}, FallbackValue=Gray, TargetNullValue=Gray}"/>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ContentControl.Style>
+                                            </ContentControl>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

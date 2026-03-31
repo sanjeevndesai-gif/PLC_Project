@@ -4,6 +4,55 @@
              xmlns:conv="clr-namespace:CopaFormGui.Converters">
     <Application.Resources>
         <ResourceDictionary>
+                                    <!-- Modern ToggleButton Style for Outputs -->
+                                    <Style x:Key="PrimaryToggleButtonStyle" TargetType="ToggleButton">
+                                        <Setter Property="Width" Value="64"/>
+                                        <Setter Property="Height" Value="28"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="Background" Value="#DC3545"/>
+                                        <Setter Property="BorderBrush" Value="#BDBDBD"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                        <Setter Property="Content" Value="OFF"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            CornerRadius="14"
+                                                            SnapsToDevicePixels="True">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#b71c1c"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsChecked" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#28A745"/>
+                                                            <Setter Property="Content" Value="ON"/>
+                                                        </Trigger>
+                                                        <MultiTrigger>
+                                                            <MultiTrigger.Conditions>
+                                                                <Condition Property="IsChecked" Value="True"/>
+                                                                <Condition Property="IsMouseOver" Value="True"/>
+                                                            </MultiTrigger.Conditions>
+                                                            <Setter TargetName="border" Property="Background" Value="#1b5e20"/>
+                                                        </MultiTrigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter Property="Content" Value="ON"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
                         <!-- Run Icon -->
                         <DrawingImage x:Key="RunIconImage">
                             <DrawingImage.Drawing>
