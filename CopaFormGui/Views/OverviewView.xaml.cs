@@ -100,13 +100,24 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
-        // Build the file content
+        // Build the file content with custom logic for M and F
         var lines = new System.Collections.Generic.List<string>();
         lines.Add("OPEN PROG 99");
         int n = 1;
         foreach (var step in latest.Steps)
         {
-            lines.Add($"N{n} X{step.X} Y{step.Y} F");
+            // Add Nn: label line
+            lines.Add($"N{n}:");
+            if (step.X == 0 && step.Y == 0)
+            {
+                // Only M value line
+                lines.Add($"N{n} M{step.M}");
+            }
+            else
+            {
+                // X, Y, F line
+                lines.Add($"N{n} X{step.X} Y{step.Y} F{step.F}");
+            }
             n++;
         }
         lines.Add("CLOSE");

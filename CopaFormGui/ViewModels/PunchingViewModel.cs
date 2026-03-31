@@ -204,6 +204,8 @@ public partial class PunchingViewModel : ObservableObject
         SelectedStep = PunchSteps.FirstOrDefault();
         UpdateDimensionPreview();
         RefreshToolPreview();
+        // Ensure ToolInfo is updated for all steps when loading from database
+        UpdateAllPunchStepToolInfo();
     }
 
     partial void OnSelectedStepChanged(PunchStep? value)
@@ -689,6 +691,8 @@ public partial class PunchingViewModel : ObservableObject
             StepNumber = step.StepNumber,
             X = step.X,
             Y = step.Y,
+            M = step.M,
+            F = step.F,
             ToolId = step.ToolId,
             Operation = step.Operation,
             IsCompleted = step.IsCompleted
