@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:CopaFormGui.ViewModels"
         xmlns:views="clr-namespace:CopaFormGui.Views"
         mc:Ignorable="d"
-        Title="Copa Form – CNC Punching Machine"
+        Title="DICS – CNC Punching Machine"
         Height="720" Width="1100"
         MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"

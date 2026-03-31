@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:CopaFormGui.ViewModels"
         mc:Ignorable="d"
-        Title="Copa Form – Connect to Controller"
+        Title="DICS – Connect to Controller"
         Height="560" Width="440"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
@@ -22,9 +22,9 @@
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border Width="74" Height="74" CornerRadius="18" Background="#0D3C6B" Padding="10" Margin="0,0,0,10">
-                    <Image Source="{StaticResource CopaLogoImage}" Stretch="Uniform"/>
+                    <Image Source="/CopaFormGui;component/Assets/DICS.ico" Stretch="Uniform"/>
                 </Border>
-                <TextBlock Text="Copa Form"
+                <TextBlock Text="DICS"
                            FontSize="28" FontWeight="Bold"
                            Foreground="White" HorizontalAlignment="Center"/>
                 <TextBlock Text="CNC Punching Machine Controller"

@@ -69,6 +69,19 @@ public partial class MainWindow : Window
 
     private void Generate_Click(object sender, RoutedEventArgs e)
     {
+        // Show password dialog
+        var pwdDialog = new PasswordDialog { Owner = this };
+        if (pwdDialog.ShowDialog() != true)
+            return;
+
+        // Hardcoded password for demonstration (replace with secure storage for production)
+        const string requiredPassword = "Sanpug@260128";
+        if (pwdDialog.EnteredPassword != requiredPassword)
+        {
+            MessageBox.Show(this, "Incorrect password.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
         try
         {
             var request = BuildRequest();

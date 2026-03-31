@@ -9,7 +9,7 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>CopaFormGui</RootNamespace>
     <AssemblyName>CopaFormGui</AssemblyName>
-    <ApplicationIcon>Assets\CopaForm.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\DICS.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\CopaForm.ico" />
+    <Resource Include="Assets\DICS.ico" />
   </ItemGroup>
 
   <ItemGroup>
