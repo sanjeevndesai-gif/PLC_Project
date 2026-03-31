@@ -239,6 +239,9 @@
                              Text="{Binding RecentThickness}"
                              IsReadOnly="True"/>
 
+                    <Button Content="Pause" Height="32" Margin="0,0,0,8"
+                            Command="{Binding PauseCommand}"/>
+
                     <!-- Display last saved file content -->
                     <TextBlock Text="Last Saved File Content:" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,0"/>
                     <ScrollViewer Height="120" VerticalScrollBarVisibility="Auto" Margin="0,2,0,8">

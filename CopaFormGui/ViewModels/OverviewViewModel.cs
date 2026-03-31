@@ -335,6 +335,25 @@ public partial class OverviewViewModel : ObservableObject
         PreviewZoom = 1.5;
     }
 
+    [RelayCommand]
+    private async Task PauseAsync()
+    {
+        if (_controllerService != null && _controllerService.IsConnected)
+        {
+            // Send 1 to PROG_HOLD
+            await _controllerService.WriteOutputValueAsync("PROG_HOLD", "1");
+            // Small delay to ensure the controller registers the pulse
+            await Task.Delay(100);
+            // Send 0 to PROG_HOLD
+            await _controllerService.WriteOutputValueAsync("PROG_HOLD", "0");
+            StatusMessage = "Pause signal sent to PROG_HOLD.";
+        }
+        else
+        {
+            StatusMessage = "Controller not connected.";
+        }
+    }
+
     private static bool IsSquareToolType(string? rawType)
     {
         var value = (rawType ?? string.Empty).Trim().ToLowerInvariant();
