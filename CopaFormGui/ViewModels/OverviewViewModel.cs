@@ -163,13 +163,20 @@ public partial class OverviewViewModel : ObservableObject
         RecentThicknessText = $"{safeThickness:F3} mm";
         RenderProgramPreview(program);
 
-        // Populate RunPopupPunchRows for the popup DataGrid
+        // Populate RunPopupPunchRows for the popup DataGrid with unique ToolIds (last occurrence per ToolId)
         var toolsById = _dataStoreService
             .LoadToolRecords()
             .GroupBy(t => t.ToolId)
             .ToDictionary(g => g.Key, g => g.Last());
+
+        // Group steps by ToolId and select the last occurrence for each ToolId
+        var uniqueSteps = program.Steps
+            .GroupBy(s => s.ToolId)
+            .Select(g => g.Last())
+            .ToList();
+
         var rows = new ObservableCollection<RunPopupPunchRow>();
-        foreach (var step in program.Steps)
+        foreach (var step in uniqueSteps)
         {
             string toolName = toolsById.TryGetValue(step.ToolId, out var tool) ? tool.ToolName : $"T{step.ToolId}";
             string punchInfo = toolsById.TryGetValue(step.ToolId, out var t)
