@@ -31,6 +31,12 @@ public partial class IOMonitorViewModel : ObservableObject
         // Subscribe to OutputValueChanged event
         CopaFormGui.Models.IOPoint.OutputValueChanged += OnOutputValueChanged;
 
+        // Always start auto-refresh if already connected
+        if (IsConnected)
+        {
+            StartAutoRefresh();
+        }
+
         // Fetch initial I/O states immediately
         _ = RefreshStatesAsync();
     }
@@ -108,7 +114,11 @@ public partial class IOMonitorViewModel : ObservableObject
         {
             try
             {
-                await RefreshStatesAsync();
+                // Ensure property changes are marshaled to the UI thread
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    await RefreshStatesAsync();
+                });
             }
             catch (Exception ex)
             {
