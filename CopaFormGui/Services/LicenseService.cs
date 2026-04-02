@@ -10,6 +10,8 @@ namespace CopaFormGui.Services;
 public class LicenseService : ILicenseService
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+    // Any license issued before this UTC timestamp is considered revoked after key rotation.
+    private static readonly DateTime MinIssuedUtc = new(2026, 4, 2, 19, 57, 0, DateTimeKind.Utc);
 
     private static readonly string ProgramDataFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "CopaFormGui");
@@ -64,6 +66,9 @@ public class LicenseService : ILicenseService
 
         if (license.ExpiresUtc.HasValue && DateTime.UtcNow > license.ExpiresUtc.Value.ToUniversalTime())
             return LicenseValidationResult.Fail("License has expired.");
+
+        if (license.IssuedUtc.ToUniversalTime() < MinIssuedUtc)
+            return LicenseValidationResult.Fail("License was issued before the current key rotation and is no longer valid.");
 
         if (!VerifySignature(license))
             return LicenseValidationResult.Fail("License signature is invalid.");
