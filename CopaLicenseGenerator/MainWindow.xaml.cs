@@ -87,11 +87,7 @@ public partial class MainWindow : Window
             var request = BuildRequest();
             var outputPath = LicenseGeneratorService.GenerateLicense(request);
             const string successMessage = "License Generated Successfully";
-
-            var statusLines = new System.Text.StringBuilder();
-            statusLines.AppendLine("License generated successfully.");
-            statusLines.AppendLine();
-            statusLines.AppendLine("Saved to: " + outputPath);
+            TrySyncLicenseToArtifacts(outputPath);
 
             // Always copy to C:\ProgramData\CopaFormGui\ (create folder if needed)
             var programDataTarget = Path.Combine(
@@ -117,6 +113,40 @@ public partial class MainWindow : Window
             StatusTextBox.Text = "Could not generate license.\n\n" + ex.Message;
             MessageBox.Show(this, ex.Message, "Generate Failed", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private static void TrySyncLicenseToArtifacts(string generatedLicensePath)
+    {
+        var root = FindWorkspaceRoot();
+        if (string.IsNullOrWhiteSpace(root))
+            return;
+
+        var artifactsLicensePath = Path.Combine(root, "artifacts", "CopaFormGui-Release", "license.json");
+        var artifactsDir = Path.GetDirectoryName(artifactsLicensePath);
+        if (string.IsNullOrWhiteSpace(artifactsDir) || !Directory.Exists(artifactsDir))
+            return;
+
+        File.Copy(generatedLicensePath, artifactsLicensePath, overwrite: true);
+    }
+
+    private static string? FindWorkspaceRoot()
+    {
+        string[] starts = { Environment.CurrentDirectory, AppContext.BaseDirectory };
+
+        foreach (var start in starts)
+        {
+            var dir = new DirectoryInfo(Path.GetFullPath(start));
+            for (int i = 0; i < 8 && dir is not null; i++)
+            {
+                var marker = Path.Combine(dir.FullName, "artifacts", "CopaFormGui-Release");
+                if (Directory.Exists(marker))
+                    return dir.FullName;
+
+                dir = dir.Parent;
+            }
+        }
+
+        return null;
     }
 
     private LicenseGenerationRequest BuildRequest()

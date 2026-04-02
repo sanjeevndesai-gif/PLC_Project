@@ -12,4 +12,20 @@
     <None Include="keys\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
   </ItemGroup>
 
+  <Target Name="SyncCopaLicenseGeneratorInstallerArtifacts" AfterTargets="Build">
+    <PropertyGroup>
+      <CopaLicenseInstallerAppDir>$(MSBuildProjectDirectory)\..\artifacts\CopaLicenseGenerator-Installer\app</CopaLicenseInstallerAppDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(CopaLicenseInstallerAppDir)" />
+
+    <ItemGroup>
+      <CopaLicenseGeneratorOutputFiles Include="$(TargetDir)**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(CopaLicenseGeneratorOutputFiles)"
+          DestinationFiles="@(CopaLicenseGeneratorOutputFiles->'$(CopaLicenseInstallerAppDir)\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

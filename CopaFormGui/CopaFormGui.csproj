@@ -56,9 +56,24 @@
     </Reference>
   </ItemGroup>
 
-  <!-- Post-build event to copy Release build to installer app folder -->
-  <Target Name="PostBuildCopyToInstaller" AfterTargets="Build">
-    <Exec Condition=" '$(Configuration)' == 'Release' " Command="copy /Y &quot;$(TargetDir)$(TargetFileName)&quot; &quot;$(ProjectDir)..\artifacts\CopaFormGui-Installer\app\$(TargetFileName)&quot;" />
+  <Target Name="SyncCopaFormGuiArtifacts" AfterTargets="Build">
+    <PropertyGroup>
+      <CopaFormGuiReleaseDir>$(MSBuildProjectDirectory)\..\artifacts\CopaFormGui-Release</CopaFormGuiReleaseDir>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(CopaFormGuiReleaseDir)" />
+
+    <ItemGroup>
+      <CopaFormGuiOutputFiles Include="$(TargetDir)**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(CopaFormGuiOutputFiles)"
+          DestinationFiles="@(CopaFormGuiOutputFiles->'$(CopaFormGuiReleaseDir)\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\license.json"
+          DestinationFiles="$(CopaFormGuiReleaseDir)\license.json"
+          Condition="Exists('$(MSBuildProjectDirectory)\..\license.json')" />
   </Target>
 
 </Project>
