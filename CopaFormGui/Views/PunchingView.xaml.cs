@@ -25,7 +25,7 @@ public partial class PunchingView : UserControl
             grid.PreparingCellForEdit += DataGrid_PreparingCellForEdit;
             grid.BeginningEdit += DataGrid_BeginningEdit;
             grid.PreviewKeyDown += DataGrid_AdvancedKeyDown;
-            grid.AddingNewItem += DataGrid_AddingNewItem;
+            // grid.AddingNewItem += DataGrid_AddingNewItem; // Disabled to prevent repeated row addition
             grid.MouseLeftButtonDown += DataGrid_MouseLeftButtonDown;
         }
     }

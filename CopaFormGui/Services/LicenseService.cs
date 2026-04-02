@@ -34,8 +34,6 @@ public class LicenseService : ILicenseService
 
         if (!File.Exists(licensePath))
         {
-            // Diagnostic: Show which path is being checked
-            System.Windows.MessageBox.Show($"Checked for license at:\n{ProgramDataLicensePath}\nand\n{LocalLicensePath}", "License Check Diagnostic");
             return LicenseValidationResult.Fail(
                 $"License file not found.\nExpected: {ProgramDataLicensePath} or {LocalLicensePath}\n\n" +
                 $"Machine ID: {currentMachineId}");
