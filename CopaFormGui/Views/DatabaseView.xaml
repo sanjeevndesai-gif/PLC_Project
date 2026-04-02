@@ -60,7 +60,7 @@
 
         <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
             <StackPanel Orientation="Horizontal">
-                <Button Content="Delete Old Data"
+                <Button Content="Clear Database"
                         Command="{Binding DeleteOldDataCommand}"
                         Style="{StaticResource DangerButtonStyle}"/>
             </StackPanel>

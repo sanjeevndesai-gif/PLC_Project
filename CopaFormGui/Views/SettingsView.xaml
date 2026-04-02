@@ -1,0 +1,453 @@
+<UserControl x:Class="CopaFormGui.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="SettingsFieldLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource FormLabelStyle}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+
+        <Style x:Key="SettingsValueBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextBoxStyle}">
+            <Setter Property="MinWidth" Value="110"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        </Style>
+
+        <Style x:Key="SettingsTabControlStyle" TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <Style x:Key="SettingsTabItemStyle" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabBorder"
+                                Background="#E7EDF5"
+                                BorderBrush="#C5D2E1"
+                                BorderThickness="1"
+                                CornerRadius="6,6,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              ContentSource="Header"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="White"/>
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SettingsSectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="Margin" Value="12,-12,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
+            <StackPanel>
+                <TextBlock Text="Settings" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                
+            </StackPanel>
+        </Border>
+
+        <TabControl Grid.Row="1"
+                    SelectedIndex="{Binding SelectedTabIndex}"
+                    Style="{StaticResource SettingsTabControlStyle}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem" BasedOn="{StaticResource SettingsTabItemStyle}"/>
+            </TabControl.ItemContainerStyle>
+            <TabItem Header="General">
+                <Border Style="{StaticResource CardStyle}" Padding="10" Margin="0,8,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,8" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Times" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Supervise-time punching" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SuperviseTimePunching, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Running time belt with workpiece" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RunningTimeBeltWorkpiece, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Running time belt with rest" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding RunningTimeBeltRest, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Waiting time closing grippers" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding WaitingTimeClosingGrippers, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Waiting time open grippers" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding WaitingTimeOpenGrippers, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Waiting time closing clamping" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding WaitingTimeClosingClamping, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Waiting time open clamping" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding WaitingTimeOpenClamping, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardStyle}" Margin="8,0,0,8" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Speed settings" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Speed X" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SpeedX, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Speed Y" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SpeedY, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Speed Z" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SpeedZ, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Speed X (Hand)" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SpeedXHand, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Speed Y (Hand)" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SpeedYHand, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Speed Z (Hand)" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding SpeedZHand, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}" Margin="0,8,0,0" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Positions and lengths" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Part drop off position" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PartDropOffPosition, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="3" Text="X minimum" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="4" Text="{Binding XMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Grab position gripper" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding GrabPositionGripper, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="3" Text="X maximum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding XMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Changeover position punching" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ChangeoverPositionPunching, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="3" Text="Y minimum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="4" Text="{Binding YMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Changeover position cutting" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ChangeoverPositionCutting, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="3" Text="Y maximum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="4" Text="{Binding YMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Offset side stop" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding OffsetSideStop, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="3" Text="Z minimum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="4" Text="{Binding ZMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Zero point tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ZeroPointTool4, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="3" Text="Z maximum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="5" Grid.Column="4" Text="{Binding ZMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Change position tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding ChangePositionTool4, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="3" Text="Home position (X / Y)" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <StackPanel Grid.Row="6" Grid.Column="4" Orientation="Horizontal" Margin="0,5,0,0">
+                                        <TextBox Text="{Binding HomeX, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" MinWidth="58" Width="58" Margin="0,0,6,0"/>
+                                        <TextBox Text="{Binding HomeY, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" MinWidth="58" Width="58"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Tool">
+                <Border Style="{StaticResource CardStyle}" Padding="10" Margin="0,8,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="320"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,8" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="General" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Tool length 1" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ToolLength1, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Tool length 2" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ToolLength2, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool length 3" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ToolLength3, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Zero point tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ZeroPointTool4, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Change position tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ChangePositionTool4, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardStyle}" Margin="8,0,0,8" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Options" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <StackPanel Margin="0,18,0,0">
+                                    <CheckBox Content="6 Tools" FontSize="12" Margin="0,0,0,12" IsHitTestVisible="False"/>
+                                    <CheckBox Content="Z-Axis" FontSize="12" IsHitTestVisible="False"/>
+                                    <TextBlock Text="Machine-specific options can be extended here later."
+                                               FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,18,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}" Margin="0,8,0,0" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Offsets" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="160"/>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="X" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Y" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Tool 1" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding XMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,8,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding YMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool 2" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding XMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,8,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding YMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Tool 3 / Tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding HomeX, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,8,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding HomeY, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Service">
+                <Border Style="{StaticResource CardStyle}" Padding="10" Margin="0,8,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,8" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Motion service" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="X-axis acceleration" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding XAxisAcceleration, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Y-axis acceleration" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding YAxisAcceleration, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Z-axis acceleration" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ZAxisAcceleration, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Safety height / clamp force" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="0,5,0,0">
+                                        <TextBox Text="{Binding SafetyHeight, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" MinWidth="58" Width="58" Margin="0,0,6,0"/>
+                                        <TextBox Text="{Binding ClampForce, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" MinWidth="58" Width="58"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardStyle}" Margin="8,0,0,8" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Axis unblock" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <Grid Margin="0,5,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="130"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="X-axis unblock Y" Style="{StaticResource SettingsFieldLabelStyle}"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding XAxisUnblockY, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Y-axis unblock X right" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding YAxisUnblockXRight, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Y-axis unblock X left" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding YAxisUnblockXLeft, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Y-axis side stop" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding YAxisSideStop, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource CardStyle}" Margin="0,8,0,0" Padding="18,14,18,14">
+                            <Grid>
+                                <TextBlock Text="Controller sync" Style="{StaticResource SettingsSectionTitleStyle}"/>
+                                <StackPanel Margin="0,12,0,0">
+                                    <TextBlock Text="These service values are typically maintained during commissioning and maintenance."
+                                               FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Use the action bar below to save the values, apply them to the controller, or reset them to defaults."
+                                               FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="12,8" Margin="0,8,0,0">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <TextBlock Text="Settings actions" Style="{StaticResource FormLabelStyle}" Margin="0,0,0,2"/>
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="{StaticResource PrimaryDarkBrush}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Reset" Command="{Binding ResetDefaultsCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Apply" Command="{Binding ApplySettingsCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Save" Command="{Binding SaveSettingsCommand}" Style="{StaticResource PrimaryButtonStyle}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>
