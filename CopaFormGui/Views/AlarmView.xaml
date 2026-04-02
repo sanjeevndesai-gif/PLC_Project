@@ -7,58 +7,57 @@
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" CornerRadius="6" Padding="16,10" Margin="0,0,0,8">
-            <Grid>
-                <StackPanel>
-                    <TextBlock Text="Alarms &amp; Events" FontSize="18" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- Active Alarms Banner -->
-        <Border Grid.Row="1" Background="#FFEBEE" CornerRadius="6" Padding="12,8" Margin="0,0,0,8"
-                Visibility="{Binding HasActiveAlarms, Converter={StaticResource BoolToVisibility}}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#x26A0; " FontSize="14" Foreground="#C62828"/>
-                <TextBlock Foreground="#C62828" FontSize="12" FontWeight="SemiBold">
-                    <Run Text="{Binding ActiveAlarms.Count}"/>
-                    <Run Text=" active alarm(s) require attention"/>
-                </TextBlock>
+            <StackPanel>
+                <TextBlock Text="Alarms &amp; Events" FontSize="18" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#BBDEFB" Margin="0,2,0,0"/>
             </StackPanel>
         </Border>
 
-        <!-- Alarm Table -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Padding="8">
-            <DataGrid ItemsSource="{Binding Alarms}"
-                      SelectedItem="{Binding SelectedAlarm}"
-                      AutoGenerateColumns="False"
-                      CanUserAddRows="False"
-                      SelectionMode="Single"
-                      IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID"          Binding="{Binding AlarmId}"      Width="50"/>
-                    <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss dd/MM}}" Width="130"/>
-                    <DataGridTextColumn Header="Code"        Binding="{Binding Code}"         Width="70"/>
-                    <DataGridTextColumn Header="Description" Binding="{Binding Description}"  Width="*"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Border>
+        <!-- Tabs -->
+        <TabControl Grid.Row="1">
 
-        <!-- Action Buttons -->
-        <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Clear History"        Command="{Binding ClearHistoryCommand}"
-                        Style="{StaticResource DangerButtonStyle}"  Margin="0,0,8,0"/>
-                <Button Content="Refresh"              Command="{Binding RefreshCommand}"
-                        Style="{StaticResource SecondaryButtonStyle}"/>
-            </StackPanel>
-        </Border>
+            <!-- Active Alarms Tab -->
+            <TabItem Header="Active Alarms">
+                <Border Style="{StaticResource CardStyle}" Padding="8">
+                    <DataGrid ItemsSource="{Binding ActiveAlarms}"
+                              SelectedItem="{Binding SelectedAlarm}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"          Binding="{Binding AlarmId}"      Width="50"/>
+                            <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss dd/MM}}" Width="130"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}"  Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </TabItem>
+
+            <!-- History Tab -->
+            <TabItem Header="History">
+                <Border Style="{StaticResource CardStyle}" Padding="8">
+                    <DataGrid ItemsSource="{Binding Alarms}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"          Binding="{Binding AlarmId}"                                       Width="50"/>
+                            <DataGridTextColumn Header="Date"        Binding="{Binding Timestamp, StringFormat={}{0:dd/MM/yyyy}}"       Width="100"/>
+                            <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"         Width="80"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}"                                   Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </TabItem>
+
+        </TabControl>
+
     </Grid>
 </UserControl>
