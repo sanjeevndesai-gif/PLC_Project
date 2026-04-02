@@ -18,6 +18,18 @@ public class LicenseService : ILicenseService
 
     private static readonly string ProgramDataLicensePath = Path.Combine(ProgramDataFolder, "license.json");
     private static readonly string LocalLicensePath = Path.Combine(AppContext.BaseDirectory, "license.json");
+    private static readonly string DebugLogPath = Path.Combine(AppContext.BaseDirectory, "license_debug.log");
+
+    private static void LogDebug(string message)
+    {
+        try
+        {
+            var logMessage = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff}] {message}{Environment.NewLine}";
+            System.Diagnostics.Debug.WriteLine(message);
+            File.AppendAllText(DebugLogPath, logMessage);
+        }
+        catch { }
+    }
 
     public string GetCurrentMachineId()
     {
@@ -31,15 +43,49 @@ public class LicenseService : ILicenseService
 
     public LicenseValidationResult ValidateCurrentMachineLicense()
     {
-        var licensePath = File.Exists(ProgramDataLicensePath) ? ProgramDataLicensePath : LocalLicensePath;
         var currentMachineId = GetCurrentMachineId();
+        LogDebug($"\n===== ValidateCurrentMachineLicense started =====");
+        LogDebug($"Current Machine ID: {currentMachineId}");
+        
+        var candidatePaths = new[] { ProgramDataLicensePath, LocalLicensePath };
+        var checkedAny = false;
+        var errors = new List<string>();
 
-        if (!File.Exists(licensePath))
+        foreach (var licensePath in candidatePaths)
         {
-            return LicenseValidationResult.Fail(
-                $"License file not found.\nExpected: {ProgramDataLicensePath} or {LocalLicensePath}\n\n" +
-                $"Machine ID: {currentMachineId}");
+            LogDebug($"Checking path: {licensePath} - Exists: {File.Exists(licensePath)}");
+            if (!File.Exists(licensePath))
+                continue;
+
+            checkedAny = true;
+            if (TryValidateLicenseAtPath(licensePath, currentMachineId, out var errorMessage))
+            {
+                LogDebug($"✓ VALIDATION PASSED at: {licensePath}");
+                return LicenseValidationResult.Ok();
+            }
+
+            errors.Add($"{licensePath}: {errorMessage}");
+            LogDebug($"✗ VALIDATION FAILED at: {licensePath} - {errorMessage}");
         }
+
+        if (!checkedAny)
+        {
+            var failMsg = $"License file not found.\nExpected: {ProgramDataLicensePath} or {LocalLicensePath}\n\n" +
+                $"Machine ID: {currentMachineId}";
+            LogDebug($"No license files found. Fail message: {failMsg}");
+            return LicenseValidationResult.Fail(failMsg);
+        }
+
+        var finalMsg = "No valid license found.\n\n" + string.Join("\n", errors);
+        LogDebug($"All licenses failed validation. Final error: {finalMsg}");
+        return LicenseValidationResult.Fail(finalMsg);
+    }
+
+    private static bool TryValidateLicenseAtPath(string licensePath, string currentMachineId, out string errorMessage)
+    {
+        errorMessage = string.Empty;
+        LogDebug($"[TryValidateLicenseAtPath] Validating license at: {licensePath}");
+        LogDebug($"[TryValidateLicenseAtPath] Current machine ID: {currentMachineId}");
 
         LicenseFile? license;
         try
@@ -49,31 +95,60 @@ public class LicenseService : ILicenseService
         }
         catch (Exception ex)
         {
-            return LicenseValidationResult.Fail($"License file could not be read: {ex.Message}");
+            errorMessage = $"License file could not be read: {ex.Message}";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
         }
 
         if (license is null)
-            return LicenseValidationResult.Fail("License file is empty or invalid.");
-
-        if (!string.Equals(license.Product, "CopaFormGui", StringComparison.OrdinalIgnoreCase))
-            return LicenseValidationResult.Fail("License product does not match this application.");
-
-        if (!string.Equals(license.MachineId?.Trim(), currentMachineId, StringComparison.OrdinalIgnoreCase))
         {
-            return LicenseValidationResult.Fail(
-                $"License is not valid for this system.\nLicensed Machine ID: {license.MachineId}\nCurrent Machine ID: {currentMachineId}");
+            errorMessage = "License file is empty or invalid.";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
         }
 
+        LogDebug($"[TryValidateLicenseAtPath] Product in license: {license.Product}");
+        if (!string.Equals(license.Product, "CopaFormGui", StringComparison.OrdinalIgnoreCase))
+        {
+            errorMessage = "License product does not match this application.";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
+        }
+
+        LogDebug($"[TryValidateLicenseAtPath] Machine ID in license: {license.MachineId?.Trim()}");
+        if (!string.Equals(license.MachineId?.Trim(), currentMachineId, StringComparison.OrdinalIgnoreCase))
+        {
+            errorMessage = $"License is not valid for this system. Licensed Machine ID: {license.MachineId}; Current Machine ID: {currentMachineId}";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
+        }
+
+        LogDebug($"[TryValidateLicenseAtPath] Expires: {license.ExpiresUtc?.ToUniversalTime():O}, Now: {DateTime.UtcNow:O}");
         if (license.ExpiresUtc.HasValue && DateTime.UtcNow > license.ExpiresUtc.Value.ToUniversalTime())
-            return LicenseValidationResult.Fail("License has expired.");
+        {
+            errorMessage = "License has expired.";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
+        }
 
+        LogDebug($"[TryValidateLicenseAtPath] IssuedUtc: {license.IssuedUtc.ToUniversalTime():O}, MinIssuedUtc: {MinIssuedUtc:O}");
         if (license.IssuedUtc.ToUniversalTime() < MinIssuedUtc)
-            return LicenseValidationResult.Fail("License was issued before the current key rotation and is no longer valid.");
+        {
+            errorMessage = "License was issued before the current key rotation and is no longer valid.";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
+        }
 
+        LogDebug($"[TryValidateLicenseAtPath] Calling VerifySignature...");
         if (!VerifySignature(license))
-            return LicenseValidationResult.Fail("License signature is invalid.");
+        {
+            errorMessage = "License signature is invalid.";
+            LogDebug($"[TryValidateLicenseAtPath] ERROR: {errorMessage}");
+            return false;
+        }
 
-        return LicenseValidationResult.Ok();
+        LogDebug($"[TryValidateLicenseAtPath] SUCCESS: License validated");
+        return true;
     }
 
     private static bool VerifySignature(LicenseFile license)
@@ -81,17 +156,28 @@ public class LicenseService : ILicenseService
         try
         {
             if (LicenseCrypto.PublicKeyPem.Contains("REPLACE_WITH_YOUR_RSA_PUBLIC_KEY", StringComparison.Ordinal))
+            {
+                LogDebug("[LicenseService] ERROR: Public key contains placeholder text!");
                 return false;
+            }
 
             var payload = LicenseCrypto.BuildPayload(license);
+            LogDebug($"[VerifySignature] Payload: {payload}");
+            LogDebug($"[VerifySignature] Public key first 60 chars: {LicenseCrypto.PublicKeyPem.Substring(0, 60)}");
+            LogDebug($"[VerifySignature] Signature length: {license.Signature.Length}");
+
             var payloadBytes = Encoding.UTF8.GetBytes(payload);
             var signatureBytes = Convert.FromBase64String(license.Signature);
 
             using var rsa = ImportPublicKeyFromPem(LicenseCrypto.PublicKeyPem);
-            return rsa.VerifyData(payloadBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            var result = rsa.VerifyData(payloadBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            LogDebug($"[VerifySignature] Result: {result}");
+            return result;
         }
-        catch
+        catch (Exception ex)
         {
+            LogDebug($"[VerifySignature] EXCEPTION: {ex.GetType().Name}: {ex.Message}");
+            LogDebug($"[VerifySignature] Stack trace: {ex.StackTrace}");
             return false;
         }
     }
@@ -120,25 +206,42 @@ public class LicenseService : ILicenseService
 
     private static RSA ImportPublicKeyFromPem(string pem)
     {
-        var base64 = pem
-            .Replace("-----BEGIN PUBLIC KEY-----", "")
-            .Replace("-----END PUBLIC KEY-----", "")
-            .Replace("\r", "").Replace("\n", "").Trim();
-        var spki = Convert.FromBase64String(base64);
+        try
+        {
+            var base64 = pem
+                .Replace("-----BEGIN PUBLIC KEY-----", "")
+                .Replace("-----END PUBLIC KEY-----", "")
+                .Replace("\r", "").Replace("\n", "").Trim();
+            var spki = Convert.FromBase64String(base64);
+            LogDebug($"[ImportPublicKeyFromPem] DER SPKI length: {spki.Length} bytes");
 
-        // Parse DER SubjectPublicKeyInfo to extract RSA modulus and exponent
-        int i = 0;
-        DerAdvancePast(spki, ref i, 0x30); // outer SEQUENCE
-        DerSkipNode(spki, ref i, 0x30);    // algorithm SEQUENCE (skip entirely)
-        DerAdvancePast(spki, ref i, 0x03); // BIT STRING
-        i++;                               // skip unused-bits byte (0x00)
-        DerAdvancePast(spki, ref i, 0x30); // RSAPublicKey SEQUENCE
-        var modulus  = DerReadInteger(spki, ref i);
-        var exponent = DerReadInteger(spki, ref i);
+            // Parse DER SubjectPublicKeyInfo to extract RSA modulus and exponent
+            int i = 0;
+            DerAdvancePast(spki, ref i, 0x30); // outer SEQUENCE
+            LogDebug($"[ImportPublicKeyFromPem] Parsed outer SEQUENCE");
+            DerSkipNode(spki, ref i, 0x30);    // algorithm SEQUENCE (skip entirely)
+            LogDebug($"[ImportPublicKeyFromPem] Skipped algorithm SEQUENCE");
+            DerAdvancePast(spki, ref i, 0x03); // BIT STRING
+            i++;                               // skip unused-bits byte (0x00)
+            LogDebug($"[ImportPublicKeyFromPem] Parsed BIT STRING");
+            DerAdvancePast(spki, ref i, 0x30); // RSAPublicKey SEQUENCE
+            LogDebug($"[ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE");
+            var modulus  = DerReadInteger(spki, ref i);
+            LogDebug($"[ImportPublicKeyFromPem] Parsed modulus: {modulus.Length} bytes");
+            var exponent = DerReadInteger(spki, ref i);
+            LogDebug($"[ImportPublicKeyFromPem] Parsed exponent: {exponent.Length} bytes");
 
-        var rsa = RSA.Create();
-        rsa.ImportParameters(new RSAParameters { Modulus = modulus, Exponent = exponent });
-        return rsa;
+            var rsa = RSA.Create();
+            rsa.ImportParameters(new RSAParameters { Modulus = modulus, Exponent = exponent });
+            LogDebug($"[ImportPublicKeyFromPem] RSA key imported successfully");
+            return rsa;
+        }
+        catch (Exception ex)
+        {
+            LogDebug($"[ImportPublicKeyFromPem] EXCEPTION: {ex.GetType().Name}: {ex.Message}");
+            LogDebug($"[ImportPublicKeyFromPem] Stack trace: {ex.StackTrace}");
+            throw;
+        }
     }
 
     private static void DerAdvancePast(byte[] data, ref int i, byte tag)
