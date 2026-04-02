@@ -86,6 +86,7 @@ public partial class MainWindow : Window
         {
             var request = BuildRequest();
             var outputPath = LicenseGeneratorService.GenerateLicense(request);
+            const string successMessage = "License Generated Successfully";
 
             var statusLines = new System.Text.StringBuilder();
             statusLines.AppendLine("License generated successfully.");
@@ -96,19 +97,24 @@ public partial class MainWindow : Window
             var programDataTarget = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "CopaFormGui");
-
-            Directory.CreateDirectory(programDataTarget);
             var destPath = Path.Combine(programDataTarget, "license.json");
-            File.Copy(outputPath, destPath, overwrite: true);
-            statusLines.AppendLine();
-            statusLines.AppendLine("Deployed to: " + destPath);
 
-            StatusTextBox.Text = statusLines.ToString();
-            MessageBox.Show(this, StatusTextBox.Text, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                Directory.CreateDirectory(programDataTarget);
+                File.Copy(outputPath, destPath, overwrite: true);
+                StatusTextBox.Text = successMessage;
+                MessageBox.Show(this, successMessage, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                StatusTextBox.Text = successMessage;
+                MessageBox.Show(this, successMessage, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
         catch (Exception ex)
         {
-            StatusTextBox.Text = "Failed to generate license.\n\n" + ex.Message;
+            StatusTextBox.Text = "Could not generate license.\n\n" + ex.Message;
             MessageBox.Show(this, ex.Message, "Generate Failed", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
