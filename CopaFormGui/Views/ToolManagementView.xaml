@@ -172,6 +172,11 @@
 
                     <!-- Row 4: Notes and Used checkbox -->
                     <StackPanel Grid.Row="4" Margin="0,0,0,10">
+                        <TextBlock Text="GCode" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditGCode, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 Margin="0,0,0,8"/>
+
                         <TextBlock Text="Notes" Style="{StaticResource FormLabelStyle}"/>
                         <TextBox Text="{Binding EditNotes, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource InputTextBoxStyle}"

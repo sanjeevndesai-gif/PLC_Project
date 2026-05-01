@@ -23,6 +23,7 @@ public partial class ToolManagementViewModel : ObservableObject
     [ObservableProperty] private int _editToolId;
     [ObservableProperty] private string _editToolStation = "T1";
     [ObservableProperty] private string _editToolName = string.Empty;
+    [ObservableProperty] private string _editGCode = string.Empty;
     [ObservableProperty] private string _editToolType = "Round";
     [ObservableProperty] private double _editDiameter;
     [ObservableProperty] private double _editLength;
@@ -74,6 +75,7 @@ public partial class ToolManagementViewModel : ObservableObject
         EditToolId = value.ToolId;
         EditToolStation = string.IsNullOrWhiteSpace(value.ToolStation) ? "T1" : value.ToolStation;
         EditToolName = value.ToolName;
+        EditGCode = value.GCode;
         EditToolType = NormalizeToolType(value.ToolType);
         EditDiameter = value.Diameter;
         EditLength = value.Length;
@@ -148,6 +150,7 @@ public partial class ToolManagementViewModel : ObservableObject
             ToolId = SelectedTool.ToolId,
             ToolStation = string.IsNullOrWhiteSpace(EditToolStation) ? "T1" : EditToolStation,
             ToolName = EditToolName,
+            GCode = EditGCode,
             ToolType = normalizedType,
             Diameter = normalizedType == "Round" ? EditDiameter : 0,
             Length = normalizedType == "Square" ? EditLength : 0,
@@ -166,6 +169,7 @@ public partial class ToolManagementViewModel : ObservableObject
         EditToolId = 0;
         EditToolStation = "T1";
         EditToolName = string.Empty;
+        EditGCode = string.Empty;
         EditToolType = "Round";
         EditDiameter = 0;
         EditLength = 0;
@@ -188,6 +192,7 @@ public partial class ToolManagementViewModel : ObservableObject
         EditToolId = 0;
         EditToolStation = "T1";
         EditToolName = string.Empty;
+        EditGCode = string.Empty;
         EditToolType = "Round";
         EditDiameter = 0;
         EditLength = 0;

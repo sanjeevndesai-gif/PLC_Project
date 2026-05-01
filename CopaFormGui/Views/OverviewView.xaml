@@ -36,10 +36,14 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Text="Length of the bar" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource FormLabelStyle}"/>
                                 <TextBox Width="90" Grid.Row="0" Grid.Column="1" Margin="4,0,0,8" Style="{StaticResource InputTextBoxStyle}"
+                                         Text="{Binding RunBarLengthMm, UpdateSourceTrigger=PropertyChanged}"
                                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                                          DataObject.Pasting="NumericTextBox_Pasting"/>
                                 <TextBlock Text="Number of parts" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource FormLabelStyle}"/>
                                 <TextBox Width="90" Grid.Row="1" Grid.Column="1" Margin="4,0,0,8" Style="{StaticResource InputTextBoxStyle}"
+                                         Text="{Binding RunNumberOfParts}"
+                                         IsReadOnly="True"
+                                         IsEnabled="False"
                                          PreviewTextInput="NumericTextBox_PreviewTextInput"
                                          DataObject.Pasting="NumericTextBox_Pasting"/>
                                 <TextBlock Text="Part off" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource FormLabelStyle}"/>
@@ -49,6 +53,7 @@
                                 <DataGrid AutoGenerateColumns="False" HeadersVisibility="Column" Height="100" Margin="0" BorderThickness="0" ItemsSource="{Binding RunPopupPunchRows}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="ToolId" Binding="{Binding ToolId}" Width="60"/>
+                                        <DataGridTextColumn Header="Tool Type" Binding="{Binding ToolType}" Width="80"/>
                                         <DataGridTextColumn Header="Tool" Binding="{Binding Tool}" Width="60"/>
                                         <DataGridTextColumn Header="Punch" Binding="{Binding Punch}" Width="*"/>
                                     </DataGrid.Columns>
@@ -241,6 +246,8 @@
 
                     <Button Content="Pause" Height="32" Margin="0,0,0,8"
                             Command="{Binding PauseCommand}"/>
+
+                        <Button Content="Download program" Height="32" Margin="0,0,0,8"/>
 
                     <!-- Display last saved file content -->
                     <TextBlock Text="Last Saved File Content:" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,0"/>

@@ -65,6 +65,11 @@ public partial class OverviewViewModel : ObservableObject
     [ObservableProperty] private string _recentWidthText = string.Empty;
     [ObservableProperty] private string _recentThicknessText = string.Empty;
 
+    // Run popup inputs
+    [ObservableProperty] private string _runBarLengthMm = string.Empty;
+    [ObservableProperty] private int _runNumberOfParts;
+    [ObservableProperty] private double _currentProgramLengthMm;
+
     // POC test I/O
     [ObservableProperty] private string _testVariableName = "P100";
     [ObservableProperty] private string _testWriteValue = "0";
@@ -103,6 +108,7 @@ public partial class OverviewViewModel : ObservableObject
             RecentLengthText = "0.000 mm";
             RecentWidthText = "0.000 mm";
             RecentThicknessText = "0.000 mm";
+            CurrentProgramLengthMm = 0;
             InitializeDefaultPreview();
             return;
         }
@@ -161,6 +167,7 @@ public partial class OverviewViewModel : ObservableObject
         RecentLengthText = $"{safeLength:F3} mm";
         RecentWidthText = $"{safeWidth:F3} mm";
         RecentThicknessText = $"{safeThickness:F3} mm";
+        CurrentProgramLengthMm = safeLength;
         RenderProgramPreview(program);
 
         // Populate RunPopupPunchRows for the popup DataGrid with unique ToolIds (last occurrence per ToolId)
@@ -179,12 +186,52 @@ public partial class OverviewViewModel : ObservableObject
         foreach (var step in uniqueSteps)
         {
             string toolName = toolsById.TryGetValue(step.ToolId, out var tool) ? tool.ToolName : $"T{step.ToolId}";
+            string toolType = toolsById.TryGetValue(step.ToolId, out var typeTool)
+                ? (string.IsNullOrWhiteSpace(typeTool.ToolStation) ? $"T{step.ToolId}" : typeTool.ToolStation)
+                : $"T{step.ToolId}";
             string punchInfo = toolsById.TryGetValue(step.ToolId, out var t)
                 ? $"Dia {t.Diameter} L = {t.Length} w = {t.Width}"
                 : string.Empty;
-            rows.Add(new RunPopupPunchRow { ToolId = step.ToolId, Tool = toolName, Punch = punchInfo });
+            rows.Add(new RunPopupPunchRow { ToolId = step.ToolId, ToolType = toolType, Tool = toolName, Punch = punchInfo });
         }
         RunPopupPunchRows = rows;
+    }
+
+    partial void OnRunBarLengthMmChanged(string value)
+    {
+        _ = value;
+        RecalculateRunNumberOfParts();
+    }
+
+    partial void OnCurrentProgramLengthMmChanged(double value)
+    {
+        _ = value;
+        RecalculateRunNumberOfParts();
+    }
+
+    private void RecalculateRunNumberOfParts()
+    {
+        var barLength = ParseNumber(RunBarLengthMm);
+        if (barLength <= 0 || CurrentProgramLengthMm <= 0)
+        {
+            RunNumberOfParts = 0;
+            return;
+        }
+
+        RunNumberOfParts = (int)Math.Floor(barLength / CurrentProgramLengthMm);
+    }
+
+    private static double ParseNumber(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return 0;
+
+        if (double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+            return value;
+
+        if (double.TryParse(raw, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
+            return value;
+
+        return 0;
     }
 
     private static bool HasUsableHeaderData(PunchProgram? program)
