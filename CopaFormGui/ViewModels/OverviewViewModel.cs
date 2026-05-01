@@ -68,6 +68,7 @@ public partial class OverviewViewModel : ObservableObject
     // Run popup inputs
     [ObservableProperty] private string _runBarLengthMm = string.Empty;
     [ObservableProperty] private int _runNumberOfParts;
+    [ObservableProperty] private bool _runPartOff;
     [ObservableProperty] private double _currentProgramLengthMm;
 
     // POC test I/O

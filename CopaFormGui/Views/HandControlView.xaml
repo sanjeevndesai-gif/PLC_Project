@@ -78,13 +78,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- HOME FEEDRATE -->
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                    <TextBlock Text="HOME FEEDRATE:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <TextBox Width="60" Height="28" VerticalAlignment="Center"
-                             Text="{Binding HomeFeedrate, UpdateSourceTrigger=PropertyChanged}"
-                             LostFocus="HomeFeedrateChangedHandler"/>
-                </StackPanel>
             </StackPanel>
 
             <!-- Right: Axis Position Displays + Jog Buttons -->
