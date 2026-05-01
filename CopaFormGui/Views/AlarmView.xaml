@@ -87,18 +87,34 @@
             <!-- History Tab -->
             <TabItem Header="History">
                 <Border Style="{StaticResource CardStyle}" Padding="8">
-                    <DataGrid ItemsSource="{Binding Alarms}"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              SelectionMode="Single"
-                              IsReadOnly="True">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID"          Binding="{Binding AlarmId}"                                       Width="50"/>
-                            <DataGridTextColumn Header="Date"        Binding="{Binding Timestamp, StringFormat={}{0:dd/MM/yyyy}}"       Width="100"/>
-                            <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"         Width="80"/>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description}"                                   Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <DockPanel Grid.Row="0" Margin="0,0,0,8" LastChildFill="False">
+                            <Button Content="Clear"
+                                    Command="{Binding ClearHistoryCommand}"
+                                    Width="90"
+                                    Height="30"
+                                    HorizontalAlignment="Right"/>
+                        </DockPanel>
+
+                        <DataGrid Grid.Row="1"
+                                  ItemsSource="{Binding Alarms}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  SelectionMode="Single"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID"          Binding="{Binding AlarmId}"                                 Width="50"/>
+                                <DataGridTextColumn Header="Date"        Binding="{Binding Timestamp, StringFormat={}{0:dd/MM/yyyy}}" Width="100"/>
+                                <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"   Width="80"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}"                             Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
                 </Border>
             </TabItem>
 
