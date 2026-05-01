@@ -22,6 +22,13 @@ public class MachineSettings
     public double ToolLength1 { get; set; } = 50.0;
     public double ToolLength2 { get; set; } = 50.0;
     public double ToolLength3 { get; set; } = 50.0;
+    public double ToolLength4 { get; set; } = 50.0;
+
+    // Tool offsets (T1_Offset_pos .. T4_Offset_pos)
+    public double T1OffsetPos { get; set; } = 0.0;
+    public double T2OffsetPos { get; set; } = 0.0;
+    public double T3OffsetPos { get; set; } = 0.0;
+    public double T4OffsetPos { get; set; } = 0.0;
 
     // Home positions
     public double HomeX { get; set; } = 0.0;

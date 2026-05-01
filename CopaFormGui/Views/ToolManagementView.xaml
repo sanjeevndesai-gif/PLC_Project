@@ -63,16 +63,17 @@
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               SelectionMode="Single"
-                              IsReadOnly="True">
+                              IsReadOnly="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"                               Width="45"/>
-                            <DataGridTextColumn Header="Name"        Binding="{Binding ToolName}"                             Width="*"/>
-                            <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"                             Width="75"/>
-                            <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}"      Width="75"/>
-                            <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"        Width="85"/>
-                            <DataGridTextColumn Header="Width (mm)"  Binding="{Binding Width, StringFormat={}{0:F1}}"         Width="80"/>
+                            <DataGridTextColumn Header="ID"          Binding="{Binding ToolId}"                               Width="45" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Tool"        Binding="{Binding ToolStation}"                         Width="70" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Name"        Binding="{Binding ToolName}"                             Width="*" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Type"        Binding="{Binding ToolType}"                             Width="75" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Dia (mm)"    Binding="{Binding Diameter, StringFormat={}{0:F1}}"      Width="75" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Length (mm)" Binding="{Binding Length, StringFormat={}{0:F1}}"        Width="85" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Width (mm)"  Binding="{Binding Width, StringFormat={}{0:F1}}"         Width="80" IsReadOnly="True"/>
                             <DataGridCheckBoxColumn Header="Tool in Used"    Binding="{Binding IsUsed, Mode=TwoWay}"                  Width="60"/>
-                            <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"                                Width="100"/>
+                            <DataGridTextColumn Header="Notes"       Binding="{Binding Notes}"                                Width="100" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
@@ -86,13 +87,14 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Tool Details" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,10"/>
 
-                    <!-- Row 1: Name + Type side by side -->
+                    <!-- Row 1: Tool + Type side by side -->
                     <Grid Grid.Row="1" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -100,9 +102,10 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Tool Name" Style="{StaticResource FormLabelStyle}"/>
-                            <TextBox Text="{Binding EditToolName, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource InputTextBoxStyle}"/>
+                            <TextBlock Text="Tool" Style="{StaticResource FormLabelStyle}"/>
+                            <ComboBox ItemsSource="{Binding ToolStations}"
+                                      SelectedItem="{Binding EditToolStation, UpdateSourceTrigger=PropertyChanged}"
+                                      Padding="8,6" FontSize="13"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock Text="Tool Type" Style="{StaticResource FormLabelStyle}"/>
@@ -112,8 +115,15 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Row 2: Diameter (Round) OR Length + Width (Square) -->
-                    <Grid Grid.Row="2" Margin="0,0,0,10">
+                    <!-- Row 2: Name -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,10">
+                        <TextBlock Text="Tool Name" Style="{StaticResource FormLabelStyle}"/>
+                        <TextBox Text="{Binding EditToolName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource InputTextBoxStyle}"/>
+                    </StackPanel>
+
+                    <!-- Row 3: Diameter (Round) OR Length + Width (Square) -->
+                    <Grid Grid.Row="3" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="12"/>
@@ -160,8 +170,8 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Row 3: Notes and Used checkbox -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                    <!-- Row 4: Notes and Used checkbox -->
+                    <StackPanel Grid.Row="4" Margin="0,0,0,10">
                         <TextBlock Text="Notes" Style="{StaticResource FormLabelStyle}"/>
                         <TextBox Text="{Binding EditNotes, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource InputTextBoxStyle}"
@@ -178,11 +188,11 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Row 4: spacer -->
-                    <Grid Grid.Row="4"/>
+                    <!-- Row 5: spacer -->
+                    <Grid Grid.Row="5"/>
 
-                    <!-- Row 5: Action Buttons -->
-                        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <!-- Row 6: Action Buttons -->
+                        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="Delete Tool" Command="{Binding DeleteToolCommand}"
                             Style="{StaticResource DangerButtonStyle}" Height="34" Width="110" Margin="0,0,8,0"/>
                         <Button Content="Save Tool" Command="{Binding SaveToolCommand}"

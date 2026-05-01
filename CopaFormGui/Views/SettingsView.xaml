@@ -199,7 +199,7 @@
                                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ToolLength3, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Tool length 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
-                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ZeroPointTool4, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ToolLength4, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
                                 </Grid>
                             </Grid>
                         </Border>
@@ -224,16 +224,16 @@
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="Y" Style="{StaticResource FormLabelStyle}" HorizontalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Tool 1" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding YMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding T1OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool 2" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
-                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding YMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding T2OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Tool 3" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
-                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding HomeY, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding T3OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
 
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
-                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding HomeX, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding T4OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
                                 </Grid>
                             </Grid>
                         </Border>

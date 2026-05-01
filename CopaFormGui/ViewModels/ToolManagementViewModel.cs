@@ -21,6 +21,7 @@ public partial class ToolManagementViewModel : ObservableObject
 
     // Edit fields
     [ObservableProperty] private int _editToolId;
+    [ObservableProperty] private string _editToolStation = "T1";
     [ObservableProperty] private string _editToolName = string.Empty;
     [ObservableProperty] private string _editToolType = "Round";
     [ObservableProperty] private double _editDiameter;
@@ -36,6 +37,7 @@ public partial class ToolManagementViewModel : ObservableObject
     [ObservableProperty] private bool _isSquareTool = false;
 
     public IEnumerable<string> ToolTypes { get; } = new[] { "Round", "Square" };
+    public IEnumerable<string> ToolStations { get; } = new[] { "T1", "T2", "T3", "T4" };
 
     public ToolManagementViewModel(IControllerService controllerService, IDataStoreService dataStoreService)
     {
@@ -57,10 +59,10 @@ public partial class ToolManagementViewModel : ObservableObject
 
         Tools = new ObservableCollection<ToolRecord>
         {
-            new() { ToolId = 1, ToolName = "Round Punch 10mm",  ToolType = "Round",  Diameter = 10.0, Length = 0.0, Width = 0.0 },
-            new() { ToolId = 2, ToolName = "Square Punch 8x8", ToolType = "Square", Diameter = 0.0, Length = 8.0, Width = 8.0 },
-            new() { ToolId = 3, ToolName = "Round Punch 6mm",   ToolType = "Round",  Diameter = 6.0, Length = 0.0, Width = 0.0 },
-            new() { ToolId = 4, ToolName = "Square Punch 12x10", ToolType = "Square", Diameter = 0.0, Length = 12.0, Width = 10.0 },
+            new() { ToolId = 1, ToolStation = "T1", ToolName = "Round Punch 10mm",  ToolType = "Round",  Diameter = 10.0, Length = 0.0, Width = 0.0 },
+            new() { ToolId = 2, ToolStation = "T2", ToolName = "Square Punch 8x8", ToolType = "Square", Diameter = 0.0, Length = 8.0, Width = 8.0 },
+            new() { ToolId = 3, ToolStation = "T3", ToolName = "Round Punch 6mm",   ToolType = "Round",  Diameter = 6.0, Length = 0.0, Width = 0.0 },
+            new() { ToolId = 4, ToolStation = "T4", ToolName = "Square Punch 12x10", ToolType = "Square", Diameter = 0.0, Length = 12.0, Width = 10.0 },
         };
 
         _dataStoreService.SaveToolRecords(Tools.ToList());
@@ -70,6 +72,7 @@ public partial class ToolManagementViewModel : ObservableObject
     {
         if (value is null) return;
         EditToolId = value.ToolId;
+        EditToolStation = string.IsNullOrWhiteSpace(value.ToolStation) ? "T1" : value.ToolStation;
         EditToolName = value.ToolName;
         EditToolType = NormalizeToolType(value.ToolType);
         EditDiameter = value.Diameter;
@@ -115,6 +118,7 @@ public partial class ToolManagementViewModel : ObservableObject
         var tool = new ToolRecord
         {
             ToolId = Tools.Count > 0 ? Tools.Max(t => t.ToolId) + 1 : 1,
+            ToolStation = "T1",
             ToolName = "New Tool",
             ToolType = "Round",
             Diameter = 10.0,
@@ -142,6 +146,7 @@ public partial class ToolManagementViewModel : ObservableObject
         var updatedTool = new ToolRecord
         {
             ToolId = SelectedTool.ToolId,
+            ToolStation = string.IsNullOrWhiteSpace(EditToolStation) ? "T1" : EditToolStation,
             ToolName = EditToolName,
             ToolType = normalizedType,
             Diameter = normalizedType == "Round" ? EditDiameter : 0,
@@ -159,6 +164,7 @@ public partial class ToolManagementViewModel : ObservableObject
 
         // Clear edit fields after save
         EditToolId = 0;
+        EditToolStation = "T1";
         EditToolName = string.Empty;
         EditToolType = "Round";
         EditDiameter = 0;
@@ -180,6 +186,7 @@ public partial class ToolManagementViewModel : ObservableObject
 
         // Clear edit fields after delete
         EditToolId = 0;
+        EditToolStation = "T1";
         EditToolName = string.Empty;
         EditToolType = "Round";
         EditDiameter = 0;

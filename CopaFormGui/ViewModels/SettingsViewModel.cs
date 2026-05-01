@@ -39,6 +39,13 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private double _toolLength1 = 50.0;
     [ObservableProperty] private double _toolLength2 = 50.0;
     [ObservableProperty] private double _toolLength3 = 50.0;
+    [ObservableProperty] private double _toolLength4 = 50.0;
+
+    // Tool Offsets
+    [ObservableProperty] private double _t1OffsetPos = 0.0;
+    [ObservableProperty] private double _t2OffsetPos = 0.0;
+    [ObservableProperty] private double _t3OffsetPos = 0.0;
+    [ObservableProperty] private double _t4OffsetPos = 0.0;
 
     // Home Positions
     [ObservableProperty] private double _homeX = 0.0;
@@ -103,7 +110,8 @@ public partial class SettingsViewModel : ObservableObject
         SpeedX = s.SpeedX; SpeedY = s.SpeedY; SpeedZ = s.SpeedZ;
         SpeedXHand = s.SpeedXHand; SpeedYHand = s.SpeedYHand; SpeedZHand = s.SpeedZHand;
         XMin = s.XMin; XMax = s.XMax; YMin = s.YMin; YMax = s.YMax; ZMin = s.ZMin; ZMax = s.ZMax;
-        ToolLength1 = s.ToolLength1; ToolLength2 = s.ToolLength2; ToolLength3 = s.ToolLength3;
+        ToolLength1 = s.ToolLength1; ToolLength2 = s.ToolLength2; ToolLength3 = s.ToolLength3; ToolLength4 = s.ToolLength4;
+        T1OffsetPos = s.T1OffsetPos; T2OffsetPos = s.T2OffsetPos; T3OffsetPos = s.T3OffsetPos; T4OffsetPos = s.T4OffsetPos;
         HomeX = s.HomeX; HomeY = s.HomeY;
         SafetyHeight = s.SafetyHeight; ClampForce = s.ClampForce;
         SuperviseTimePunching = s.SuperviseTimePunching;
@@ -138,7 +146,8 @@ public partial class SettingsViewModel : ObservableObject
             SpeedX = SpeedX, SpeedY = SpeedY, SpeedZ = SpeedZ,
             SpeedXHand = SpeedXHand, SpeedYHand = SpeedYHand, SpeedZHand = SpeedZHand,
             XMin = XMin, XMax = XMax, YMin = YMin, YMax = YMax, ZMin = ZMin, ZMax = ZMax,
-            ToolLength1 = ToolLength1, ToolLength2 = ToolLength2, ToolLength3 = ToolLength3,
+            ToolLength1 = ToolLength1, ToolLength2 = ToolLength2, ToolLength3 = ToolLength3, ToolLength4 = ToolLength4,
+            T1OffsetPos = T1OffsetPos, T2OffsetPos = T2OffsetPos, T3OffsetPos = T3OffsetPos, T4OffsetPos = T4OffsetPos,
             HomeX = HomeX, HomeY = HomeY,
             SafetyHeight = SafetyHeight, ClampForce = ClampForce,
             SuperviseTimePunching = SuperviseTimePunching,
@@ -174,9 +183,16 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ApplySettings()
+    private async Task ApplySettings()
     {
         SaveSettings();
+        if (IsConnected)
+        {
+            await _controllerService.WriteVariableAsync("T1_Offset_pos", T1OffsetPos);
+            await _controllerService.WriteVariableAsync("T2_Offset_pos", T2OffsetPos);
+            await _controllerService.WriteVariableAsync("T3_Offset_pos", T3OffsetPos);
+            await _controllerService.WriteVariableAsync("T4_Offset_pos", T4OffsetPos);
+        }
         StatusMessage = "Settings applied to controller.";
     }
 }

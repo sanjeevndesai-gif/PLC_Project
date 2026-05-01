@@ -3,6 +3,7 @@ namespace CopaFormGui.Models;
 public class ToolRecord
 {
     public int ToolId { get; set; }
+    public string ToolStation { get; set; } = "T1";
     public string ToolName { get; set; } = string.Empty;
     public string ToolType { get; set; } = string.Empty;
     public double Diameter { get; set; }
