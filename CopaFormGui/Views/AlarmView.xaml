@@ -77,7 +77,8 @@
                               IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID"          Binding="{Binding AlarmId}"      Width="50"/>
-                            <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss dd/MM}}" Width="130"/>
+                            <DataGridTextColumn Header="Date"        Binding="{Binding Timestamp, StringFormat={}{0:dd/MM/yyyy}}" Width="100"/>
+                            <DataGridTextColumn Header="Time"        Binding="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" Width="90"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description}"  Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>

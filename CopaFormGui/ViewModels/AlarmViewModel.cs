@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -22,6 +21,7 @@ public partial class AlarmViewModel : ObservableObject
     private readonly IControllerService _controllerService;
     private readonly List<AlarmSignal> _alarmSignals;
     private readonly Dictionary<string, bool> _lastSignalStates = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, AlarmRecord> _liveActiveAlarms = new(StringComparer.OrdinalIgnoreCase);
     private System.Timers.Timer? _monitorTimer;
 
     [ObservableProperty] private bool _isConnected;
@@ -48,24 +48,27 @@ public partial class AlarmViewModel : ObservableObject
         LoadHistory();
 
         if (IsConnected)
+        {
             StartMonitoring();
+            _ = PollAlarmSignalsAsync(captureBaselineOnly: true);
+        }
     }
 
     private static List<AlarmSignal> BuildAlarmSignalMap()
     {
         return new List<AlarmSignal>
         {
-            new("X_NLIMIT_UI", "X_NLIMIT_UI", "X AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new("X_PLIMIT_UI", "X_PLIMIT_UI", "X AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new("Y_NLIMIT_UI", "Y_NLIMIT_UI", "Y AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new("Y_PLIMIT_UI", "Y_PLIMIT_UI", "Y AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new("HYD_UP_SENSE_ERR", "HYD_UP_SENSE_ERR", "HYD UP SENSE ERROR", AlarmSeverity.Error, "HYD_UP_SENSE_ERR", "HYDRAULIC_UP_SENS_UI"),
-            new("HYD_DOWN_SENSE_ERR", "HYD_DOWN_SENSE_ERR", "HYD DOWN SENSE ERROR", AlarmSeverity.Error, "HYD_DOWN_SENSE_ERR", "HYD_DOWN_SENSE", "HYDRAULIC_DOWN_SENS_UI"),
-            new("X_AXIS_ERROR", "X_AXIS_ERROR", "X AXIS SERVO ERROR", AlarmSeverity.Error, "X_AXIS_ERROR_UI"),
-            new("Y_AXIS_ERROR", "Y_AXIS_ERROR", "Y AXIS SERVO ERROR", AlarmSeverity.Error, "Y_AXIS_ERROR_UI"),
-            new("JOGSPEED_LT_1", "JOGSPEED<1", "JOG SPEED IS ZERO", AlarmSeverity.Warning, "JOGSPEED_LT_1", "JOGSPEED_ZERO", "JOGSPEED<1"),
-            new("EMERGENCY_PB=0", "EMERGENCY_PB=0", "EMERGENCY PB PRESSED", AlarmSeverity.Critical, "EMERGENCY_PB=0", "Emergency_PB=0", "EMERGENCY_PB_UI=0", "Emergency_PB_UI=0", "EMERGENCY_PB_UI", "Emergency_PB_UI"),
-            new("BUSBAR_PRESENT_S_INS", "BUSBAR_PRESENT_S_INS", "INSERT BUSBAR TO START PUNCH", AlarmSeverity.Warning, "BUSBAR_PRESENT_S_INS", "BUSBAR_PRESENT_SENS_UI", "BUSBAR_PRESENT_SENSOR")
+            new(1, "X_NLIMIT_UI", "X_NLIMIT_UI", "X AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Warning),
+            new(2, "X_PLIMIT_UI", "X_PLIMIT_UI", "X AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Warning),
+            new(3, "Y_NLIMIT_UI", "Y_NLIMIT_UI", "Y AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Warning),
+            new(4, "Y_PLIMIT_UI", "Y_PLIMIT_UI", "Y AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Warning),
+            new(5, "HYD_UP_SENSE_ERR", "HYD_UP_SENSE_ERR", "HYD UP SENSE ERROR", AlarmSeverity.Error, "HYD_UP_SENSE_ERR", "HYDRAULIC_UP_SENS_UI"),
+            new(6, "HYD_DOWN_SENSE_ERR", "HYD_DOWN_SENSE_ERR", "HYD DOWN SENSE ERROR", AlarmSeverity.Error, "HYD_DOWN_SENSE_ERR", "HYD_DOWN_SENSE", "HYDRAULIC_DOWN_SENS_UI"),
+            new(7, "X_AXIS_ERROR", "X_AXIS_ERROR", "X AXIS SERVO ERROR", AlarmSeverity.Error, "X_AXIS_ERROR_UI"),
+            new(8, "Y_AXIS_ERROR", "Y_AXIS_ERROR", "Y AXIS SERVO ERROR", AlarmSeverity.Error, "Y_AXIS_ERROR_UI"),
+            new(9, "JOGSPEED_LT_1", "JOGSPEED<1", "JOG SPEED IS ZERO", AlarmSeverity.Warning, "JOGSPEED_LT_1", "JOGSPEED_ZERO", "JOGSPEED<1"),
+            new(10, "EMERGENCY_PB=0", "EMERGENCY_PB=0", "EMERGENCY PB PRESSED", AlarmSeverity.Critical, "EMERGENCY_PB=0", "Emergency_PB=0", "EMERGENCY_PB_UI=0", "Emergency_PB_UI=0", "EMERGENCY_PB_UI", "Emergency_PB_UI"),
+            new(11, "BUSBAR_PRESENT_S_INS", "BUSBAR_PRESENT_S_INS", "INSERT BUSBAR TO START PUNCH", AlarmSeverity.Warning, "BUSBAR_PRESENT_S_INS", "BUSBAR_PRESENT_SENS_UI", "BUSBAR_PRESENT_SENSOR")
         };
     }
 
@@ -76,11 +79,13 @@ public partial class AlarmViewModel : ObservableObject
         if (IsConnected)
         {
             StartMonitoring();
-            _ = PollAlarmSignalsAsync();
+            _ = PollAlarmSignalsAsync(captureBaselineOnly: true);
         }
         else
         {
             StopMonitoring();
+            _liveActiveAlarms.Clear();
+            RefreshActiveAlarms();
         }
     }
 
@@ -115,7 +120,7 @@ public partial class AlarmViewModel : ObservableObject
         {
             await System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
             {
-                await PollAlarmSignalsAsync();
+                await PollAlarmSignalsAsync(captureBaselineOnly: false);
             });
         }
         catch
@@ -124,7 +129,7 @@ public partial class AlarmViewModel : ObservableObject
         }
     }
 
-    private async Task PollAlarmSignalsAsync()
+    private async Task PollAlarmSignalsAsync(bool captureBaselineOnly)
     {
         if (!IsConnected)
             return;
@@ -134,20 +139,42 @@ public partial class AlarmViewModel : ObservableObject
             var isActive = await TryReadAlarmSignalAsync(signal);
             var lastState = _lastSignalStates.TryGetValue(signal.SignalKey, out var previous) && previous;
 
-            if (isActive && !lastState)
+            if (isActive)
             {
-                AddAlarm(new AlarmRecord
+                if (!_liveActiveAlarms.ContainsKey(signal.SignalKey))
                 {
-                    Timestamp = DateTime.Now,
-                    Code = signal.Code,
-                    Description = signal.Description,
-                    Severity = signal.Severity,
-                    IsAcknowledged = false
-                });
+                    var record = new AlarmRecord
+                    {
+                        AlarmId = signal.DisplayId,
+                        Timestamp = DateTime.Now,
+                        Code = signal.Code,
+                        Description = signal.Description,
+                        Severity = signal.Severity,
+                        IsAcknowledged = false
+                    };
+                    _liveActiveAlarms[signal.SignalKey] = record;
+                    AddAlarm(record);
+                }
+                else if (!captureBaselineOnly && !lastState)
+                {
+                    var record = new AlarmRecord
+                    {
+                        AlarmId = signal.DisplayId,
+                        Timestamp = DateTime.Now,
+                        Code = signal.Code,
+                        Description = signal.Description,
+                        Severity = signal.Severity,
+                        IsAcknowledged = false
+                    };
+                    AddAlarm(record);
+                    _liveActiveAlarms[signal.SignalKey] = record;
+                }
             }
 
             if (!isActive && lastState)
             {
+                _liveActiveAlarms.Remove(signal.SignalKey);
+
                 var lastOpen = Alarms
                     .Where(a => string.Equals(a.Code, signal.Code, StringComparison.OrdinalIgnoreCase) && !a.IsAcknowledged)
                     .OrderByDescending(a => a.Timestamp)
@@ -164,6 +191,8 @@ public partial class AlarmViewModel : ObservableObject
 
             _lastSignalStates[signal.SignalKey] = isActive;
         }
+
+        RefreshActiveAlarms();
     }
 
     private async Task<bool> TryReadAlarmSignalAsync(AlarmSignal signal)
@@ -175,43 +204,12 @@ public partial class AlarmViewModel : ObservableObject
             if (string.IsNullOrWhiteSpace(candidate))
                 continue;
 
-            if (IsExpressionCandidate(candidate))
-            {
-                var response = await _controllerService.ReadResponseAsync($"echo 7 {candidate}");
-                if (TryParseNumericFromResponse(response, out var expressionValue))
-                    return Math.Abs(expressionValue) > 0.00001d;
-
-                continue;
-            }
-
             var value = await _controllerService.ReadVariableAsync(candidate);
             if (value.HasValue)
                 return Math.Abs(value.Value) > 0.00001d;
         }
 
         return false;
-    }
-
-    private static bool IsExpressionCandidate(string candidate)
-    {
-        return candidate.Contains('<')
-            || candidate.Contains('>')
-            || candidate.Contains("==", StringComparison.Ordinal)
-            || candidate.Contains("!=", StringComparison.Ordinal)
-            || candidate.Contains('=');
-    }
-
-    private static bool TryParseNumericFromResponse(string? response, out double value)
-    {
-        value = 0;
-        if (string.IsNullOrWhiteSpace(response))
-            return false;
-
-        var match = Regex.Match(response, @"[-+]?\d*\.?\d+");
-        if (!match.Success)
-            return false;
-
-        return double.TryParse(match.Value, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out value);
     }
 
     private void LoadHistory()
@@ -255,7 +253,8 @@ public partial class AlarmViewModel : ObservableObject
 
     private void RefreshActiveAlarms()
     {
-        ActiveAlarms = new ObservableCollection<AlarmRecord>(Alarms.Where(a => !a.IsAcknowledged));
+        ActiveAlarms = new ObservableCollection<AlarmRecord>(
+            _liveActiveAlarms.Values.OrderByDescending(a => a.Timestamp));
         HasActiveAlarms = ActiveAlarms.Any();
         StatusMessage = HasActiveAlarms ? $"{ActiveAlarms.Count} active alarm(s)" : "System Normal";
     }
@@ -264,8 +263,26 @@ public partial class AlarmViewModel : ObservableObject
     private void AcknowledgeSelected()
     {
         if (SelectedAlarm is null) return;
-        SelectedAlarm.IsAcknowledged = true;
-        SelectedAlarm.AcknowledgedBy = "Operator";
+
+        var matchingSignals = _alarmSignals
+            .Where(s => string.Equals(s.Code, SelectedAlarm.Code, StringComparison.OrdinalIgnoreCase))
+            .Select(s => s.SignalKey)
+            .ToList();
+
+        for (var i = 0; i < matchingSignals.Count; i++)
+            _liveActiveAlarms.Remove(matchingSignals[i]);
+
+        var lastOpen = Alarms
+            .Where(a => string.Equals(a.Code, SelectedAlarm.Code, StringComparison.OrdinalIgnoreCase) && !a.IsAcknowledged)
+            .OrderByDescending(a => a.Timestamp)
+            .FirstOrDefault();
+
+        if (lastOpen is not null)
+        {
+            lastOpen.IsAcknowledged = true;
+            lastOpen.AcknowledgedBy = "Operator";
+        }
+
         RefreshActiveAlarms();
         SaveHistory();
         StatusMessage = $"Alarm {SelectedAlarm.Code} acknowledged.";
@@ -274,6 +291,8 @@ public partial class AlarmViewModel : ObservableObject
     [RelayCommand]
     private void AcknowledgeAll()
     {
+        _liveActiveAlarms.Clear();
+
         foreach (var alarm in Alarms)
         {
             alarm.IsAcknowledged = true;
@@ -288,8 +307,9 @@ public partial class AlarmViewModel : ObservableObject
     private void ClearHistory()
     {
         Alarms.Clear();
-        RefreshActiveAlarms();
         SaveHistory();
+        _liveActiveAlarms.Clear();
+        RefreshActiveAlarms();
         StatusMessage = "Alarm history cleared.";
     }
 
@@ -310,8 +330,9 @@ public partial class AlarmViewModel : ObservableObject
 
     private sealed class AlarmSignal
     {
-        public AlarmSignal(string signalKey, string code, string description, AlarmSeverity severity, params string[] variableCandidates)
+        public AlarmSignal(int displayId, string signalKey, string code, string description, AlarmSeverity severity, params string[] variableCandidates)
         {
+            DisplayId = displayId;
             SignalKey = signalKey;
             Code = code;
             Description = description;
@@ -319,6 +340,7 @@ public partial class AlarmViewModel : ObservableObject
             VariableCandidates = variableCandidates.Length > 0 ? variableCandidates : new[] { signalKey };
         }
 
+        public int DisplayId { get; }
         public string SignalKey { get; }
         public string Code { get; }
         public string Description { get; }
