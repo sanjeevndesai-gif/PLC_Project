@@ -59,8 +59,8 @@ public partial class MainWindow : Window
     private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
     {
         MessageBox.Show(
-            "Copa Form GUI\nVersion 1.0\n\nCNC Punching Machine Controller Interface\n\n� 2024 Copa Form",
-            "About Copa Form",
+            "DICS – CNC Punching Machine Controller Interface\nVersion 1.0\n\n© 2026 DICS",
+            "About DICS",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
     }
