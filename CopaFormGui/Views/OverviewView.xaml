@@ -248,7 +248,7 @@
                     <Button Content="Pause" Height="32" Margin="0,0,0,8"
                             Command="{Binding PauseCommand}"/>
 
-                        <Button Content="Download program" Height="32" Margin="0,0,0,8"/>
+                        <Button Content="Download program" Height="32" Margin="0,0,0,8" Click="DownloadProgram_Click"/>
 
                     <!-- Display last saved file content -->
                     <TextBlock Text="Last Saved File Content:" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,0"/>

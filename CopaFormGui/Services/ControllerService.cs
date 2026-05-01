@@ -404,6 +404,138 @@ public class ControllerService : IControllerService
         }
     }
 
+    public async Task<bool> DownloadSingleFileAsync(string localFilePath)
+    {
+        if (!IsConnected || gpascii is null || string.IsNullOrWhiteSpace(localFilePath))
+            return false;
+
+        if (!System.IO.File.Exists(localFilePath))
+            return false;
+
+        try
+        {
+            // Preferred path: use FTP + terminal gpascii single-file flow.
+            var ftpGpasciiResult = await Task.Run(() => TryDownloadViaFtpAndGpascii(localFilePath));
+            if (ftpGpasciiResult)
+                return true;
+        }
+        catch
+        {
+            // Fall back to direct payload transfer below.
+        }
+
+        string fileContent;
+        try
+        {
+            fileContent = await Task.Run(() => System.IO.File.ReadAllText(localFilePath));
+        }
+        catch
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(fileContent))
+            return false;
+
+        // Fallback: send program content in one transfer.
+        var payload = fileContent.Replace("\r\n", "\n").Replace('\r', '\n');
+        var timeoutMs = payload.Length * 5;
+        if (timeoutMs < 5000) timeoutMs = 5000;
+        if (timeoutMs > 120000) timeoutMs = 120000;
+
+        try
+        {
+            var response = await ExecuteCommandAsync(gpascii, payload, timeoutMs);
+            return response is not null && response.Item1 == ODT.PowerPmacComLib.Status.Ok;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool TryDownloadViaFtpAndGpascii(string localFilePath)
+    {
+        object? ftpClient = null;
+        object? terminalClient = null;
+
+        try
+        {
+            var connectType = typeof(Connect);
+
+            var ftpEnumType = typeof(CommunicationGlobals).GetNestedType("FTPConnectionTypes");
+            if (ftpEnumType is null) return false;
+            var ftpMode = Enum.Parse(ftpEnumType, "FTP");
+
+            var createFtp = connectType.GetMethod("CreateFTPClient", new[] { ftpEnumType, typeof(object) });
+            if (createFtp is null) return false;
+            ftpClient = createFtp.Invoke(null, new[] { ftpMode, null });
+            if (ftpClient is null) return false;
+
+            var connectionType = typeof(CommunicationGlobals).GetNestedType("ConnectionTypes");
+            if (connectionType is null) return false;
+            var sshMode = Enum.Parse(connectionType, "SSH");
+
+            var createTerminal = connectType.GetMethod("CreateSyncTerminal", new[] { connectionType, typeof(object) });
+            if (createTerminal is null) return false;
+            terminalClient = createTerminal.Invoke(null, new[] { sshMode, null });
+            if (terminalClient is null) return false;
+
+            var ip = _connectedIp;
+            var user = _savedUser;
+            var pass = _savedPassword ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(ip) || string.IsNullOrWhiteSpace(user))
+                return false;
+
+            var ftpConnect = ftpClient.GetType().GetMethod("ConnectFTP", new[] { typeof(string), typeof(string), typeof(string) });
+            if (ftpConnect is null) return false;
+            var ftpConnected = ftpConnect.Invoke(ftpClient, new object[] { ip, user, pass }) as bool?;
+            if (ftpConnected != true) return false;
+
+            var terminalConnect = terminalClient.GetType().GetMethod("ConnectTerminal", new[] { typeof(string), typeof(int), typeof(string), typeof(string) });
+            if (terminalConnect is null) return false;
+            var terminalConnected = terminalConnect.Invoke(terminalClient, new object[] { ip, ModbusPort, user, pass }) as bool?;
+            if (terminalConnected != true) return false;
+
+            var fileName = System.IO.Path.GetFileName(localFilePath);
+            var remotePath = "/var/ftp/usrflash/Temp/" + fileName;
+
+            var downloadFile = ftpClient.GetType().GetMethod("DownloadFile", new[] { typeof(string), typeof(string) });
+            if (downloadFile is null) return false;
+            downloadFile.Invoke(ftpClient, new object[] { localFilePath, remotePath });
+
+            var sendCommand = terminalClient.GetType().GetMethod("SendCommand", new[] { typeof(string), typeof(string).MakeByRefType() });
+            if (sendCommand is null) return false;
+
+            var cmdDownload = "gpascii -i" + remotePath + " -e/var/ftp/usrflash/Project/Log/filednlderror.log";
+            object?[] args = { cmdDownload, string.Empty };
+            sendCommand.Invoke(terminalClient, args);
+            var response = args[1]?.ToString() ?? string.Empty;
+
+            return response.IndexOf("EOF", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            try
+            {
+                var disconnectTerminal = terminalClient?.GetType().GetMethod("DisconnectTerminal", Type.EmptyTypes);
+                disconnectTerminal?.Invoke(terminalClient, null);
+            }
+            catch { }
+
+            try
+            {
+                var disconnectFtp = ftpClient?.GetType().GetMethod("DisconnectFTP", Type.EmptyTypes);
+                disconnectFtp?.Invoke(ftpClient, null);
+            }
+            catch { }
+        }
+    }
+
     public async Task<double> ReadRegisterAsync(int address)
     {
         // Map register reads to PMAC P-variables for now (e.g., 100 -> P100)

@@ -44,6 +44,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         return System.Text.RegularExpressions.Regex.IsMatch(text, @"^\d*(\.\d*)?$");
     }
     private OverviewViewModel? _vm;
+    private string? _lastGeneratedProgramPath;
     // 3D preview fields removed
 
     public OverviewView()
@@ -216,6 +217,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         try
         {
             System.IO.File.WriteAllLines(filePath, lines);
+            _lastGeneratedProgramPath = filePath;
             // Read the file content and set it to the ViewModel property
             string fileContent = System.IO.File.ReadAllText(filePath);
             vm.LastSavedFileContent = fileContent;
@@ -224,6 +226,50 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         catch (System.Exception ex)
         {
             MessageBox.Show($"Failed to write file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void DownloadProgram_Click(object sender, RoutedEventArgs e)
+    {
+        _ = sender;
+
+        if (string.IsNullOrWhiteSpace(_lastGeneratedProgramPath) || !System.IO.File.Exists(_lastGeneratedProgramPath))
+        {
+            MessageBox.Show("Generate the program first using the RUN popup check button.", "Download program", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var vm = DataContext as CopaFormGui.ViewModels.OverviewViewModel;
+        if (vm == null)
+        {
+            MessageBox.Show("ViewModel not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        var controllerServiceField = typeof(CopaFormGui.ViewModels.OverviewViewModel)
+            .GetField("_controllerService", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var controllerService = controllerServiceField?.GetValue(vm) as CopaFormGui.Services.IControllerService;
+
+        if (controllerService == null)
+        {
+            MessageBox.Show("Controller service not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        if (!controllerService.IsConnected)
+        {
+            MessageBox.Show("Controller is not connected.", "Download program", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var success = await controllerService.DownloadSingleFileAsync(_lastGeneratedProgramPath!);
+        if (success)
+        {
+            MessageBox.Show("Program downloaded to PMAC successfully.", "Download program", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            MessageBox.Show("Program download to PMAC failed.", "Download program", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

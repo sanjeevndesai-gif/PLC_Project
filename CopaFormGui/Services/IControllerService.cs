@@ -23,6 +23,7 @@ public interface IControllerService
     Task<string?> ReadResponseAsync(string commandOrVariable);
     Task<double?> ReadVariableAsync(string variableName);
     Task<bool> WriteVariableAsync(string variableName, double value);
+    Task<bool> DownloadSingleFileAsync(string localFilePath);
     Task<bool> ReadCoilAsync(int address);
     Task<double> ReadRegisterAsync(int address);
     Task WriteCoilAsync(int address, bool value);
