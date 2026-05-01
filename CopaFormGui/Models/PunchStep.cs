@@ -41,6 +41,20 @@ public class PunchStep : INotifyPropertyChanged
         }
     }
 
+    private string _toolStation = string.Empty;
+    public string ToolStation
+    {
+        get => _toolStation;
+        set
+        {
+            if (_toolStation != value)
+            {
+                _toolStation = value;
+                OnPropertyChanged(nameof(ToolStation));
+            }
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged(string propertyName) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

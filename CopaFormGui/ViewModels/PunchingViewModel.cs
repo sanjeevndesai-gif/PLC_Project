@@ -28,6 +28,7 @@ public partial class PunchingViewModel : ObservableObject
         toolLookup ??= UsedTools.ToDictionary(t => t.ToolId);
         if (toolLookup.TryGetValue(step.ToolId, out var tool))
         {
+            step.ToolStation = string.IsNullOrWhiteSpace(tool.ToolStation) ? $"T{tool.ToolId}" : tool.ToolStation;
             // Show only Dia if L/W are zero, only L/W if Dia is zero, else show all
             bool hasDia = tool.Diameter > 0;
             bool hasL = tool.Length > 0;
@@ -43,6 +44,7 @@ public partial class PunchingViewModel : ObservableObject
         }
         else
         {
+            step.ToolStation = string.Empty;
             step.ToolInfo = string.Empty;
         }
     }

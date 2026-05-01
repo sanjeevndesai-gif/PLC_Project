@@ -115,30 +115,6 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="M" Width="60">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding M}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding M, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumericTextBox_PreviewTextInput" AcceptsReturn="False" TabIndex="2" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="F" Width="60">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding F}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding F, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumericTextBox_PreviewTextInput" AcceptsReturn="False" TabIndex="3" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
-                            </DataGridTemplateColumn>
                             <DataGridComboBoxColumn Header="Tool"
                                                     SelectedValueBinding="{Binding ToolId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                     SelectedValuePath="ToolId"
@@ -159,6 +135,7 @@
                                     </Style>
                                 </DataGridComboBoxColumn.EditingElementStyle>
                             </DataGridComboBoxColumn>
+                            <DataGridTextColumn Header="Tool Type" Binding="{Binding ToolStation}" IsReadOnly="True" Width="90"/>
                             <DataGridTextColumn Header="Punch" Binding="{Binding ToolInfo}" IsReadOnly="True" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
