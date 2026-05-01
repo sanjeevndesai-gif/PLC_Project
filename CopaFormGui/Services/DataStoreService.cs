@@ -9,6 +9,7 @@ namespace CopaFormGui.Services
     {
         // Event to notify when tool list changes
         public static event Action? ToolListChanged;
+        public static event Action? PunchProgramsChanged;
     private static readonly string DataFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CopaFormGui");
 
@@ -68,6 +69,17 @@ namespace CopaFormGui.Services
         EnsureFolderExists();
         var json = JsonSerializer.Serialize(programs, JsonOptions);
         File.WriteAllText(ProgramsPath, json);
+        PunchProgramsChanged?.Invoke();
+    }
+
+    public void ClearPunchPrograms()
+    {
+        EnsureFolderExists();
+
+        if (File.Exists(ProgramsPath))
+            File.Delete(ProgramsPath);
+
+        PunchProgramsChanged?.Invoke();
     }
 
     private static void EnsureFolderExists()

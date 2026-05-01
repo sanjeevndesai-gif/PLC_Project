@@ -172,12 +172,22 @@ public partial class PunchingViewModel : ObservableObject
             SubscribePunchStepPropertyChanged(step);
         // Subscribe to tool list changes
         DataStoreService.ToolListChanged += RefreshUsedTools;
+        DataStoreService.PunchProgramsChanged += RefreshProgramsFromStore;
         // Initialize UsedTools
         RefreshUsedTools();
         LoadSamplePrograms();
         ClearEditorState();
         UpdateDimensionPreview();
         RefreshToolPreview();
+    }
+
+    private void RefreshProgramsFromStore()
+    {
+        var storedPrograms = _dataStoreService.LoadPunchPrograms();
+        Programs = new ObservableCollection<PunchProgram>(storedPrograms);
+
+        if (SelectedProgram is not null && !Programs.Any(p => p.ProgramId == SelectedProgram.ProgramId))
+            ClearEditorState();
     }
 
     partial void OnSelectedProgramChanged(PunchProgram? value)

@@ -100,7 +100,8 @@ public partial class DatabaseViewModel : ObservableObject
     {
         ProgramRecords.Clear();
         SelectedRecord = null;
-        _dataStoreService.SavePunchPrograms(new List<PunchProgram>());
+        _dataStoreService.ClearPunchPrograms();
+        LoadProgramData();
         StatusMessage = "All old database data deleted.";
     }
 }

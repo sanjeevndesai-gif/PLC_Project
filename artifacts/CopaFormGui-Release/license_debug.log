@@ -1134,3 +1134,29 @@ MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
 [2026-05-01 19:24:11.092] [VerifySignature] Result: True
 [2026-05-01 19:24:11.092] [TryValidateLicenseAtPath] SUCCESS: License validated
 [2026-05-01 19:24:11.093] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-01 19:39:13.267] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-01 19:39:13.270] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-01 19:39:13.271] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-01 19:39:13.274] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-01 19:39:13.276] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-01 19:39:13.673] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-01 19:39:13.674] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-01 19:39:13.675] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-01T19:39:13.6754992Z
+[2026-05-01 19:39:13.675] [TryValidateLicenseAtPath] IssuedUtc: 2026-04-02T20:52:39.2000440Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-01 19:39:13.676] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-01 19:39:13.690] [VerifySignature] Payload: CopaFormGui|test|E7984430-9201-4AD2-88AD-354EC899002F|2026-04-02T20:52:39.2000440Z|
+[2026-05-01 19:39:13.691] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-01 19:39:13.692] [VerifySignature] Signature length: 512
+[2026-05-01 19:39:13.694] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-01 19:39:13.696] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-01 19:39:13.697] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-01 19:39:13.698] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-01 19:39:13.699] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-01 19:39:13.700] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-01 19:39:13.701] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-01 19:39:13.702] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-01 19:39:13.703] [VerifySignature] Result: True
+[2026-05-01 19:39:13.704] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-01 19:39:13.705] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json

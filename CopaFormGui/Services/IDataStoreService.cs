@@ -9,4 +9,5 @@ public interface IDataStoreService
 
     List<PunchProgram> LoadPunchPrograms();
     void SavePunchPrograms(List<PunchProgram> programs);
+    void ClearPunchPrograms();
 }
