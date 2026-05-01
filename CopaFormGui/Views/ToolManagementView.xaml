@@ -102,7 +102,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Tool" Style="{StaticResource FormLabelStyle}"/>
+                            <TextBlock Text="Tool Position" Style="{StaticResource FormLabelStyle}"/>
                             <ComboBox ItemsSource="{Binding ToolStations}"
                                       SelectedItem="{Binding EditToolStation, UpdateSourceTrigger=PropertyChanged}"
                                       Padding="8,6" FontSize="13"/>
