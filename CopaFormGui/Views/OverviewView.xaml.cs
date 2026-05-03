@@ -123,89 +123,117 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         string gT4 = GetGCodeForStation(toolRecords, "T4", "G57");
 
         int numberOfParts = Math.Max(0, vm.RunNumberOfParts);
+        double widthForCuts = ParseMmFromText(vm.RecentWidthText, latest.Width);
 
+        // Check which stations have steps saved in the program
+        bool t1Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
+            string.Equals(tool.ToolStation, "T1", StringComparison.OrdinalIgnoreCase));
+        bool t2Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
+            string.Equals(tool.ToolStation, "T2", StringComparison.OrdinalIgnoreCase));
+        bool t3Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
+            string.Equals(tool.ToolStation, "T3", StringComparison.OrdinalIgnoreCase));
+        bool t4Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
+            string.Equals(tool.ToolStation, "T4", StringComparison.OrdinalIgnoreCase));
+
+        int nNum = 1;
         var lines = new List<string>
         {
             "//HEADER",
             "open prog 202",
-            "N1 G90",
-            "N2 linear",
-            "N3 G59",
-            "N4 M21",
-            "N5 M23",
-            "N6 M27",
-            $"N7 X500 F{FormatNc(autoFeed)}",
-            $"N8 Y910 F{FormatNc(autoFeed)}",
-            "N9 M28",
+            $"N{nNum++} G90",
+            $"N{nNum++} linear",
+            $"N{nNum++} G59",
+            $"N{nNum++} M21",
+            $"N{nNum++} M23",
+            $"N{nNum++} M27",
+            $"N{nNum++} X500 F{FormatNc(autoFeed)}",
+            $"N{nNum++} Y910 F{FormatNc(autoFeed)}",
+            $"N{nNum++} M28",
             "P2101=0",
+            $"P2100={numberOfParts}",
             "while(P2101<P2100)",
             "{",
-            "N10 M26",
-            "// FIRST TOOL POSITION",
-            $"N11 {gT1}",
-            $"N12 Y{FormatNc(yT1)}",
-            "N13 X0",
-            "N14 M22",
-            "N15 M27",
-            $"N16 X{FormatNc(xT1)}",
-            "N17 M26",
-            "N18 M20",
-            "N19 M21"
+            $"N{nNum++} M26",
         };
 
-        if (vm.RunPartOff)
-            lines.Add("M28");
+        if (t1Used)
+        {
+            lines.Add("// FIRST TOOL POSITION");
+            lines.Add($"N{nNum++} {gT1}");
+            lines.Add($"N{nNum++} Y{FormatNc(yT1)}");
+            lines.Add($"N{nNum++} X0");
+            lines.Add($"N{nNum++} M22");
+            lines.Add($"N{nNum++} M27");
+            lines.Add($"N{nNum++} X{FormatNc(xT1)}");
+            lines.Add($"N{nNum++} M26");
+            lines.Add($"N{nNum++} M20");
+            lines.Add($"N{nNum++} M21");
+            if (vm.RunPartOff)
+                lines.Add("M28");
+        }
+
+        if (t2Used)
+        {
+            lines.Add("// SECOND TOOL POSITION");
+            lines.Add($"N{nNum++} {gT2}");
+            lines.Add($"N{nNum++} Y{FormatNc(yT2)}");
+            lines.Add($"N{nNum++} M27");
+            lines.Add($"N{nNum++} X{FormatNc(xT2)}");
+            lines.Add($"N{nNum++} M26");
+            lines.Add($"N{nNum++} M20");
+            lines.Add($"N{nNum++} M21");
+        }
+
+        if (t4Used)
+        {
+            lines.Add("// FOURTH TOOL POSITION");
+            lines.Add($"N{nNum++} {gT4}");
+            lines.Add($"N{nNum++} Y{FormatNc(yT4)}");
+            lines.Add($"N{nNum++} M27");
+            lines.Add($"N{nNum++} X{FormatNc(xT4)}");
+            lines.Add($"N{nNum++} M26");
+            lines.Add($"N{nNum++} M20");
+            lines.Add($"N{nNum++} M21");
+        }
+
+        if (t3Used)
+        {
+            lines.Add("// THIRD TOOL POSITION");
+            // Include cut n while previous cut's yOffset (10*(n-1)*n) < width
+            // cut 1 always included; cut 4 stops when prev=120 >= width=100
+            int cut = 1;
+            while (cut == 1 || 10.0 * (cut - 1) * cut < widthForCuts)
+            {
+                double yOffset = 10.0 * cut * (cut + 1); // 20, 60, 120, 200, ...
+                lines.Add($"// CUT {cut}");
+                lines.Add($"N{nNum++} {gT3}");
+                lines.Add($"N{nNum++} Y{FormatNc(yT3 + yOffset)}");
+                lines.Add($"N{nNum++} M27");
+                lines.Add($"N{nNum++} X{FormatNc(xT3 + 4)}");
+                lines.Add($"N{nNum++} M26");
+                lines.Add($"N{nNum++} M20");
+                lines.Add($"N{nNum++} M21");
+                cut++;
+            }
+            lines.Add($"N{nNum++} M27");
+        }
 
         lines.AddRange(new[]
         {
-            "// SECOND TOOL POSITION",
-            $"N20 {gT2}",
-            $"N21 Y{FormatNc(yT2)}",
-            "N22 M27",
-            $"N23 X{FormatNc(xT2)}",
-            "N24 M26",
-            "N25 M20",
-            "N26 M21",
-            "// FOURTH TOOL POSITION",
-            $"N28 {gT4}",
-            $"N29 Y{FormatNc(yT4)}",
-            "N30 M27",
-            $"N31 X{FormatNc(xT4)}",
-            "N32 M26",
-            "N33 M20",
-            "N34 M21",
-            "// THIRD TOOL POSITION",
-            "// FIRST CUT",
-            $"N35 {gT3}",
-            $"N36 Y{FormatNc(yT3 + 20)}",
-            "N37 M27",
-            $"N38 X{FormatNc(xT3 + 4)}",
-            "N39 M26",
-            "N40 M20",
-            "N41 M21",
-            "// SECOND CUT",
-            $"N43 {gT3}",
-            $"N44 Y{FormatNc(yT3 + 60)}",
-            $"N45 X{FormatNc(xT3 + 4)}",
-            "N46 M26",
-            "N47 M20",
-            "N48 M21",
-            "N49 M27",
             "// FOOTER",
-            "N50 X500",
-            "N51 M23",
-            "N52 M24",
+            $"N{nNum++} X500",
+            $"N{nNum++} M23",
+            $"N{nNum++} M24",
             "DWELL 3000",
-            "N53 M25",
+            $"N{nNum++} M25",
             "P2101=P2101+1",
             "}",
-            "N54 G59",
-            "N55 X500 Y910",
-            "N56 M30",
+            $"N{nNum++} G59",
+            $"N{nNum++} X500 Y910",
+            $"N{nNum++} M30",
             "CLOSE"
         });
 
-        lines.Insert(lines.IndexOf("P2101=0") + 1, $"P2100={numberOfParts}");
         lines = lines.Select(l => l.ToUpperInvariant()).ToList();
 
         // Use the program name from the database for the file name
@@ -352,6 +380,20 @@ public partial class OverviewView : System.Windows.Controls.UserControl
     private static string FormatNc(double value)
     {
         return value.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private static double ParseMmFromText(string? valueWithUnit, double fallback)
+    {
+        if (string.IsNullOrWhiteSpace(valueWithUnit))
+            return fallback;
+
+        string numeric = System.Text.RegularExpressions.Regex.Replace(valueWithUnit, "mm", string.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+        if (double.TryParse(numeric, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+            return parsed;
+        if (double.TryParse(numeric, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out parsed))
+            return parsed;
+
+        return fallback;
     }
 
     private static string GetGCodeForStation(
