@@ -199,12 +199,13 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         if (t3Used)
         {
             lines.Add("// THIRD TOOL POSITION");
-            // Include cut n while previous cut's yOffset (10*(n-1)*n) < width
-            // cut 1 always included; cut 4 stops when prev=120 >= width=100
+            // Cut positions are 20, 60, 100, ... (first at 20, then +40 each cut).
+            // Keep one cut minimum and cap width at 100 mm for cut generation.
+            double effectiveWidthForCuts = Math.Min(widthForCuts, 100.0);
             int cut = 1;
-            while (cut == 1 || 10.0 * (cut - 1) * cut < widthForCuts)
+            while (cut == 1 || (20.0 + ((cut - 1) * 40.0)) <= effectiveWidthForCuts)
             {
-                double yOffset = 10.0 * cut * (cut + 1); // 20, 60, 120, 200, ...
+                double yOffset = 20.0 + ((cut - 1) * 40.0);
                 lines.Add($"// CUT {cut}");
                 lines.Add($"N{nNum++} {gT3}");
                 lines.Add($"N{nNum++} Y{FormatNc(yT3 + yOffset)}");
