@@ -229,6 +229,38 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         }
     }
 
+    private void BrowseFile_Click(object sender, RoutedEventArgs e)
+    {
+        _ = sender;
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "Select program file",
+            Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+            DefaultExt = ".txt"
+        };
+
+        if (dialog.ShowDialog() != true)
+            return;
+
+        string filePath = dialog.FileName;
+        string fileContent;
+        try
+        {
+            fileContent = System.IO.File.ReadAllText(filePath);
+        }
+        catch (System.Exception ex)
+        {
+            MessageBox.Show($"Failed to read file: {ex.Message}", "Browse file", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        _lastGeneratedProgramPath = filePath;
+
+        var vm = DataContext as CopaFormGui.ViewModels.OverviewViewModel;
+        if (vm != null)
+            vm.LastSavedFileContent = fileContent;
+    }
+
     private async void DownloadProgram_Click(object sender, RoutedEventArgs e)
     {
         _ = sender;
@@ -262,7 +294,23 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
-        var success = await controllerService.DownloadSingleFileAsync(_lastGeneratedProgramPath!);
+        // Disable button and show progress bar to prevent multiple clicks
+        DownloadProgramButton.IsEnabled = false;
+        DownloadProgressBar.Visibility = System.Windows.Visibility.Visible;
+        DownloadProgressText.Visibility = System.Windows.Visibility.Visible;
+
+        bool success = false;
+        try
+        {
+            success = await controllerService.DownloadSingleFileAsync(_lastGeneratedProgramPath!);
+        }
+        finally
+        {
+            DownloadProgressBar.Visibility = System.Windows.Visibility.Collapsed;
+            DownloadProgressText.Visibility = System.Windows.Visibility.Collapsed;
+            DownloadProgramButton.IsEnabled = true;
+        }
+
         if (success)
         {
             MessageBox.Show("Program downloaded to PMAC successfully.", "Download program", MessageBoxButton.OK, MessageBoxImage.Information);

@@ -248,7 +248,13 @@
                     <Button Content="Pause" Height="32" Margin="0,0,0,8"
                             Command="{Binding PauseCommand}"/>
 
-                        <Button Content="Download program" Height="32" Margin="0,0,0,8" Click="DownloadProgram_Click"/>
+                        <Button Content="Browse file..." Height="32" Margin="0,0,0,6" Click="BrowseFile_Click"/>
+
+                        <Grid Margin="0,0,0,8">
+                            <Button x:Name="DownloadProgramButton" Content="Download program" Height="32" Click="DownloadProgram_Click"/>
+                            <ProgressBar x:Name="DownloadProgressBar" Height="32" IsIndeterminate="True" Visibility="Collapsed" Opacity="0.7"/>
+                            <TextBlock x:Name="DownloadProgressText" Text="Downloading..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="SemiBold" Visibility="Collapsed"/>
+                        </Grid>
 
                     <!-- Display last saved file content -->
                     <TextBlock Text="Last Saved File Content:" Style="{StaticResource FormLabelStyle}" Margin="0,8,0,0"/>
