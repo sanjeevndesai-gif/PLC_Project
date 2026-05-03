@@ -101,21 +101,21 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
-        var settings = new CopaFormGui.Services.SettingsService().LoadSettings();
         var toolRecords = dataStoreService.LoadToolRecords();
         var toolById = toolRecords.ToDictionary(t => t.ToolId, t => t);
 
         double feed = latest.Steps.FirstOrDefault(s => s.F > 0)?.F ?? 0;
+        double autoFeed = new CopaFormGui.Services.SettingsService().LoadSettings().SpeedXHand;
 
         double xT1 = GetLastXForStation(latest, toolById, "T1", 50);
         double xT2 = GetLastXForStation(latest, toolById, "T2", 100);
         double xT4 = GetLastXForStation(latest, toolById, "T4", 150);
         double xT3 = GetLastXForStation(latest, toolById, "T3", xT2 + 4);
 
-        double yT1 = settings.T1OffsetPos;
-        double yT2 = settings.T2OffsetPos;
-        double yT3 = settings.T3OffsetPos;
-        double yT4 = settings.T4OffsetPos;
+        double yT1 = GetLastYForStation(latest, toolById, "T1", 0);
+        double yT2 = GetLastYForStation(latest, toolById, "T2", 0);
+        double yT3 = GetLastYForStation(latest, toolById, "T3", 0);
+        double yT4 = GetLastYForStation(latest, toolById, "T4", 0);
 
         string gT1 = GetGCodeForStation(toolRecords, "T1", "G54");
         string gT2 = GetGCodeForStation(toolRecords, "T2", "G55");
@@ -134,8 +134,8 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             "N4 M21",
             "N5 M23",
             "N6 M27",
-            $"N7 X500 F{FormatNc(feed)}",
-            $"N8 Y910 F{FormatNc(feed)}",
+            $"N7 X500 F{FormatNc(autoFeed)}",
+            $"N8 Y910 F{FormatNc(autoFeed)}",
             "N9 M28",
             "P2101=0",
             "while(P2101<P2100)",
@@ -177,7 +177,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             "// THIRD TOOL POSITION",
             "// FIRST CUT",
             $"N35 {gT3}",
-            $"N36 Y{FormatNc(yT3)}",
+            $"N36 Y{FormatNc(yT3 + 20)}",
             "N37 M27",
             $"N38 X{FormatNc(xT3 + 4)}",
             "N39 M26",
@@ -185,7 +185,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             "N41 M21",
             "// SECOND CUT",
             $"N43 {gT3}",
-            $"N44 Y{FormatNc(yT3 + 40)}",
+            $"N44 Y{FormatNc(yT3 + 60)}",
             $"N45 X{FormatNc(xT3 + 4)}",
             "N46 M26",
             "N47 M20",
@@ -333,6 +333,20 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             .LastOrDefault();
 
         return step?.X ?? fallback;
+    }
+
+    private static double GetLastYForStation(
+        CopaFormGui.Models.PunchProgram program,
+        Dictionary<int, CopaFormGui.Models.ToolRecord> toolById,
+        string station,
+        double fallback)
+    {
+        var step = program.Steps
+            .Where(s => toolById.TryGetValue(s.ToolId, out var tool)
+                        && string.Equals(tool.ToolStation, station, StringComparison.OrdinalIgnoreCase))
+            .LastOrDefault();
+
+        return step?.Y ?? fallback;
     }
 
     private static string FormatNc(double value)

@@ -114,6 +114,48 @@
                     </Grid>
                 </Border>
 
+                <!-- Move To Position -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
+                    <StackPanel>
+                        <TextBlock Text="Move To Position" Style="{StaticResource SectionHeaderStyle}" Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="X" FontSize="13" FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding MoveToX, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputTextBoxStyle}"
+                                     HorizontalContentAlignment="Right"/>
+                            <TextBlock Grid.Column="2" Text="mm" FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center" Margin="4,0,0,0"/>
+                            <TextBlock Grid.Column="4" Text="Y" FontSize="13" FontWeight="Bold"
+                                       Foreground="#2E7D32"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox Grid.Column="5" Text="{Binding MoveToY, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource InputTextBoxStyle}"
+                                     HorizontalContentAlignment="Right"/>
+                            <TextBlock Grid.Column="6" Text="mm" FontSize="12"
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center" Margin="4,0,0,0"/>
+                            <Button Grid.Column="8" Content="Send to PMAC"
+                                    Command="{Binding SendMoveToPositionCommand}"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Height="32" Margin="12,0,0,0"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Jog Buttons -->
                 <Border Style="{StaticResource CardStyle}">
                     <StackPanel>

@@ -163,4 +163,33 @@ public partial class HandControlViewModel : ObservableObject
         IsEmergencyStop = false;
         StatusMessage = "E-Stop reset. Ready.";
     }
+
+    // ── Manual Move To Position ──────────────────────────────────────────────
+
+    [ObservableProperty] private string _moveToX = string.Empty;
+    [ObservableProperty] private string _moveToY = string.Empty;
+
+    [RelayCommand]
+    private async Task SendMoveToPosition()
+    {
+        bool xOk = double.TryParse(MoveToX, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double xVal);
+        bool yOk = double.TryParse(MoveToY, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double yVal);
+
+        if (!xOk && !yOk)
+        {
+            StatusMessage = "Enter a valid X and/or Y value before sending.";
+            return;
+        }
+
+        if (_controllerService.IsConnected)
+        {
+            if (xOk) await _controllerService.WriteVariableAsync("X_MAN_POS", xVal);
+            if (yOk) await _controllerService.WriteVariableAsync("Y_MAN_POS", yVal);
+            StatusMessage = $"Move sent → X: {(xOk ? xVal.ToString("F3") : "-")}  Y: {(yOk ? yVal.ToString("F3") : "-")}";
+        }
+        else
+        {
+            StatusMessage = "Not connected to PMAC – move not sent.";
+        }
+    }
 }
