@@ -15,17 +15,25 @@
   <Target Name="SyncCopaLicenseGeneratorInstallerArtifacts" AfterTargets="Build">
     <PropertyGroup>
       <CopaLicenseInstallerAppDir>$(MSBuildProjectDirectory)\..\artifacts\CopaLicenseGenerator-Installer\app</CopaLicenseInstallerAppDir>
+       <CopaLicenseReleaseDir>$(MSBuildProjectDirectory)\..\artifacts\CopaLicenseGenerator-Release</CopaLicenseReleaseDir>
     </PropertyGroup>
 
     <MakeDir Directories="$(CopaLicenseInstallerAppDir)" />
+     <MakeDir Directories="$(CopaLicenseReleaseDir)" />
 
     <ItemGroup>
       <CopaLicenseGeneratorOutputFiles Include="$(TargetDir)**\*.*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(CopaLicenseGeneratorOutputFiles)"
-          DestinationFiles="@(CopaLicenseGeneratorOutputFiles->'$(CopaLicenseInstallerAppDir)\%(RecursiveDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true" />
+     <!-- Copy to Installer app folder -->
+     <Copy SourceFiles="@(CopaLicenseGeneratorOutputFiles)"
+           DestinationFiles="@(CopaLicenseGeneratorOutputFiles->'$(CopaLicenseInstallerAppDir)\%(RecursiveDir)%(Filename)%(Extension)')"
+           SkipUnchangedFiles="true" />
+
+     <!-- Copy to Release folder -->
+     <Copy SourceFiles="@(CopaLicenseGeneratorOutputFiles)"
+           DestinationFiles="@(CopaLicenseGeneratorOutputFiles->'$(CopaLicenseReleaseDir)\%(RecursiveDir)%(Filename)%(Extension)')"
+           SkipUnchangedFiles="true" />
   </Target>
 
 </Project>

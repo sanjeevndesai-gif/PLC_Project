@@ -59,20 +59,32 @@
   <Target Name="SyncCopaFormGuiArtifacts" AfterTargets="Build">
     <PropertyGroup>
       <CopaFormGuiReleaseDir>$(MSBuildProjectDirectory)\..\artifacts\CopaFormGui-Release</CopaFormGuiReleaseDir>
+      <CopaFormGuiInstallerAppDir>$(MSBuildProjectDirectory)\..\artifacts\CopaFormGui-Installer\app</CopaFormGuiInstallerAppDir>
     </PropertyGroup>
 
     <MakeDir Directories="$(CopaFormGuiReleaseDir)" />
+    <MakeDir Directories="$(CopaFormGuiInstallerAppDir)" />
 
     <ItemGroup>
       <CopaFormGuiOutputFiles Include="$(TargetDir)**\*.*" />
     </ItemGroup>
 
+    <!-- Copy to Release folder -->
     <Copy SourceFiles="@(CopaFormGuiOutputFiles)"
           DestinationFiles="@(CopaFormGuiOutputFiles->'$(CopaFormGuiReleaseDir)\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
 
     <Copy SourceFiles="$(MSBuildProjectDirectory)\..\license.json"
           DestinationFiles="$(CopaFormGuiReleaseDir)\license.json"
+          Condition="Exists('$(MSBuildProjectDirectory)\..\license.json')" />
+
+    <!-- Copy to Installer app folder -->
+    <Copy SourceFiles="@(CopaFormGuiOutputFiles)"
+          DestinationFiles="@(CopaFormGuiOutputFiles->'$(CopaFormGuiInstallerAppDir)\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\..\license.json"
+          DestinationFiles="$(CopaFormGuiInstallerAppDir)\license.json"
           Condition="Exists('$(MSBuildProjectDirectory)\..\license.json')" />
   </Target>
 
