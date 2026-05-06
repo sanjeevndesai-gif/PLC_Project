@@ -1564,3 +1564,237 @@ MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
 [2026-05-03 15:55:46.041] [VerifySignature] Result: True
 [2026-05-03 15:55:46.042] [TryValidateLicenseAtPath] SUCCESS: License validated
 [2026-05-03 15:55:46.042] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 17:45:25.510] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 17:45:25.515] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 17:45:25.517] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 17:45:25.525] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 17:45:25.528] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 17:45:26.328] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 17:45:26.331] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 17:45:26.340] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T17:45:26.3406112Z
+[2026-05-06 17:45:26.344] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 17:45:26.347] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 17:45:26.369] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 17:45:26.373] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 17:45:26.376] [VerifySignature] Signature length: 512
+[2026-05-06 17:45:26.381] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 17:45:26.383] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 17:45:26.388] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 17:45:26.389] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 17:45:26.390] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 17:45:26.391] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 17:45:26.393] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 17:45:26.394] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 17:45:26.397] [VerifySignature] Result: True
+[2026-05-06 17:45:26.399] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 17:45:26.401] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 17:58:57.357] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 17:58:57.360] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 17:58:57.361] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 17:58:57.362] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 17:58:57.363] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 17:58:57.682] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 17:58:57.684] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 17:58:57.685] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T17:58:57.6853241Z
+[2026-05-06 17:58:57.686] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 17:58:57.688] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 17:58:57.694] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 17:58:57.695] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 17:58:57.695] [VerifySignature] Signature length: 512
+[2026-05-06 17:58:57.697] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 17:58:57.697] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 17:58:57.698] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 17:58:57.699] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 17:58:57.700] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 17:58:57.701] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 17:58:57.702] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 17:58:57.704] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 17:58:57.705] [VerifySignature] Result: True
+[2026-05-06 17:58:57.706] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 17:58:57.707] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:04:06.775] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 18:04:06.777] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:04:06.778] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 18:04:06.782] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:04:06.785] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:04:07.177] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 18:04:07.177] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:04:07.179] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T18:04:07.1791891Z
+[2026-05-06 18:04:07.180] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 18:04:07.181] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 18:04:07.190] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 18:04:07.191] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 18:04:07.192] [VerifySignature] Signature length: 512
+[2026-05-06 18:04:07.194] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 18:04:07.195] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 18:04:07.196] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 18:04:07.197] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 18:04:07.197] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 18:04:07.199] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 18:04:07.201] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 18:04:07.202] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 18:04:07.204] [VerifySignature] Result: True
+[2026-05-06 18:04:07.205] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 18:04:07.206] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:09:07.615] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 18:09:07.617] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:09:07.619] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 18:09:07.622] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:09:07.624] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:09:07.966] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 18:09:07.968] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:09:07.969] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T18:09:07.9692888Z
+[2026-05-06 18:09:07.971] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 18:09:07.971] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 18:09:07.979] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 18:09:07.980] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 18:09:07.981] [VerifySignature] Signature length: 512
+[2026-05-06 18:09:07.984] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 18:09:07.985] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 18:09:07.987] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 18:09:07.988] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 18:09:07.988] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 18:09:07.990] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 18:09:07.990] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 18:09:07.991] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 18:09:07.992] [VerifySignature] Result: True
+[2026-05-06 18:09:07.992] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 18:09:07.993] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:37:41.234] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 18:37:41.236] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:37:41.238] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 18:37:41.241] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:37:41.242] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:37:41.626] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 18:37:41.628] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:37:41.630] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T18:37:41.6301123Z
+[2026-05-06 18:37:41.631] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 18:37:41.632] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 18:37:41.641] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 18:37:41.646] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 18:37:41.648] [VerifySignature] Signature length: 512
+[2026-05-06 18:37:41.649] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 18:37:41.651] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 18:37:41.653] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 18:37:41.653] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 18:37:41.654] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 18:37:41.655] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 18:37:41.656] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 18:37:41.657] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 18:37:41.658] [VerifySignature] Result: True
+[2026-05-06 18:37:41.658] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 18:37:41.659] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:58:27.725] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 18:58:27.728] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:58:27.729] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 18:58:27.733] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 18:58:27.734] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:58:28.111] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 18:58:28.112] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 18:58:28.113] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T18:58:28.1131409Z
+[2026-05-06 18:58:28.113] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 18:58:28.114] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 18:58:28.123] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 18:58:28.124] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 18:58:28.126] [VerifySignature] Signature length: 512
+[2026-05-06 18:58:28.128] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 18:58:28.130] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 18:58:28.131] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 18:58:28.131] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 18:58:28.133] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 18:58:28.134] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 18:58:28.135] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 18:58:28.137] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 18:58:28.138] [VerifySignature] Result: True
+[2026-05-06 18:58:28.139] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 18:58:28.140] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 19:07:36.039] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 19:07:36.042] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:07:36.042] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 19:07:36.045] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 19:07:36.045] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:07:36.267] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 19:07:36.268] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:07:36.269] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T19:07:36.2694788Z
+[2026-05-06 19:07:36.270] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 19:07:36.271] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 19:07:36.277] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 19:07:36.277] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 19:07:36.278] [VerifySignature] Signature length: 512
+[2026-05-06 19:07:36.279] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 19:07:36.280] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 19:07:36.281] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 19:07:36.281] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 19:07:36.282] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 19:07:36.283] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 19:07:36.283] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 19:07:36.284] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 19:07:36.285] [VerifySignature] Result: True
+[2026-05-06 19:07:36.285] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 19:07:36.286] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 19:14:42.360] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 19:14:42.365] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:14:42.366] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 19:14:42.370] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 19:14:42.371] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:14:42.748] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 19:14:42.749] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:14:42.751] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T19:14:42.7504307Z
+[2026-05-06 19:14:42.753] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 19:14:42.754] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 19:14:42.763] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 19:14:42.764] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 19:14:42.765] [VerifySignature] Signature length: 512
+[2026-05-06 19:14:42.767] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 19:14:42.769] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 19:14:42.770] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 19:14:42.771] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 19:14:42.772] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 19:14:42.773] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 19:14:42.773] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 19:14:42.777] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 19:14:42.778] [VerifySignature] Result: True
+[2026-05-06 19:14:42.779] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 19:14:42.780] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 19:25:58.976] 
+===== ValidateCurrentMachineLicense started =====
+[2026-05-06 19:25:58.978] Current Machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:25:58.979] Checking path: C:\ProgramData\CopaFormGui\license.json - Exists: True
+[2026-05-06 19:25:58.982] [TryValidateLicenseAtPath] Validating license at: C:\ProgramData\CopaFormGui\license.json
+[2026-05-06 19:25:58.983] [TryValidateLicenseAtPath] Current machine ID: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:25:59.209] [TryValidateLicenseAtPath] Product in license: CopaFormGui
+[2026-05-06 19:25:59.210] [TryValidateLicenseAtPath] Machine ID in license: E7984430-9201-4AD2-88AD-354EC899002F
+[2026-05-06 19:25:59.212] [TryValidateLicenseAtPath] Expires: , Now: 2026-05-06T19:25:59.2121277Z
+[2026-05-06 19:25:59.213] [TryValidateLicenseAtPath] IssuedUtc: 2026-05-03T13:39:11.8297771Z, MinIssuedUtc: 2026-04-02T19:57:00.0000000Z
+[2026-05-06 19:25:59.214] [TryValidateLicenseAtPath] Calling VerifySignature...
+[2026-05-06 19:25:59.221] [VerifySignature] Payload: CopaFormGui|TEST|E7984430-9201-4AD2-88AD-354EC899002F|2026-05-03T13:39:11.8297771Z|
+[2026-05-06 19:25:59.222] [VerifySignature] Public key first 60 chars: -----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8A
+[2026-05-06 19:25:59.222] [VerifySignature] Signature length: 512
+[2026-05-06 19:25:59.224] [ImportPublicKeyFromPem] DER SPKI length: 422 bytes
+[2026-05-06 19:25:59.225] [ImportPublicKeyFromPem] Parsed outer SEQUENCE
+[2026-05-06 19:25:59.226] [ImportPublicKeyFromPem] Skipped algorithm SEQUENCE
+[2026-05-06 19:25:59.227] [ImportPublicKeyFromPem] Parsed BIT STRING
+[2026-05-06 19:25:59.227] [ImportPublicKeyFromPem] Parsed RSAPublicKey SEQUENCE
+[2026-05-06 19:25:59.228] [ImportPublicKeyFromPem] Parsed modulus: 384 bytes
+[2026-05-06 19:25:59.229] [ImportPublicKeyFromPem] Parsed exponent: 3 bytes
+[2026-05-06 19:25:59.230] [ImportPublicKeyFromPem] RSA key imported successfully
+[2026-05-06 19:25:59.231] [VerifySignature] Result: True
+[2026-05-06 19:25:59.231] [TryValidateLicenseAtPath] SUCCESS: License validated
+[2026-05-06 19:25:59.232] ✓ VALIDATION PASSED at: C:\ProgramData\CopaFormGui\license.json
