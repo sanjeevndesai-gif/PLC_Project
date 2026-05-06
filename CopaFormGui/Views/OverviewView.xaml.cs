@@ -107,15 +107,18 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         double feed = latest.Steps.FirstOrDefault(s => s.F > 0)?.F ?? 0;
         double autoFeed = new CopaFormGui.Services.SettingsService().LoadSettings().SpeedXHand;
 
-        double xT1 = GetLastXForStation(latest, toolById, "T1", 50);
-        double xT2 = GetLastXForStation(latest, toolById, "T2", 100);
-        double xT4 = GetLastXForStation(latest, toolById, "T4", 150);
-        double xT3 = GetLastXForStation(latest, toolById, "T3", xT2 + 4);
-
-        double yT1 = GetLastYForStation(latest, toolById, "T1", 0);
-        double yT2 = GetLastYForStation(latest, toolById, "T2", 0);
-        double yT3 = GetLastYForStation(latest, toolById, "T3", 0);
-        double yT4 = GetLastYForStation(latest, toolById, "T4", 0);
+        var t1Steps = latest.Steps
+            .Where(s => toolById.TryGetValue(s.ToolId, out var t) && string.Equals(t.ToolStation, "T1", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        var t2Steps = latest.Steps
+            .Where(s => toolById.TryGetValue(s.ToolId, out var t) && string.Equals(t.ToolStation, "T2", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        var t3Steps = latest.Steps
+            .Where(s => toolById.TryGetValue(s.ToolId, out var t) && string.Equals(t.ToolStation, "T3", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        var t4Steps = latest.Steps
+            .Where(s => toolById.TryGetValue(s.ToolId, out var t) && string.Equals(t.ToolStation, "T4", StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         string gT1 = GetGCodeForStation(toolRecords, "T1", "G54");
         string gT2 = GetGCodeForStation(toolRecords, "T2", "G55");
@@ -125,15 +128,10 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         int numberOfParts = Math.Max(0, vm.RunNumberOfParts);
         double widthForCuts = ParseMmFromText(vm.RecentWidthText, latest.Width);
 
-        // Check which stations have steps saved in the program
-        bool t1Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
-            string.Equals(tool.ToolStation, "T1", StringComparison.OrdinalIgnoreCase));
-        bool t2Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
-            string.Equals(tool.ToolStation, "T2", StringComparison.OrdinalIgnoreCase));
-        bool t3Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
-            string.Equals(tool.ToolStation, "T3", StringComparison.OrdinalIgnoreCase));
-        bool t4Used = latest.Steps.Any(s => toolById.TryGetValue(s.ToolId, out var tool) &&
-            string.Equals(tool.ToolStation, "T4", StringComparison.OrdinalIgnoreCase));
+        bool t1Used = t1Steps.Any();
+        bool t2Used = t2Steps.Any();
+        bool t3Used = t3Steps.Any();
+        bool t4Used = t4Steps.Any();
 
         int nNum = 1;
         var lines = new List<string>
@@ -159,62 +157,76 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         if (t1Used)
         {
             lines.Add("// FIRST TOOL POSITION");
-            lines.Add($"N{nNum++} {gT1}");
-            lines.Add($"N{nNum++} Y{FormatNc(yT1)}");
-            lines.Add($"N{nNum++} X0");
-            lines.Add($"N{nNum++} M22");
-            lines.Add($"N{nNum++} M27");
-            lines.Add($"N{nNum++} X{FormatNc(xT1)}");
-            lines.Add($"N{nNum++} M26");
-            lines.Add($"N{nNum++} M20");
-            lines.Add($"N{nNum++} M21");
-            if (vm.RunPartOff)
-                lines.Add("M28");
+            foreach (var step in t1Steps)
+            {
+                lines.Add($"N{nNum++} {gT1}");
+                lines.Add($"N{nNum++} Y{FormatNc(step.Y)}");
+                lines.Add($"N{nNum++} X0");
+                lines.Add($"N{nNum++} M22");
+                lines.Add($"N{nNum++} M27");
+                lines.Add($"N{nNum++} X{FormatNc(step.X)}");
+                lines.Add($"N{nNum++} M26");
+                lines.Add($"N{nNum++} M20");
+                lines.Add($"N{nNum++} M21");
+                if (vm.RunPartOff)
+                    lines.Add("M28");
+            }
         }
 
         if (t2Used)
         {
             lines.Add("// SECOND TOOL POSITION");
-            lines.Add($"N{nNum++} {gT2}");
-            lines.Add($"N{nNum++} Y{FormatNc(yT2)}");
-            lines.Add($"N{nNum++} M27");
-            lines.Add($"N{nNum++} X{FormatNc(xT2)}");
-            lines.Add($"N{nNum++} M26");
-            lines.Add($"N{nNum++} M20");
-            lines.Add($"N{nNum++} M21");
+            foreach (var step in t2Steps)
+            {
+                lines.Add($"N{nNum++} {gT2}");
+                lines.Add($"N{nNum++} Y{FormatNc(step.Y)}");
+                lines.Add($"N{nNum++} M27");
+                lines.Add($"N{nNum++} X{FormatNc(step.X)}");
+                lines.Add($"N{nNum++} M26");
+                lines.Add($"N{nNum++} M20");
+                lines.Add($"N{nNum++} M21");
+            }
         }
 
         if (t4Used)
         {
             lines.Add("// FOURTH TOOL POSITION");
-            lines.Add($"N{nNum++} {gT4}");
-            lines.Add($"N{nNum++} Y{FormatNc(yT4)}");
-            lines.Add($"N{nNum++} M27");
-            lines.Add($"N{nNum++} X{FormatNc(xT4)}");
-            lines.Add($"N{nNum++} M26");
-            lines.Add($"N{nNum++} M20");
-            lines.Add($"N{nNum++} M21");
+            foreach (var step in t4Steps)
+            {
+                lines.Add($"N{nNum++} {gT4}");
+                lines.Add($"N{nNum++} Y{FormatNc(step.Y)}");
+                lines.Add($"N{nNum++} M27");
+                lines.Add($"N{nNum++} X{FormatNc(step.X)}");
+                lines.Add($"N{nNum++} M26");
+                lines.Add($"N{nNum++} M20");
+                lines.Add($"N{nNum++} M21");
+            }
         }
 
         if (t3Used)
         {
             lines.Add("// THIRD TOOL POSITION");
-            // Cut positions are 20, 60, 100, ... (first at 20, then +40 each cut).
-            // Keep one cut minimum and cap width at 100 mm for cut generation.
-            double effectiveWidthForCuts = Math.Min(widthForCuts, 100.0);
-            int cut = 1;
-            while (cut == 1 || (20.0 + ((cut - 1) * 40.0)) <= effectiveWidthForCuts)
+            // width <= 80: 2 cuts at Y+20, Y+60
+            // width >  80: 3 cuts at Y+20, Y+60, Y+100
+            double[] cutOffsets = widthForCuts <= 80.0
+                ? new[] { 20.0, 60.0 }
+                : new[] { 20.0, 60.0, 100.0 };
+
+            foreach (var step in t3Steps)
             {
-                double yOffset = 20.0 + ((cut - 1) * 40.0);
-                lines.Add($"// CUT {cut}");
-                lines.Add($"N{nNum++} {gT3}");
-                lines.Add($"N{nNum++} Y{FormatNc(yT3 + yOffset)}");
-                lines.Add($"N{nNum++} M27");
-                lines.Add($"N{nNum++} X{FormatNc(xT3 + 4)}");
-                lines.Add($"N{nNum++} M26");
-                lines.Add($"N{nNum++} M20");
-                lines.Add($"N{nNum++} M21");
-                cut++;
+                int cutNum = 1;
+                foreach (var yOffset in cutOffsets)
+                {
+                    lines.Add($"// CUT {cutNum}");
+                    lines.Add($"N{nNum++} {gT3}");
+                    lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}");
+                    lines.Add($"N{nNum++} M27");
+                    lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");
+                    lines.Add($"N{nNum++} M26");
+                    lines.Add($"N{nNum++} M20");
+                    lines.Add($"N{nNum++} M21");
+                    cutNum++;
+                }
             }
             lines.Add($"N{nNum++} M27");
         }

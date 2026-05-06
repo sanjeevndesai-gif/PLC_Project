@@ -188,10 +188,17 @@ public partial class SettingsViewModel : ObservableObject
         SaveSettings();
         if (IsConnected)
         {
-            await _controllerService.WriteVariableAsync("T1_Offset_pos", T1OffsetPos);
-            await _controllerService.WriteVariableAsync("T2_Offset_pos", T2OffsetPos);
-            await _controllerService.WriteVariableAsync("T3_Offset_pos", T3OffsetPos);
-            await _controllerService.WriteVariableAsync("T4_Offset_pos", T4OffsetPos);
+            await _controllerService.WriteVariableAsync("T1_pos", T1OffsetPos);
+            await _controllerService.WriteVariableAsync("T2_pos", T2OffsetPos);
+            await _controllerService.WriteVariableAsync("T3_pos", T3OffsetPos);
+            await _controllerService.WriteVariableAsync("T4_pos", T4OffsetPos);
+            await _controllerService.WriteVariableAsync("JOGSPEED", SpeedX);
+            await _controllerService.WriteVariableAsync("HOME_FEEDRATE", SpeedY);
+            await _controllerService.WriteVariableAsync("AUTO_FEEDRATE", SpeedXHand);
+            await _controllerService.WriteVariableAsync("X_MINPOS", XMin);
+            await _controllerService.WriteVariableAsync("X_MAXPOS", XMax);
+            await _controllerService.WriteVariableAsync("Y_MINPOS", YMin);
+            await _controllerService.WriteVariableAsync("Y_MAXPOS", YMax);
         }
         StatusMessage = "Settings applied to controller.";
     }

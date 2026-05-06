@@ -58,17 +58,17 @@ public partial class AlarmViewModel : ObservableObject
     {
         return new List<AlarmSignal>
         {
-            new(1, "X_NLIMIT_UI", "X_NLIMIT_UI", "X AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new(2, "X_PLIMIT_UI", "X_PLIMIT_UI", "X AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new(3, "Y_NLIMIT_UI", "Y_NLIMIT_UI", "Y AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new(4, "Y_PLIMIT_UI", "Y_PLIMIT_UI", "Y AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Warning),
-            new(5, "HYD_UP_SENSE_ERR", "HYD_UP_SENSE_ERR", "HYD UP SENSE ERROR", AlarmSeverity.Error, "HYD_UP_SENSE_ERR", "HYDRAULIC_UP_SENS_UI"),
-            new(6, "HYD_DOWN_SENSE_ERR", "HYD_DOWN_SENSE_ERR", "HYD DOWN SENSE ERROR", AlarmSeverity.Error, "HYD_DOWN_SENSE_ERR", "HYD_DOWN_SENSE", "HYDRAULIC_DOWN_SENS_UI"),
-            new(7, "X_AXIS_ERROR", "X_AXIS_ERROR", "X AXIS SERVO ERROR", AlarmSeverity.Error, "X_AXIS_ERROR_UI"),
-            new(8, "Y_AXIS_ERROR", "Y_AXIS_ERROR", "Y AXIS SERVO ERROR", AlarmSeverity.Error, "Y_AXIS_ERROR_UI"),
-            new(9, "JOGSPEED_LT_1", "JOGSPEED<1", "JOG SPEED IS ZERO", AlarmSeverity.Warning, "JOGSPEED_LT_1", "JOGSPEED_ZERO", "JOGSPEED<1"),
-            new(10, "EMERGENCY_PB=0", "EMERGENCY_PB=0", "EMERGENCY PB PRESSED", AlarmSeverity.Critical, "EMERGENCY_PB=0", "Emergency_PB=0", "EMERGENCY_PB_UI=0", "Emergency_PB_UI=0", "EMERGENCY_PB_UI", "Emergency_PB_UI"),
-            new(11, "BUSBAR_PRESENT_S_INS", "BUSBAR_PRESENT_S_INS", "INSERT BUSBAR TO START PUNCH", AlarmSeverity.Warning, "BUSBAR_PRESENT_S_INS", "BUSBAR_PRESENT_SENS_UI", "BUSBAR_PRESENT_SENSOR")
+            new(1, "X_NLIMIT_UI", "X_NLIMIT_UI", "X AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Error, "X_NLIMIT_UI"),
+            new(2, "X_PLIMIT_UI", "X_PLIMIT_UI", "X AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Error, "X_PLIMIT_UI"),
+            new(3, "Y_NLIMIT_UI", "Y_NLIMIT_UI", "Y AXIS NEGATIVE LIMIT REACHED", AlarmSeverity.Error, "Y_NLIMIT_UI"),
+            new(4, "Y_PLIMIT_UI", "Y_PLIMIT_UI", "Y AXIS POSITIVE LIMIT REACHED", AlarmSeverity.Error, "Y_PLIMIT_UI"),
+            new(5, "HYD_UP_SENSE_ERROR", "HYD_UP_SENSE_ERROR", "HYD UP SENSE ERROR", AlarmSeverity.Error, "HYD_UP_SENSE_ERROR"),
+            new(6, "HYD_DOWN_SENSE_ERROR", "HYD_DOWN_SENSE_ERROR", "HYD DOWN SENSE ERROR", AlarmSeverity.Error, "HYD_DOWN_SENSE_ERROR"),
+            new(7, "X_AXIS_ERROR", "X_AXIS_ERROR", "X AXIS SERVO ERROR", AlarmSeverity.Error, "X_AXIS_ERROR"),
+            new(8, "Y_AXIS_ERROR", "Y_AXIS_ERROR", "Y AXIS SERVO ERROR", AlarmSeverity.Error, "Y_AXIS_ERROR"),
+            new(9, "JOGSPEED", "JOGSPEED", "JOG SPEED IS ZERO", AlarmSeverity.Warning, activeBelowThreshold: 1.0, "JOGSPEED"),
+            new(10, "Emergency_PB", "Emergency_PB", "EMERGENCY PB PRESSED", AlarmSeverity.Error, "Emergency_PB"),
+            new(11, "BUSBAR_PRESENT_SENSE_ERROR", "BUSBAR_PRESENT_SENSE_ERROR", "INSERT BUSBAR TO START PUNCH", AlarmSeverity.Error, "BUSBAR_PRESENT_SENSE_ERROR")
         };
     }
 
@@ -206,7 +206,11 @@ public partial class AlarmViewModel : ObservableObject
 
             var value = await _controllerService.ReadVariableAsync(candidate);
             if (value.HasValue)
+            {
+                if (signal.ActiveBelowThreshold.HasValue)
+                    return value.Value < signal.ActiveBelowThreshold.Value;
                 return Math.Abs(value.Value) > 0.00001d;
+            }
         }
 
         return false;
@@ -331,12 +335,16 @@ public partial class AlarmViewModel : ObservableObject
     private sealed class AlarmSignal
     {
         public AlarmSignal(int displayId, string signalKey, string code, string description, AlarmSeverity severity, params string[] variableCandidates)
+            : this(displayId, signalKey, code, description, severity, activeBelowThreshold: null, variableCandidates) { }
+
+        public AlarmSignal(int displayId, string signalKey, string code, string description, AlarmSeverity severity, double? activeBelowThreshold, params string[] variableCandidates)
         {
             DisplayId = displayId;
             SignalKey = signalKey;
             Code = code;
             Description = description;
             Severity = severity;
+            ActiveBelowThreshold = activeBelowThreshold;
             VariableCandidates = variableCandidates.Length > 0 ? variableCandidates : new[] { signalKey };
         }
 
@@ -345,6 +353,7 @@ public partial class AlarmViewModel : ObservableObject
         public string Code { get; }
         public string Description { get; }
         public AlarmSeverity Severity { get; }
+        public double? ActiveBelowThreshold { get; }
         public string[] VariableCandidates { get; }
     }
 }

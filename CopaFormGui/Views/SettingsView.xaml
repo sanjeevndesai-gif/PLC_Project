@@ -119,7 +119,7 @@
 
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Home Speed" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SpeedY, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="rpm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Auto Feedrate" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SpeedXHand, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
@@ -146,19 +146,19 @@
 
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="X minimum" Style="{StaticResource SettingsFieldLabelStyle}"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding XMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,0,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="X maximum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding XMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Y minimum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding YMin, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Y maximum" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding YMax, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
                                 </Grid>
                             </Grid>
                         </Border>
@@ -235,19 +235,19 @@
 
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Tool 1" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding T1OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool 2" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding T2OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Tool 3" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding T3OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Tool 4" Style="{StaticResource SettingsFieldLabelStyle}" Margin="0,5,12,0"/>
                                     <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding T4OffsetPos, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SettingsValueBoxStyle}" Width="92" Margin="0,5,0,0"/>
-                                    <TextBlock Grid.Row="4" Grid.Column="2" Text="mm/s" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="2" Text="mm" Style="{StaticResource FormLabelStyle}" Margin="8,5,0,0" VerticalAlignment="Center"/>
                                 </Grid>
                             </Grid>
                         </Border>
