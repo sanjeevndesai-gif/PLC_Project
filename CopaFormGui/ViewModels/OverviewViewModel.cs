@@ -68,6 +68,7 @@ public partial class OverviewViewModel : ObservableObject
     // Run popup inputs
     [ObservableProperty] private string _runBarLengthMm = string.Empty;
     [ObservableProperty] private int _runNumberOfParts;
+    [ObservableProperty] private int _currentCuttingPart;
     [ObservableProperty] private bool _runPartOff;
     [ObservableProperty] private double _currentProgramLengthMm;
 
@@ -83,6 +84,7 @@ public partial class OverviewViewModel : ObservableObject
     public string ModeColor => IsMachineRunning ? "#28A745" : "#1565C0";
     public string EStopColor => IsEStop ? "#DC3545" : "#BDBDBD";
     public string AlarmColor => IsAlarmActive ? "#FFC107" : "#BDBDBD";
+    public string PartsProgressText => $"{RunNumberOfParts}/{CurrentCuttingPart}";
 
     public OverviewViewModel(IControllerService controllerService, IDataStoreService dataStoreService)
     {
@@ -202,6 +204,18 @@ public partial class OverviewViewModel : ObservableObject
     {
         _ = value;
         RecalculateRunNumberOfParts();
+    }
+
+    partial void OnRunNumberOfPartsChanged(int value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(PartsProgressText));
+    }
+
+    partial void OnCurrentCuttingPartChanged(int value)
+    {
+        _ = value;
+        OnPropertyChanged(nameof(PartsProgressText));
     }
 
     partial void OnCurrentProgramLengthMmChanged(double value)
@@ -452,6 +466,10 @@ public partial class OverviewViewModel : ObservableObject
         PosX = await _controllerService.ReadRegisterAsync(100);
         PosY = await _controllerService.ReadRegisterAsync(101);
         PunchForce = await _controllerService.ReadRegisterAsync(110);
+
+        var currentPartValue = await _controllerService.ReadVariableAsync("P2101");
+        if (currentPartValue.HasValue)
+            CurrentCuttingPart = (int)Math.Max(0, Math.Floor(currentPartValue.Value));
 
         var testValue = await _controllerService.ReadResponseAsync(TestVariableName);
         if (!string.IsNullOrWhiteSpace(testValue))
