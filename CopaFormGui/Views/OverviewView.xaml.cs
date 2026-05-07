@@ -59,11 +59,19 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         RunPopup.IsOpen = true;
     }
 
+    /// <summary>
+    /// Handles the OK button click in the Run popup.
+    /// Generates a PMAC CNC punch program (NC code) from the latest saved punch program
+    /// in the database and writes it to a .txt file in the user's Documents folder.
+    /// The program loops for the configured number of parts.
+    /// </summary>
     private void RunPopupOk_Click(object sender, RoutedEventArgs e)
     {
+        // ── Close the Run popup ───────────────────────────────────────────────
         RunPopup.IsOpen = false;
 
-        // Get the ViewModel
+        // ── Resolve ViewModel ─────────────────────────────────────────────────
+        // The ViewModel holds UI-bound properties such as RunNumberOfParts and RecentWidthText.
         var vm = DataContext as CopaFormGui.ViewModels.OverviewViewModel;
         if (vm == null)
         {
@@ -71,7 +79,9 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
-        // Try to get the latest punch program from the database
+        // ── Resolve DataStoreService via reflection ───────────────────────────
+        // The service is a private field on the ViewModel; reflection is used
+        // because the View does not hold a direct reference to it.
         var dataStoreServiceField = typeof(CopaFormGui.ViewModels.OverviewViewModel)
             .GetField("_dataStoreService", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var dataStoreService = dataStoreServiceField?.GetValue(vm) as CopaFormGui.Services.IDataStoreService;
@@ -81,6 +91,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
+        // ── Load punch programs from the database ─────────────────────────────
         var programs = dataStoreService.LoadPunchPrograms();
         if (programs == null || programs.Count == 0)
         {
@@ -88,7 +99,8 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
-        // Use the latest program with steps
+        // ── Select the most recently modified program that has steps ──────────
+        // Tie-break by CreatedDate, then by ProgramId (highest = newest).
         var latest = programs
             .Where(p => p.Steps != null && p.Steps.Count > 0)
             .OrderByDescending(p => p.ModifiedDate)
@@ -101,12 +113,23 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             return;
         }
 
+        // ── Load tool records and build a fast lookup dictionary ──────────────
+        // toolById[toolId] → ToolRecord (contains ToolStation: T1/T2/T3/T4 and GCode)
         var toolRecords = dataStoreService.LoadToolRecords();
         var toolById = toolRecords.ToDictionary(t => t.ToolId, t => t);
 
+        // ── Resolve feed rates ────────────────────────────────────────────────
+        // feed     : the F-value from the first step that specifies one (not used in output currently)
+        // autoFeed : the machine's X-hand speed from Settings, used in the HEADER moves
         double feed = latest.Steps.FirstOrDefault(s => s.F > 0)?.F ?? 0;
         double autoFeed = new CopaFormGui.Services.SettingsService().LoadSettings().SpeedXHand;
 
+        // ── Partition steps by tool station ───────────────────────────────────
+        // Each station maps to a physical punch position on the machine:
+        //   T1 = First punch station  (G54)
+        //   T2 = Second punch station (G55)
+        //   T3 = Cut-off station      (G56) — always runs last
+        //   T4 = Fourth punch station (G57)
         var t1Steps = latest.Steps
             .Where(s => toolById.TryGetValue(s.ToolId, out var t) && string.Equals(t.ToolStation, "T1", StringComparison.OrdinalIgnoreCase))
             .ToList();
@@ -120,97 +143,129 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             .Where(s => toolById.TryGetValue(s.ToolId, out var t) && string.Equals(t.ToolStation, "T4", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
+        // ── Resolve G-code work offsets per station ───────────────────────────
+        // Reads the GCode field from the tool record; falls back to the default if missing.
         string gT1 = GetGCodeForStation(toolRecords, "T1", "G54");
         string gT2 = GetGCodeForStation(toolRecords, "T2", "G55");
         string gT3 = GetGCodeForStation(toolRecords, "T3", "G56");
         string gT4 = GetGCodeForStation(toolRecords, "T4", "G57");
 
+        // ── Runtime parameters ────────────────────────────────────────────────
+        // numberOfParts : how many times the while-loop runs (set by the operator in the UI)
+        // widthForCuts  : part width in mm, used to decide how many cut passes T3 makes
         int numberOfParts = Math.Max(0, vm.RunNumberOfParts);
         double widthForCuts = ParseMmFromText(vm.RecentWidthText, latest.Width);
 
+        // Flags — true when at least one step exists for that station
         bool t1Used = t1Steps.Any();
         bool t2Used = t2Steps.Any();
         bool t3Used = t3Steps.Any();
         bool t4Used = t4Steps.Any();
 
+        // ── Build the NC program line by line ─────────────────────────────────
+        // nNum is the running N-number counter incremented for every motion/M-code line.
         int nNum = 1;
+
+        // ── HEADER ────────────────────────────────────────────────────────────
+        // Opens program slot 202, sets absolute mode (G90), linear interpolation,
+        // homes to G59, releases clamp (M21), engages brake (M23), parks the axes,
+        // then initialises the part counter before entering the production loop.
         var lines = new List<string>
         {
             "//HEADER",
-            "open prog 202",
-            $"N{nNum++} G90",
-            $"N{nNum++} linear",
-            $"N{nNum++} G59",
-            $"N{nNum++} M21",
-            $"N{nNum++} M23",
-            $"N{nNum++} M27",
-            $"N{nNum++} X500 F{FormatNc(autoFeed)}",
-            $"N{nNum++} Y910 F{FormatNc(autoFeed)}",
-            $"N{nNum++} M28",
-            "P2101=0",
-            $"P2100={numberOfParts}",
-            "while(P2101<P2100)",
+            "open prog 202",          // Open PMAC program buffer 202
+            $"N{nNum++} G90",         // Absolute positioning mode
+            $"N{nNum++} linear",      // Linear interpolation mode
+            $"N{nNum++} G59",         // Select home/park coordinate system
+            $"N{nNum++} M21",         // Release clamp
+            $"N{nNum++} M23",         // Engage brake
+            $"N{nNum++} M27",         // Retract punch head
+            $"N{nNum++} X500 F{FormatNc(autoFeed)}",   // Move X to park position
+            $"N{nNum++} Y910 F{FormatNc(autoFeed)}",   // Move Y to park position
+            $"N{nNum++} M28",         // Part-off / eject
+            "P2101=0",                // Reset part counter
+            $"P2100={numberOfParts}", // Set total parts target
+            "while(P2101<P2100)",     // Loop until all parts are produced
             "{",
-            $"N{nNum++} M26",
+            $"N{nNum++} M26",         // Lower punch / engage cycle start
         };
 
-        if (t1Used)
+        // ── PUNCH STEPS (T1, T2, T4) — in database order ─────────────────────
+        // T3 (cut-off) is intentionally excluded here and always appended last.
+        // Steps are emitted one-by-one in the exact order they appear in the database,
+        // so the machine follows the operator-defined punch sequence.
+        //
+        // The very first step of any station receives an X0 retract + M22 clamp command
+        // before the punch move — this homes the X-axis and locks the clamp for safety.
+        // All subsequent steps go directly to the punch sequence.
+        var nonCutSteps = latest.Steps
+            .Where(s => toolById.TryGetValue(s.ToolId, out var t) &&
+                        !string.Equals(t.ToolStation, "T3", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        string? prevStation = null; // Tracks station changes to insert position comment headers
+        bool isFirstStep = true;    // True only for the very first punch step overall
+
+        foreach (var step in nonCutSteps)
         {
-            lines.Add("// FIRST TOOL POSITION");
-            foreach (var step in t1Steps)
+            if (!toolById.TryGetValue(step.ToolId, out var tool)) continue;
+            string stationUpper = tool.ToolStation?.ToUpperInvariant() ?? "";
+
+            // Insert a position comment whenever the station changes
+            if (stationUpper != prevStation)
             {
-                lines.Add($"N{nNum++} {gT1}");
-                lines.Add($"N{nNum++} Y{FormatNc(step.Y)}");
-                lines.Add($"N{nNum++} X0");
-                lines.Add($"N{nNum++} M22");
-                lines.Add($"N{nNum++} M27");
-                lines.Add($"N{nNum++} X{FormatNc(step.X)}");
-                lines.Add($"N{nNum++} M26");
-                lines.Add($"N{nNum++} M20");
-                lines.Add($"N{nNum++} M21");
-                if (vm.RunPartOff)
-                    lines.Add("M28");
+                lines.Add($"// {stationUpper} POSITION");
+                prevStation = stationUpper;
             }
+
+            // Select the work-offset G-code for this station
+            string gCode = stationUpper switch
+            {
+                "T1" => gT1,
+                "T2" => gT2,
+                "T4" => gT4,
+                _ => ""
+            };
+
+            if (string.IsNullOrEmpty(gCode)) continue;
+
+            // Select work offset and position Y
+            lines.Add($"N{nNum++} {gCode}");          // Activate station work offset
+            lines.Add($"N{nNum++} Y{FormatNc(step.Y)}"); // Move Y to punch position
+
+            if (isFirstStep)
+            {
+                // First step only: retract X to home and engage clamp before punching
+                lines.Add($"N{nNum++} X0");   // Retract X axis to home
+                lines.Add($"N{nNum++} M22");  // Engage clamp
+                isFirstStep = false;
+            }
+
+            // Punch sequence: extend head → move X → punch down → punch up → retract
+            lines.Add($"N{nNum++} M27");               // Extend punch head
+            lines.Add($"N{nNum++} X{FormatNc(step.X)}"); // Move X to punch X coordinate
+            lines.Add($"N{nNum++} M26");               // Punch down (activate punch)
+            lines.Add($"N{nNum++} M20");               // Punch cycle step 1
+            lines.Add($"N{nNum++} M21");               // Punch cycle step 2 / retract
+
+            // Optional part-off signal after each T1 punch (if operator enabled it)
+            if (stationUpper == "T1" && vm.RunPartOff)
+                lines.Add("M28");
         }
 
-        if (t2Used)
-        {
-            lines.Add("// SECOND TOOL POSITION");
-            foreach (var step in t2Steps)
-            {
-                lines.Add($"N{nNum++} {gT2}");
-                lines.Add($"N{nNum++} Y{FormatNc(step.Y)}");
-                lines.Add($"N{nNum++} M27");
-                lines.Add($"N{nNum++} X{FormatNc(step.X)}");
-                lines.Add($"N{nNum++} M26");
-                lines.Add($"N{nNum++} M20");
-                lines.Add($"N{nNum++} M21");
-            }
-        }
-
-        if (t4Used)
-        {
-            lines.Add("// FOURTH TOOL POSITION");
-            foreach (var step in t4Steps)
-            {
-                lines.Add($"N{nNum++} {gT4}");
-                lines.Add($"N{nNum++} Y{FormatNc(step.Y)}");
-                lines.Add($"N{nNum++} M27");
-                lines.Add($"N{nNum++} X{FormatNc(step.X)}");
-                lines.Add($"N{nNum++} M26");
-                lines.Add($"N{nNum++} M20");
-                lines.Add($"N{nNum++} M21");
-            }
-        }
-
+        // ── T3 CUT-OFF — always last ──────────────────────────────────────────
+        // T3 is the cut-off station and must always run after all punching is done.
+        // Number of cut passes depends on part width:
+        //   width ≤ 80 mm → 2 passes at Y+20, Y+60
+        //   width  > 80 mm → 3 passes at Y+20, Y+60, Y+100
+        // X is offset by +4 mm to account for the cut blade geometry.
         if (t3Used)
         {
-            lines.Add("// THIRD TOOL POSITION");
-            // width <= 80: 2 cuts at Y+20, Y+60
-            // width >  80: 3 cuts at Y+20, Y+60, Y+100
+            lines.Add("// T3 POSITION");
+
             double[] cutOffsets = widthForCuts <= 80.0
-                ? new[] { 20.0, 60.0 }
-                : new[] { 20.0, 60.0, 100.0 };
+                ? new[] { 20.0, 60.0 }           // Narrow part: 2 cuts
+                : new[] { 20.0, 60.0, 100.0 };   // Wide part:   3 cuts
 
             foreach (var step in t3Steps)
             {
@@ -218,40 +273,46 @@ public partial class OverviewView : System.Windows.Controls.UserControl
                 foreach (var yOffset in cutOffsets)
                 {
                     lines.Add($"// CUT {cutNum}");
-                    lines.Add($"N{nNum++} {gT3}");
-                    lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}");
-                    lines.Add($"N{nNum++} M27");
-                    lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");
-                    lines.Add($"N{nNum++} M26");
-                    lines.Add($"N{nNum++} M20");
-                    lines.Add($"N{nNum++} M21");
+                    lines.Add($"N{nNum++} {gT3}");                        // Activate T3 work offset
+                    lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}"); // Y cut position (offset into material)
+                    lines.Add($"N{nNum++} M27");                           // Extend cut head
+                    lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
+                    lines.Add($"N{nNum++} M26");                           // Cut down
+                    lines.Add($"N{nNum++} M20");                           // Cut cycle step 1
+                    lines.Add($"N{nNum++} M21");                           // Cut cycle step 2 / retract
                     cutNum++;
                 }
             }
-            lines.Add($"N{nNum++} M27");
+            lines.Add($"N{nNum++} M27"); // Final retract after all cuts
         }
 
+        // ── FOOTER ────────────────────────────────────────────────────────────
+        // Returns the machine to the park position, triggers end-of-cycle M-codes,
+        // dwells 3 seconds (for part ejection / operator clearance), increments
+        // the part counter, then closes the loop. After all parts are done,
+        // the machine homes and ends the program.
         lines.AddRange(new[]
         {
             "// FOOTER",
-            $"N{nNum++} X500",
-            $"N{nNum++} M23",
-            $"N{nNum++} M24",
-            "DWELL 3000",
-            $"N{nNum++} M25",
-            "P2101=P2101+1",
-            "}",
-            $"N{nNum++} G59",
-            $"N{nNum++} X500 Y910",
-            $"N{nNum++} M30",
-            "CLOSE"
+            $"N{nNum++} X500",        // Return X to park position
+            $"N{nNum++} M23",         // Engage brake
+            $"N{nNum++} M24",         // End-of-part signal
+            "DWELL 3000",             // Wait 3 seconds (part eject / clearance)
+            $"N{nNum++} M25",         // Release end-of-part signal
+            "P2101=P2101+1",          // Increment part counter
+            "}",                      // End of while-loop
+            $"N{nNum++} G59",         // Restore home coordinate system
+            $"N{nNum++} X500 Y910",   // Park axes
+            $"N{nNum++} M30",         // End of program
+            "CLOSE"                   // Close PMAC program buffer
         });
 
+        // ── Convert all lines to UPPER CASE (PMAC requirement) ────────────────
         lines = lines.Select(l => l.ToUpperInvariant()).ToList();
 
-        // Use the program name from the database for the file name
+        // ── Write program to file ─────────────────────────────────────────────
+        // File name = sanitised program name from the database, saved to Documents.
         string safeName = string.IsNullOrWhiteSpace(latest.ProgramName) ? "punch_program" : latest.ProgramName;
-        // Remove invalid filename characters
         foreach (char c in System.IO.Path.GetInvalidFileNameChars())
             safeName = safeName.Replace(c, '_');
         string filePath = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), safeName + ".txt");
@@ -259,9 +320,11 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         {
             System.IO.File.WriteAllLines(filePath, lines);
             _lastGeneratedProgramPath = filePath;
-            // Read the file content and set it to the ViewModel property
+
+            // Push file content to the ViewModel so the UI preview updates
             string fileContent = System.IO.File.ReadAllText(filePath);
             vm.LastSavedFileContent = fileContent;
+
             MessageBox.Show($"Punch program written to:\n{filePath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (System.Exception ex)
