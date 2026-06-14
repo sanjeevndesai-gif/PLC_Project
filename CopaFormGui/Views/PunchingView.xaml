@@ -174,6 +174,8 @@
                                    Fill="#DCEBF7"
                                    Stroke="#577D97"
                                    StrokeThickness="2"
+                                   StrokeDashArray="4,2"
+                                   StrokeDashCap="Round"
                                    Opacity="0.9"/>
 
                         <Rectangle Canvas.Left="{Binding PreviewFrontLeft}"
@@ -182,7 +184,9 @@
                                    Height="{Binding PreviewBoxHeight}"
                                    Fill="#F2EBE3"
                                    Stroke="#202020"
-                                   StrokeThickness="3"/>
+                                   StrokeThickness="3"
+                                   StrokeDashArray="4,2"
+                                   StrokeDashCap="Round"/>
 
                         <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackLeft}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
                         <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>

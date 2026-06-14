@@ -131,6 +131,8 @@
                                                Fill="#DCEBF7"
                                                Stroke="#577D97"
                                                StrokeThickness="2"
+                                               StrokeDashArray="4,2"
+                                               StrokeDashCap="Round"
                                                Opacity="0.9"/>
 
                                     <Rectangle Canvas.Left="{Binding PreviewSheetLeft}"
@@ -139,7 +141,9 @@
                                                Height="{Binding PreviewSheetHeight}"
                                                Fill="#F2EBE3"
                                                Stroke="#202020"
-                                               StrokeThickness="3"/>
+                                               StrokeThickness="3"
+                                               StrokeDashArray="4,2"
+                                               StrokeDashCap="Round"/>
 
                                     <ItemsControl ItemsSource="{Binding ToolPreviewShapes}">
                                         <ItemsControl.ItemsPanel>
