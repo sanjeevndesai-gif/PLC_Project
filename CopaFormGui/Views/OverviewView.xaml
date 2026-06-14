@@ -261,13 +261,13 @@
                         </Grid>
 
                     <!-- Display last saved file content -->
-                    <Grid Margin="0,8,0,0">
+                    <Grid x:Name="LastSavedHeaderGrid" Margin="0,8,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="LastSavedLabelTextBlock" Text="Last Saved File Content:" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
-                        <Button x:Name="ExpandSavedButton" Grid.Column="1" Width="34" Height="28" Margin="8,0,0,0" Click="ExpandSavedFile_Click" ToolTip="Expand preview" Style="{StaticResource SecondaryButtonStyle}">
+                        <TextBlock x:Name="LastSavedLabelTextBlock" Text="Last Saved File Content:" Grid.Column="0" FontSize="12" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"/>
+                        <Button x:Name="ExpandSavedButton" Grid.Column="1" Width="20" Height="28" Margin="8,0,0,0" Click="ExpandSavedFile_Click" ToolTip="Expand preview" Style="{StaticResource SecondaryButtonStyle}">
                             <Grid Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Path Data="M2,12 L2,2 L12,2 M12,2 L8,6 M12,2 L12,8" Stroke="White" StrokeThickness="1.6" StrokeLineJoin="Round" StrokeEndLineCap="Round"/>
                             </Grid>

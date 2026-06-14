@@ -172,10 +172,7 @@
                                    Width="{Binding PreviewBoxWidth}"
                                    Height="{Binding PreviewBoxHeight}"
                                    Fill="#DCEBF7"
-                                   Stroke="#577D97"
-                                   StrokeThickness="2"
-                                   StrokeDashArray="4,2"
-                                   StrokeDashCap="Round"
+                                   StrokeThickness="0"
                                    Opacity="0.9"/>
 
                         <Rectangle Canvas.Left="{Binding PreviewFrontLeft}"
@@ -183,10 +180,7 @@
                                    Width="{Binding PreviewBoxWidth}"
                                    Height="{Binding PreviewBoxHeight}"
                                    Fill="#F2EBE3"
-                                   Stroke="#202020"
-                                   StrokeThickness="3"
-                                   StrokeDashArray="4,2"
-                                   StrokeDashCap="Round"/>
+                                   StrokeThickness="0"/>
 
                         <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackLeft}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
                         <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
@@ -232,7 +226,23 @@
                         <Line X1="{Binding WidthArrowX}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewFrontLeft}" Y2="{Binding PreviewFrontTop}" Stroke="#1565C0" StrokeThickness="1.1"/>
                         <Line X1="{Binding WidthArrowX}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewFrontLeft}" Y2="{Binding PreviewFrontBottom}" Stroke="#1565C0" StrokeThickness="1.1"/>
 
-                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}" Stroke="#CB4A4A" StrokeThickness="1.6"/>
+                        <!-- Solid top/left/bottom borders around the front face -->
+                        <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewFrontRight}" Y2="{Binding PreviewFrontTop}"
+                            Stroke="#202020" StrokeThickness="3" />
+                        <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewFrontLeft}" Y2="{Binding PreviewFrontBottom}"
+                            Stroke="#202020" StrokeThickness="3" />
+                        <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewFrontRight}" Y2="{Binding PreviewFrontBottom}"
+                            Stroke="#202020" StrokeThickness="3" />
+
+                        <!-- Right-edge dashed red lines (keeps original dashed right side visual) -->
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}"
+                            Stroke="Red" StrokeThickness="1.6" StrokeDashArray="4,2" StrokeDashCap="Round"/>
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackBottom}"
+                            Stroke="Red" StrokeThickness="1.6" StrokeDashArray="4,2" StrokeDashCap="Round"/>
+
+                        <!-- Front-face vertical dashed right-edge (missing previously) -->
+                        <Line X1="{Binding PreviewFrontRight}" X2="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" Y2="{Binding PreviewFrontBottom}"
+                              Stroke="Red" StrokeThickness="2" StrokeDashArray="4,2" StrokeDashCap="Round"/>
 
                             <TextBlock Canvas.Left="{Binding LengthLabelX}" Canvas.Top="{Binding LengthLabelY}" Text="{Binding LengthLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#0D3B66"/>
                             <TextBlock Canvas.Left="{Binding WidthLabelX}" Canvas.Top="{Binding WidthLabelY}" Text="{Binding WidthLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#0D3B66"/>

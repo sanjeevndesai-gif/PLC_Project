@@ -54,6 +54,32 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         DataContextChanged += OnDataContextChanged;
     }
 
+    private void SetupLastSavedHeaderResizer()
+    {
+        if (LastSavedHeaderGrid == null || LastSavedLabelTextBlock == null || ExpandSavedButton == null)
+            return;
+
+        LastSavedHeaderGrid.SizeChanged += (s, e) => UpdateLastSavedMaxWidth();
+        ExpandSavedButton.SizeChanged += (s, e) => UpdateLastSavedMaxWidth();
+        UpdateLastSavedMaxWidth();
+    }
+
+    private void UpdateLastSavedMaxWidth()
+    {
+        try
+        {
+            double parentWidth = LastSavedHeaderGrid.ActualWidth;
+            double btnTotal = ExpandSavedButton.ActualWidth + ExpandSavedButton.Margin.Left + ExpandSavedButton.Margin.Right;
+            double pad = 8.0; // small gap between text and button
+            double max = Math.Max(20.0, parentWidth - btnTotal - pad);
+            LastSavedLabelTextBlock.MaxWidth = max;
+        }
+        catch
+        {
+            // ignore measurement errors
+        }
+    }
+
     // Font size and expand/collapse for Last Saved File content
     private double _lastSavedFileFontSize = 12.0;
     private const double _lastSavedCollapsedHeight = 120.0;
@@ -547,6 +573,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         AttachViewModel(DataContext as OverviewViewModel);
+        SetupLastSavedHeaderResizer();
         // 3D preview removed
     }
 
