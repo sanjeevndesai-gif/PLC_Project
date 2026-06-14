@@ -73,9 +73,12 @@
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="1" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <DataGrid ItemsSource="{Binding PunchSteps}"
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}" VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Grid.Row="0" ItemsSource="{Binding PunchSteps}"
                               SelectedItem="{Binding SelectedStep, Mode=TwoWay}"
                               RowEditEnding="StepsDataGrid_RowEditEnding"
                               CellEditEnding="StepsDataGrid_CellEditEnding"
@@ -85,7 +88,8 @@
                               CanUserDeleteRows="True"
                               IsReadOnly="False"
                               HeadersVisibility="Column"
-                              Height="176"
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch"
                               SelectionUnit="FullRow"
                               SelectionMode="Single"
                               KeyboardNavigation.TabNavigation="Local">
@@ -139,8 +143,7 @@
                             <DataGridTextColumn Header="Punch" Binding="{Binding ToolInfo}" IsReadOnly="True" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
-
-                </StackPanel>
+                </Grid>
             </Border>
         </Grid>
 
