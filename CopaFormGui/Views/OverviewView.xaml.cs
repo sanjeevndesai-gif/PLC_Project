@@ -54,6 +54,35 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         DataContextChanged += OnDataContextChanged;
     }
 
+    // Font size and expand/collapse for Last Saved File content
+    private double _lastSavedFileFontSize = 12.0;
+    private const double _lastSavedCollapsedHeight = 120.0;
+    private const double _lastSavedExpandedHeight = 400.0;
+
+    private void IncreaseSavedFileFont_Click(object sender, RoutedEventArgs e)
+    {
+        _lastSavedFileFontSize = Math.Min(28.0, _lastSavedFileFontSize + 1.0);
+        if (LastSavedTextBox != null) LastSavedTextBox.FontSize = _lastSavedFileFontSize;
+    }
+
+    private void DecreaseSavedFileFont_Click(object sender, RoutedEventArgs e)
+    {
+        _lastSavedFileFontSize = Math.Max(8.0, _lastSavedFileFontSize - 1.0);
+        if (LastSavedTextBox != null) LastSavedTextBox.FontSize = _lastSavedFileFontSize;
+    }
+
+    private void ExpandSavedFile_Checked(object sender, RoutedEventArgs e)
+    {
+        if (LastSavedScrollViewer != null) LastSavedScrollViewer.Height = _lastSavedExpandedHeight;
+    }
+
+    private void ExpandSavedFile_Unchecked(object sender, RoutedEventArgs e)
+    {
+        if (LastSavedScrollViewer != null) LastSavedScrollViewer.Height = _lastSavedCollapsedHeight;
+    }
+
+    // Label size is fixed/styled in XAML now.
+
     private void RunButton_Click(object sender, RoutedEventArgs e)
     {
         RunPopup.IsOpen = true;
@@ -558,4 +587,21 @@ public partial class OverviewView : System.Windows.Controls.UserControl
     // 3D preview methods removed
 
     // 3D preview methods removed
+
+    private void ExpandSavedFile_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            LastSavedPopup.IsOpen = true;
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    private void CloseLastSavedPopup_Click(object sender, RoutedEventArgs e)
+    {
+        LastSavedPopup.IsOpen = false;
+    }
 }

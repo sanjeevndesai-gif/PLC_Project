@@ -46,10 +46,18 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private double _t2OffsetPos = 0.0;
     [ObservableProperty] private double _t3OffsetPos = 0.0;
     [ObservableProperty] private double _t4OffsetPos = 0.0;
+    // Tool X Offsets
+    [ObservableProperty] private double _t1OffsetPosX = 0.0;
+    [ObservableProperty] private double _t2OffsetPosX = 0.0;
+    [ObservableProperty] private double _t3OffsetPosX = 0.0;
+    [ObservableProperty] private double _t4OffsetPosX = 0.0;
 
     // Home Positions
     [ObservableProperty] private double _homeX = 0.0;
     [ObservableProperty] private double _homeY = 0.0;
+    // Stored home position values captured from motors
+    [ObservableProperty] private double _homeXPos = 0.0;
+    [ObservableProperty] private double _homeYPos = 0.0;
 
     // Safety
     [ObservableProperty] private double _safetyHeight = 50.0;
@@ -93,6 +101,11 @@ public partial class SettingsViewModel : ObservableObject
         IsConnected = controllerService.IsConnected;
         try
         {
+            // If already connected at startup, push settings once
+            if (IsConnected)
+            {
+                _ = ApplySettings();
+            }
             Log("Calling LoadFromSettings");
             LoadFromSettings(_settingsService.LoadSettings());
             Log("LoadFromSettings completed");
@@ -112,7 +125,9 @@ public partial class SettingsViewModel : ObservableObject
         XMin = s.XMin; XMax = s.XMax; YMin = s.YMin; YMax = s.YMax; ZMin = s.ZMin; ZMax = s.ZMax;
         ToolLength1 = s.ToolLength1; ToolLength2 = s.ToolLength2; ToolLength3 = s.ToolLength3; ToolLength4 = s.ToolLength4;
         T1OffsetPos = s.T1OffsetPos; T2OffsetPos = s.T2OffsetPos; T3OffsetPos = s.T3OffsetPos; T4OffsetPos = s.T4OffsetPos;
+        T1OffsetPosX = s.T1OffsetPosX; T2OffsetPosX = s.T2OffsetPosX; T3OffsetPosX = s.T3OffsetPosX; T4OffsetPosX = s.T4OffsetPosX;
         HomeX = s.HomeX; HomeY = s.HomeY;
+        HomeXPos = s.HOMEX_POS; HomeYPos = s.HOMEY_POS;
         SafetyHeight = s.SafetyHeight; ClampForce = s.ClampForce;
         SuperviseTimePunching = s.SuperviseTimePunching;
         RunningTimeBeltWorkpiece = s.RunningTimeBeltWorkpiece;
@@ -138,6 +153,15 @@ public partial class SettingsViewModel : ObservableObject
         Log("LoadFromSettings finished property assignment");
     }
 
+    private void OnConnectionStateChanged(object? sender, ConnectionState state)
+    {
+        IsConnected = state == ConnectionState.Connected;
+        if (IsConnected)
+        {
+            // push current settings to controller once after connection/reconnect
+            _ = ApplySettings();
+        }
+    }
     [RelayCommand]
     private void SaveSettings()
     {
@@ -148,12 +172,10 @@ public partial class SettingsViewModel : ObservableObject
             XMin = XMin, XMax = XMax, YMin = YMin, YMax = YMax, ZMin = ZMin, ZMax = ZMax,
             ToolLength1 = ToolLength1, ToolLength2 = ToolLength2, ToolLength3 = ToolLength3, ToolLength4 = ToolLength4,
             T1OffsetPos = T1OffsetPos, T2OffsetPos = T2OffsetPos, T3OffsetPos = T3OffsetPos, T4OffsetPos = T4OffsetPos,
+                T1OffsetPosX = T1OffsetPosX, T2OffsetPosX = T2OffsetPosX, T3OffsetPosX = T3OffsetPosX, T4OffsetPosX = T4OffsetPosX,
             HomeX = HomeX, HomeY = HomeY,
-            SafetyHeight = SafetyHeight, ClampForce = ClampForce,
-            SuperviseTimePunching = SuperviseTimePunching,
-            RunningTimeBeltWorkpiece = RunningTimeBeltWorkpiece,
-            RunningTimeBeltRest = RunningTimeBeltRest,
-            WaitingTimeClosingGrippers = WaitingTimeClosingGrippers,
+            HOMEX_POS = HomeXPos, HOMEY_POS = HomeYPos,
+                WaitingTimeClosingGrippers = WaitingTimeClosingGrippers,
             WaitingTimeOpenGrippers = WaitingTimeOpenGrippers,
             WaitingTimeClosingClamping = WaitingTimeClosingClamping,
             WaitingTimeOpenClamping = WaitingTimeOpenClamping,
@@ -183,6 +205,52 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task SetHomeXPos()
+    {
+        if (!_controllerService.IsConnected)
+        {
+            StatusMessage = "Controller not connected.";
+            return;
+        }
+
+        var val = await _controllerService.ReadVariableAsync("Motor[1].Actpos");
+        if (val is null)
+        {
+            StatusMessage = "Failed to read Motor[1].Actpos.";
+            return;
+        }
+
+        HomeXPos = val.Value;
+        SaveSettings();
+        await _controllerService.WriteVariableAsync("HOMEX_POS", HomeXPos);
+        await _controllerService.WriteVariableAsync("HOMEX", 1);
+        StatusMessage = $"HOMEX_POS set to {HomeXPos:0.###}";
+    }
+
+    [RelayCommand]
+    private async Task SetHomeYPos()
+    {
+        if (!_controllerService.IsConnected)
+        {
+            StatusMessage = "Controller not connected.";
+            return;
+        }
+
+        var val = await _controllerService.ReadVariableAsync("Motor[2].Actpos");
+        if (val is null)
+        {
+            StatusMessage = "Failed to read Motor[2].Actpos.";
+            return;
+        }
+
+        HomeYPos = val.Value;
+        SaveSettings();
+        await _controllerService.WriteVariableAsync("HOMEY_POS", HomeYPos);
+        await _controllerService.WriteVariableAsync("HOMEY", 1);
+        StatusMessage = $"HOMEY_POS set to {HomeYPos:0.###}";
+    }
+
+    [RelayCommand]
     private async Task ApplySettings()
     {
         SaveSettings();
@@ -192,6 +260,14 @@ public partial class SettingsViewModel : ObservableObject
             await _controllerService.WriteVariableAsync("T2_pos", T2OffsetPos);
             await _controllerService.WriteVariableAsync("T3_pos", T3OffsetPos);
             await _controllerService.WriteVariableAsync("T4_pos", T4OffsetPos);
+            // X offsets (PMAC variables)
+            await _controllerService.WriteVariableAsync("T1_POSX", T1OffsetPosX);
+            await _controllerService.WriteVariableAsync("T2_POSX", T2OffsetPosX);
+            await _controllerService.WriteVariableAsync("T3_POSX", T3OffsetPosX);
+            await _controllerService.WriteVariableAsync("T4_POSX", T4OffsetPosX);
+            // Ensure stored home positions are sent on every reconnect
+            await _controllerService.WriteVariableAsync("HOMEX_POS", HomeXPos);
+            await _controllerService.WriteVariableAsync("HOMEY_POS", HomeYPos);
             await _controllerService.WriteVariableAsync("JOGSPEED", SpeedX);
             await _controllerService.WriteVariableAsync("HOME_FEEDRATE", SpeedY);
             await _controllerService.WriteVariableAsync("AUTO_FEEDRATE", SpeedXHand);

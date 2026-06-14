@@ -31,6 +31,8 @@ public partial class LoginWindow : Window
         Dispatcher.Invoke(() =>
         {
             var mainWindow = App.Services.GetRequiredService<MainWindow>();
+            // Ensure the main window opens maximized when launching from login
+            mainWindow.WindowState = WindowState.Maximized;
             mainWindow.Show();
             Close();
         });

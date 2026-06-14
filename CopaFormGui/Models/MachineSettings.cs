@@ -29,6 +29,11 @@ public class MachineSettings
     public double T2OffsetPos { get; set; } = 0.0;
     public double T3OffsetPos { get; set; } = 0.0;
     public double T4OffsetPos { get; set; } = 0.0;
+    // Tool X offsets (A-T1_POSX .. D-T4_POSX)
+    public double T1OffsetPosX { get; set; } = 0.0;
+    public double T2OffsetPosX { get; set; } = 0.0;
+    public double T3OffsetPosX { get; set; } = 0.0;
+    public double T4OffsetPosX { get; set; } = 0.0;
 
     // Home positions
     public double HomeX { get; set; } = 0.0;
@@ -64,4 +69,7 @@ public class MachineSettings
     public double YAxisUnblockXLeft { get; set; } = 0.0;
     public double YAxisSideStop { get; set; } = 0.0;
     public double ZAxisAcceleration { get; set; } = 0.0;
+    // Stored home positions captured from Motor[].Actpos
+    public double HOMEX_POS { get; set; } = 0.0;
+    public double HOMEY_POS { get; set; } = 0.0;
 }
