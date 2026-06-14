@@ -199,7 +199,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         // Opens program slot 202, sets absolute mode (G90), linear interpolation,
         // homes to G59, releases clamp (M21), engages brake (M23), parks the axes,
         // then initialises the part counter before entering the production loop.
-        var lines = new List<string>
+            var lines = new List<string>
         {
             "//HEADER",
             "open prog 202",          // Open PMAC program buffer 202
@@ -265,17 +265,27 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             if (isFirstStep)
             {
                 // First step only: retract X to home and engage clamp before punching
+                lines.Add($"N{nNum++} G59"); 
+                lines.Add($"N{nNum++} DWELL 10"); 
                 lines.Add($"N{nNum++} X0");   // Retract X axis to home
                 lines.Add($"N{nNum++} M22");  // Engage clamp
-                isFirstStep = false;
             }
 
             // Punch sequence: extend head → move X → punch down → punch up → retract
-            lines.Add($"N{nNum++} M27");               // Extend punch head
+            lines.Add($"N{nNum++} M27");  
+            if (isFirstStep)            // Extend punch head
+            {
+                lines.Add($"N{nNum++} {gCode}"); 
+                lines.Add($"N{nNum++} DWELL 10"); 
+            }
+
+            // Mark that the special first-step handling has been emitted
+            isFirstStep = false;
             lines.Add($"N{nNum++} X{FormatNc(step.X)}"); // Move X to punch X coordinate
             lines.Add($"N{nNum++} M26");               // Punch down (activate punch)
             lines.Add($"N{nNum++} M20");               // Punch cycle step 1
             lines.Add($"N{nNum++} M21");               // Punch cycle step 2 / retract
+            
 
             // Optional part-off signal after each T1 punch (if operator enabled it)
             if (stationUpper == "T1" && vm.RunPartOff)
