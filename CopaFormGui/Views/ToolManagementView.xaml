@@ -139,10 +139,12 @@
                                     <ColumnDefinition Width="12"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
+                                    <StackPanel Grid.Column="0">
                                     <TextBlock Text="Diameter (mm)" Style="{StaticResource FormLabelStyle}"/>
-                                    <TextBox Text="{Binding EditDiameter, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource InputTextBoxStyle}"/>
+                                        <TextBox Text="{Binding EditDiameter, UpdateSourceTrigger=LostFocus}"
+                                             Style="{StaticResource InputTextBoxStyle}"
+                                             PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                             DataObject.Pasting="NumericTextBox_Pasting"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
@@ -156,15 +158,19 @@
                                     <ColumnDefinition Width="12"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
+                                    <StackPanel Grid.Column="0">
                                     <TextBlock Text="Length (mm)" Style="{StaticResource FormLabelStyle}"/>
-                                    <TextBox Text="{Binding EditLength, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource InputTextBoxStyle}"/>
+                                        <TextBox Text="{Binding EditLength, UpdateSourceTrigger=LostFocus}"
+                                             Style="{StaticResource InputTextBoxStyle}"
+                                             PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                             DataObject.Pasting="NumericTextBox_Pasting"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Text="Width (mm)" Style="{StaticResource FormLabelStyle}"/>
-                                    <TextBox Text="{Binding EditWidth, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource InputTextBoxStyle}"/>
+                                    <TextBox Text="{Binding EditWidth, UpdateSourceTrigger=LostFocus}"
+                                             Style="{StaticResource InputTextBoxStyle}"
+                                             PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                             DataObject.Pasting="NumericTextBox_Pasting"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>

@@ -138,7 +138,7 @@ public partial class PunchingView : UserControl
         }
     }
 
-    // Allow only numbers and a single decimal point
+    // Allow only numbers and a single decimal point (accepts '.' or ',' as decimal separators)
     private void NumericTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
         var textBox = sender as System.Windows.Controls.TextBox;
@@ -147,10 +147,28 @@ public partial class PunchingView : UserControl
         e.Handled = !IsTextValidDecimal(fullText);
     }
 
+    private void NumericTextBox_Pasting(object sender, DataObjectPastingEventArgs e)
+    {
+        if (e.DataObject.GetDataPresent(typeof(string)))
+        {
+            string pasteText = (string)e.DataObject.GetData(typeof(string));
+            var textBox = sender as System.Windows.Controls.TextBox;
+            string fullText = textBox?.Text.Remove(textBox?.SelectionStart ?? 0, textBox?.SelectionLength ?? 0) ?? string.Empty;
+            fullText = fullText.Insert(textBox?.SelectionStart ?? 0, pasteText);
+            if (!IsTextValidDecimal(fullText))
+                e.CancelCommand();
+        }
+        else
+        {
+            e.CancelCommand();
+        }
+    }
+
     private bool IsTextValidDecimal(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return true;
-        return System.Text.RegularExpressions.Regex.IsMatch(text, @"^\d*(\.\d*)?$", System.Text.RegularExpressions.RegexOptions.Compiled);
+        // Accept either '.' or ',' as decimal separator
+        return System.Text.RegularExpressions.Regex.IsMatch(text, @"^\d*([\.,]\d*)?$", System.Text.RegularExpressions.RegexOptions.Compiled);
     }
 
     private void StepsDataGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
