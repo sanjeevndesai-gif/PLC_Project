@@ -4,9 +4,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:CopaFormGui.Views"
+             xmlns:conv="clr-namespace:CopaFormGui.Converters"
              mc:Ignorable="d">
     <UserControl.Resources>
         <local:SheetEdgeCoordinateConverter x:Key="SheetEdgeCoordinateConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
     </UserControl.Resources>
     <Grid Margin="4">
         <Grid.RowDefinitions>
@@ -242,8 +245,22 @@
                                         </Line.Y2>
                                     </Line>
 
-                                    <!-- Right side: red dotted line -->
-                                    <Line Stroke="#D23A2A" StrokeThickness="3" StrokeDashArray="4,2" StrokeDashCap="Round">
+                                    <!-- Right side: change appearance based on HasT3 (dotted red when true, solid dark when false) -->
+                                    <Line StrokeThickness="3">
+                                        <Line.Style>
+                                            <Style TargetType="Line">
+                                                <Setter Property="Stroke" Value="#202020"/>
+                                                <Setter Property="StrokeDashArray" Value=""/>
+                                                <Setter Property="StrokeDashCap" Value="Flat"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasT3}" Value="True">
+                                                        <Setter Property="Stroke" Value="#D23A2A"/>
+                                                        <Setter Property="StrokeDashArray" Value="4,2"/>
+                                                        <Setter Property="StrokeDashCap" Value="Round"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Line.Style>
                                         <Line.X1>
                                             <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Right">
                                                 <Binding Path="PreviewSheetLeft"/>

@@ -65,6 +65,7 @@ public partial class PunchingViewModel : ObservableObject
         if (sender is PunchStep step && e.PropertyName == nameof(PunchStep.ToolId))
         {
             UpdatePunchStepToolInfo(step);
+            RefreshToolPreview();
         }
     }
     private ObservableCollection<ToolRecord> _usedTools = new();
@@ -156,6 +157,7 @@ public partial class PunchingViewModel : ObservableObject
     [ObservableProperty] private string _thicknessLabelText = "T = 5.000";
     [ObservableProperty] private ObservableCollection<PunchPreviewShape> _toolPreviewShapes = new();
     [ObservableProperty] private double _previewZoom = 1.0;
+    [ObservableProperty] private bool _hasT3;
 
     [ObservableProperty] private int _selectedToolId = 1;
 
@@ -526,6 +528,11 @@ public partial class PunchingViewModel : ObservableObject
             .LoadToolRecords()
             .GroupBy(t => t.ToolId)
             .ToDictionary(g => g.Key, g => g.Last());
+
+        // Detect presence of any T3 tool (cut-off) so the view can switch the right-edge style.
+        var hasT3 = PunchSteps.Any(s => toolsById.TryGetValue(s.ToolId, out var tr)
+                                         && string.Equals(tr.ToolStation, "T3", System.StringComparison.OrdinalIgnoreCase));
+        HasT3 = hasT3;
 
         var maxStepX = PunchSteps.Count > 0 ? PunchSteps.Max(s => s.X) : 0;
         var maxStepY = PunchSteps.Count > 0 ? PunchSteps.Max(s => s.Y) : 0;

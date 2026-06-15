@@ -4,7 +4,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             xmlns:conv="clr-namespace:CopaFormGui.Converters">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
+    </UserControl.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding RefreshUsedToolsCommand}" />
@@ -182,6 +187,8 @@
                                    Fill="#F2EBE3"
                                    StrokeThickness="0"/>
 
+                        
+
                         <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackLeft}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
                         <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}" Stroke="#202020" StrokeThickness="1.4"/>
                         <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackBottom}" Stroke="#202020" StrokeThickness="1.4"/>
@@ -234,15 +241,57 @@
                         <Line X1="{Binding PreviewFrontLeft}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewFrontRight}" Y2="{Binding PreviewFrontBottom}"
                             Stroke="#202020" StrokeThickness="3" />
 
-                        <!-- Right-edge dashed red lines (keeps original dashed right side visual) -->
-                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}"
-                            Stroke="Red" StrokeThickness="1.6" StrokeDashArray="4,2" StrokeDashCap="Round"/>
-                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackBottom}"
-                            Stroke="Red" StrokeThickness="1.6" StrokeDashArray="4,2" StrokeDashCap="Round"/>
+                        <!-- Right-edge line: style switches to dashed red when HasT3 is true, otherwise solid dark stroke -->
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackTop}">
+                            <Line.Style>
+                                <Style TargetType="Line">
+                                        <Setter Property="Stroke" Value="#202020" />
+                                        <Setter Property="StrokeThickness" Value="3" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasT3}" Value="True">
+                                            <Setter Property="Stroke" Value="Red" />
+                                            <Setter Property="StrokeThickness" Value="1.6" />
+                                            <Setter Property="StrokeDashArray" Value="4,2" />
+                                            <Setter Property="StrokeDashCap" Value="Round" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Line.Style>
+                        </Line>
 
-                        <!-- Front-face vertical dashed right-edge (missing previously) -->
-                        <Line X1="{Binding PreviewFrontRight}" X2="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" Y2="{Binding PreviewFrontBottom}"
-                              Stroke="Red" StrokeThickness="2" StrokeDashArray="4,2" StrokeDashCap="Round"/>
+                        <Line X1="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontBottom}" X2="{Binding PreviewBackRight}" Y2="{Binding PreviewBackBottom}">
+                            <Line.Style>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="#202020" />
+                                    <Setter Property="StrokeThickness" Value="3" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasT3}" Value="True">
+                                            <Setter Property="Stroke" Value="Red" />
+                                            <Setter Property="StrokeThickness" Value="1.6" />
+                                            <Setter Property="StrokeDashArray" Value="4,2" />
+                                            <Setter Property="StrokeDashCap" Value="Round" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Line.Style>
+                        </Line>
+
+                        <Line X1="{Binding PreviewFrontRight}" X2="{Binding PreviewFrontRight}" Y1="{Binding PreviewFrontTop}" Y2="{Binding PreviewFrontBottom}">
+                            <Line.Style>
+                                <Style TargetType="Line">
+                                    <Setter Property="Stroke" Value="#202020" />
+                                    <Setter Property="StrokeThickness" Value="3" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasT3}" Value="True">
+                                            <Setter Property="Stroke" Value="Red" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                            <Setter Property="StrokeDashArray" Value="4,2" />
+                                            <Setter Property="StrokeDashCap" Value="Round" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Line.Style>
+                        </Line>
 
                             <TextBlock Canvas.Left="{Binding LengthLabelX}" Canvas.Top="{Binding LengthLabelY}" Text="{Binding LengthLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#0D3B66"/>
                             <TextBlock Canvas.Left="{Binding WidthLabelX}" Canvas.Top="{Binding WidthLabelY}" Text="{Binding WidthLabelText}" FontSize="11" FontWeight="SemiBold" Foreground="#0D3B66"/>

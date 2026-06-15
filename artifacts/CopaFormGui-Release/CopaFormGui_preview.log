@@ -1,0 +1,4 @@
+2026-06-16T00:04:16.9345732+05:30 ProgramId=1 HasT3=True Stations=[T1,T3]
+2026-06-16T00:04:30.7057941+05:30 ProgramId=1 HasT3=False Stations=[T1,T2]
+2026-06-16T00:09:01.8041506+05:30 ProgramId=1 HasT3=False Stations=[T1,T2]
+2026-06-16T00:15:22.4351528+05:30 ProgramId=1 HasT3=False Stations=[T1,T2]

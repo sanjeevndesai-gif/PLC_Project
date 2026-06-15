@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -57,6 +58,7 @@ public partial class OverviewViewModel : ObservableObject
     [ObservableProperty] private string _firmwareVersion = "v3.1.4";
     [ObservableProperty] private string _lastConnected = "—";
     [ObservableProperty] private string _statusMessage = "Ready";
+    [ObservableProperty] private bool _hasT3;
     [ObservableProperty] private string _recentComment = string.Empty;
     [ObservableProperty] private string _recentMaterial = string.Empty;
     [ObservableProperty] private string _recentLengthWidth = string.Empty;
@@ -336,7 +338,27 @@ public partial class OverviewViewModel : ObservableObject
         // Detect if any T3 (cut-off) tool is present. We will continue
         // rendering other tool shapes (e.g., T1) but skip shapes for T3.
         var hasT3 = program.Steps.Any(s => toolsById.TryGetValue(s.ToolId, out var tr)
-                                           && string.Equals(tr.ToolStation, "T3", System.StringComparison.OrdinalIgnoreCase));
+                           && string.Equals(tr.ToolStation, "T3", System.StringComparison.OrdinalIgnoreCase));
+        HasT3 = hasT3;
+        // Expose quick debug info in the status bar so user can see HasT3 state at runtime
+        StatusMessage = hasT3 ? "Preview includes T3 tool(s)" : "Preview without T3";
+
+        // Lightweight file log to help diagnose binding/state issues on user's machine.
+        try
+        {
+            var stations = program.Steps
+                .Select(s => toolsById.TryGetValue(s.ToolId, out var tr) ? (tr?.ToolStation ?? $"T{s.ToolId}") : $"T{s.ToolId}")
+                .Distinct()
+                .OrderBy(s => s)
+                .ToArray();
+
+            var msg = $"{DateTime.Now:O} ProgramId={program?.ProgramId ?? 0} HasT3={hasT3} Stations=[{string.Join(",", stations)}]\n";
+            File.AppendAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CopaFormGui_preview.log"), msg);
+        }
+        catch
+        {
+            // ignore logging failures
+        }
 
         var shapes = new List<PunchPreviewShape>();
         foreach (var step in program.Steps)
