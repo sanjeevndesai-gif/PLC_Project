@@ -3,7 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:CopaFormGui.Views"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <local:SheetEdgeCoordinateConverter x:Key="SheetEdgeCoordinateConverter"/>
+    </UserControl.Resources>
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -124,26 +128,155 @@
                                         <ScaleTransform ScaleX="{Binding PreviewZoom}" ScaleY="{Binding PreviewZoom}"/>
                                     </Canvas.RenderTransform>
 
-                                    <Rectangle Canvas.Left="{Binding PreviewSheetLeft}"
-                                               Canvas.Top="{Binding PreviewSheetTop}"
-                                               Width="{Binding PreviewSheetWidth}"
-                                               Height="{Binding PreviewSheetHeight}"
-                                               Fill="#DCEBF7"
-                                               Stroke="#577D97"
-                                               StrokeThickness="2"
-                                               StrokeDashArray="4,2"
-                                               StrokeDashCap="Round"
-                                               Opacity="0.9"/>
-
+                                    <!-- Sheet fill (no stroke) -->
                                     <Rectangle Canvas.Left="{Binding PreviewSheetLeft}"
                                                Canvas.Top="{Binding PreviewSheetTop}"
                                                Width="{Binding PreviewSheetWidth}"
                                                Height="{Binding PreviewSheetHeight}"
                                                Fill="#F2EBE3"
-                                               Stroke="#202020"
-                                               StrokeThickness="3"
-                                               StrokeDashArray="4,2"
-                                               StrokeDashCap="Round"/>
+                                               StrokeThickness="0"/>
+
+                                    <!-- Three solid sides (top, left, bottom) and a right-side red dotted line -->
+                                    <Line Stroke="#202020" StrokeThickness="3">
+                                        <Line.X1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Left">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X1>
+                                        <Line.Y1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Top">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y1>
+                                        <Line.X2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Right">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X2>
+                                        <Line.Y2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Top">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y2>
+                                    </Line>
+
+                                    <Line Stroke="#202020" StrokeThickness="3">
+                                        <Line.X1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Left">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X1>
+                                        <Line.Y1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Top">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y1>
+                                        <Line.X2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Left">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X2>
+                                        <Line.Y2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Bottom">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y2>
+                                    </Line>
+
+                                    <Line Stroke="#202020" StrokeThickness="3">
+                                        <Line.X1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Left">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X1>
+                                        <Line.Y1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Bottom">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y1>
+                                        <Line.X2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Right">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X2>
+                                        <Line.Y2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Bottom">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y2>
+                                    </Line>
+
+                                    <!-- Right side: red dotted line -->
+                                    <Line Stroke="#D23A2A" StrokeThickness="3" StrokeDashArray="4,2" StrokeDashCap="Round">
+                                        <Line.X1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Right">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X1>
+                                        <Line.Y1>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Top">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y1>
+                                        <Line.X2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Right">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.X2>
+                                        <Line.Y2>
+                                            <MultiBinding Converter="{StaticResource SheetEdgeCoordinateConverter}" ConverterParameter="Bottom">
+                                                <Binding Path="PreviewSheetLeft"/>
+                                                <Binding Path="PreviewSheetTop"/>
+                                                <Binding Path="PreviewSheetWidth"/>
+                                                <Binding Path="PreviewSheetHeight"/>
+                                            </MultiBinding>
+                                        </Line.Y2>
+                                    </Line>
 
                                     <ItemsControl ItemsSource="{Binding ToolPreviewShapes}">
                                         <ItemsControl.ItemsPanel>
