@@ -36,6 +36,8 @@ public class ControllerService : IControllerService
             if (_connectionState != value)
             {
                 _connectionState = value;
+                // Log connection state transitions for diagnostics
+                try { App.LogInfo($"ControllerService.ConnectionState -> {_connectionState}"); } catch { }
                 var handler = ConnectionStateChanged;
                 if (handler is null) return;
 
@@ -60,17 +62,19 @@ public class ControllerService : IControllerService
 
     private const int ModbusPort = 22;
     private const int ConnectTimeoutMs = 30000;
-
     public async Task<bool> ConnectAsync(string ipAddress, string userName, string password)
     {
-        ConnectionState = ConnectionState.Connecting;
+        try { App.LogInfo($"ConnectAsync start: {ipAddress} (suppress={_suppressConnectionStateChanges})"); } catch { }
+        if (!_suppressConnectionStateChanges)
+            ConnectionState = ConnectionState.Connecting;
         _lastConnectionError = null;
         _connectedIp = ipAddress;
         try
         {
             if (string.IsNullOrWhiteSpace(ipAddress) || string.IsNullOrWhiteSpace(userName))
             {
-                ConnectionState = ConnectionState.Error;
+                if (!_suppressConnectionStateChanges)
+                    ConnectionState = ConnectionState.Error;
                 _lastConnectionError = "IP address and user name are required.";
                 return false;
             }
@@ -107,14 +111,18 @@ public class ControllerService : IControllerService
 
             if (!connectResult.connected || !gpascii.GpAsciiConnected)
             {
-                ConnectionState = ConnectionState.Error;
+                if (!_suppressConnectionStateChanges)
+                    ConnectionState = ConnectionState.Error;
                 _lastConnectionError = "PLC connection was not established (ConnectGPAscii returned false or PMAC protocol not connected).";
                 return false;
             }
 
             _savedUser = userName;
             _savedPassword = password;
+            // Record whether this successful connection was user-initiated (i.e. not suppressed)
+            _lastConnectionWasUserInitiated = !_suppressConnectionStateChanges;
             StopReconnect(); // cancel any in-progress reconnect loop
+            try { App.LogInfo($"ConnectAsync succeeded: {ipAddress}"); } catch { }
             ConnectionState = ConnectionState.Connected;
             _heartbeatFailureCount = 0;
             StartHeartbeat();
@@ -122,17 +130,37 @@ public class ControllerService : IControllerService
         }
         catch (TimeoutException)
         {
-            ConnectionState = ConnectionState.Error;
+            if (!_suppressConnectionStateChanges)
+                ConnectionState = ConnectionState.Error;
             _lastConnectionError = $"Connection timed out after {ConnectTimeoutMs / 1000} seconds. Check that the PLC is powered on and reachable at {ipAddress}.";
             DisconnectPMAC();
+            try { App.LogInfo($"ConnectAsync timeout: {ipAddress}"); } catch { }
             return false;
         }
         catch (Exception ex)
         {
-            ConnectionState = ConnectionState.Error;
+            if (!_suppressConnectionStateChanges)
+                ConnectionState = ConnectionState.Error;
             _lastConnectionError = BuildConnectionErrorMessage(ex);
             App.LogException("ControllerService.ConnectAsync", ex);
+            try { App.LogInfo($"ConnectAsync exception: {ex.GetType().Name} {ex.Message}"); } catch { }
             return false;
+        }
+    }
+
+    // Helper to perform a silent connection attempt (no transient UI states).
+    public async Task<bool> ConnectSilentlyAsync(string ipAddress, string userName, string password)
+    {
+        try
+        {
+            try { App.LogInfo($"ConnectSilentlyAsync start: {ipAddress}"); } catch { }
+            _suppressConnectionStateChanges = true;
+            return await ConnectAsync(ipAddress, userName, password);
+        }
+        finally
+        {
+            _suppressConnectionStateChanges = false;
+            try { App.LogInfo($"ConnectSilentlyAsync end: {ipAddress}"); } catch { }
         }
     }
 
@@ -140,6 +168,9 @@ public class ControllerService : IControllerService
     private string? _savedUser;
     private string? _savedPassword;
     private CancellationTokenSource? _reconnectCts;
+    // When true, ConnectAsync will avoid changing ConnectionState to Connecting/Error
+    // Used for background reconnect attempts so UI stays Offline until a connection is established.
+    private volatile bool _suppressConnectionStateChanges;
     private readonly SemaphoreSlim _pmacCommandLock = new(1, 1);
     private const int ReconnectIntervalMs = 5000;
     private const int CommandTimeoutMs = 2000;
@@ -150,6 +181,8 @@ public class ControllerService : IControllerService
     private const int HeartbeatFailuresBeforeDisconnect = 2;
     private int _heartbeatFailureCount;
     private int _heartbeatInProgress;
+    // True when the most recent successful connection was initiated by the user (Connect button).
+    private bool _lastConnectionWasUserInitiated;
 
     private void StartHeartbeat()
     {
@@ -158,6 +191,7 @@ public class ControllerService : IControllerService
         _heartbeatTimer.Elapsed += OnHeartbeat;
         _heartbeatTimer.AutoReset = true;
         _heartbeatTimer.Start();
+        try { App.LogInfo("StartHeartbeat"); } catch { }
     }
 
     private void StopHeartbeat()
@@ -165,6 +199,7 @@ public class ControllerService : IControllerService
         _heartbeatTimer?.Stop();
         _heartbeatTimer?.Dispose();
         _heartbeatTimer = null;
+        try { App.LogInfo("StopHeartbeat"); } catch { }
     }
 
     private void StopReconnect()
@@ -172,11 +207,14 @@ public class ControllerService : IControllerService
         _reconnectCts?.Cancel();
         _reconnectCts?.Dispose();
         _reconnectCts = null;
+        try { App.LogInfo("StopReconnect"); } catch { }
     }
 
     private void StartReconnectLoop()
     {
         StopReconnect();
+
+        try { App.LogInfo($"StartReconnectLoop: ip={_connectedIp} user={_savedUser}"); } catch { }
 
         var ip   = _connectedIp;
         var user = _savedUser;
@@ -188,7 +226,6 @@ public class ControllerService : IControllerService
             return;
         }
 
-        ConnectionState = ConnectionState.Reconnecting;
         _reconnectCts = new CancellationTokenSource();
         var token = _reconnectCts.Token;
 
@@ -203,7 +240,7 @@ public class ControllerService : IControllerService
 
                 try
                 {
-                    var success = await ConnectAsync(ip!, user!, pass ?? string.Empty);
+                    var success = await ConnectSilentlyAsync(ip!, user!, pass ?? string.Empty);
                     if (success)
                     {
                         // ConnectAsync already set state=Connected and started heartbeat.
@@ -213,20 +250,16 @@ public class ControllerService : IControllerService
                         cts?.Dispose();
                         break;
                     }
-
-                    // ConnectAsync failed — reset state to Reconnecting and keep trying
-                    if (!token.IsCancellationRequested)
-                        ConnectionState = ConnectionState.Reconnecting;
+                    // Connect failed silently — keep UI as Disconnected and keep trying
                 }
                 catch
                 {
-                    if (!token.IsCancellationRequested)
-                        ConnectionState = ConnectionState.Reconnecting;
+                    // Swallow exceptions during background reconnect attempts.
+                    // Keep UI as Disconnected until a successful connection occurs.
                 }
             }
         });
     }
-
     private async void OnHeartbeat(object sender, ElapsedEventArgs e)
     {
         if (Interlocked.Exchange(ref _heartbeatInProgress, 1) == 1) return;
@@ -240,6 +273,53 @@ public class ControllerService : IControllerService
             {
                 RegisterHeartbeatFailure();
                 return;
+            }
+
+            // If the underlying GPASCII client reports it's no longer connected, treat as failure.
+            try
+            {
+                if (!client.GpAsciiConnected)
+                {
+                    RegisterHeartbeatFailure();
+                    return;
+                }
+            }
+            catch
+            {
+                // If accessing the property throws, assume disconnected.
+                RegisterHeartbeatFailure();
+                return;
+            }
+
+            // Additional quick TCP-level check to detect offline PMAC faster — only for user-initiated connections
+            if (_lastConnectionWasUserInitiated)
+            {
+                try
+                {
+                    var ip = deviceProp?.IPAddress ?? _connectedIp;
+                    if (!string.IsNullOrWhiteSpace(ip))
+                    {
+                        try { App.LogInfo($"Heartbeat socket check start: {ip}"); } catch { }
+                        using var cts = new CancellationTokenSource(HeartbeatProbeTimeoutMs);
+                        using var tcp = new System.Net.Sockets.TcpClient();
+                        var connectTask = tcp.ConnectAsync(ip, ModbusPort);
+                        var delayTask = Task.Delay(HeartbeatProbeTimeoutMs, cts.Token);
+                        var finished = await Task.WhenAny(connectTask, delayTask);
+                        if (finished != connectTask || !tcp.Connected)
+                        {
+                            try { App.LogInfo($"Heartbeat socket check failed: {ip}"); } catch { }
+                            RegisterHeartbeatFailure();
+                            return;
+                        }
+                        try { App.LogInfo($"Heartbeat socket check ok: {ip}"); } catch { }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    try { App.LogInfo($"Heartbeat socket check exception: {ex.Message}"); } catch { }
+                    RegisterHeartbeatFailure();
+                    return;
+                }
             }
 
             try
@@ -268,6 +348,7 @@ public class ControllerService : IControllerService
 
     private void RegisterHeartbeatFailure()
     {
+        try { App.LogInfo($"RegisterHeartbeatFailure count={_heartbeatFailureCount + 1}"); } catch { }
         _heartbeatFailureCount++;
         if (_heartbeatFailureCount >= HeartbeatFailuresBeforeDisconnect)
         {
@@ -277,12 +358,16 @@ public class ControllerService : IControllerService
 
     private void MarkDisconnected()
     {
+        try { App.LogInfo("MarkDisconnected"); } catch { }
         StopHeartbeat();
         _heartbeatFailureCount = 0;
         _lastConnectionError = "Connection to PLC was lost unexpectedly.";
         DisconnectPMAC();
         gpascii = null;
         deviceProp = null;
+        // Immediately set state to Disconnected so UI updates promptly.
+        ConnectionState = ConnectionState.Disconnected;
+
         // Keep _connectedIp / _savedUser / _savedPassword so the reconnect loop can retry.
         StartReconnectLoop();
     }
@@ -299,6 +384,12 @@ public class ControllerService : IControllerService
         _savedPassword = null;
         _lastConnectionError = null;
         ConnectionState = ConnectionState.Disconnected;
+    }
+
+    public void SetUserInitiatedConnection(bool enabled)
+    {
+        _lastConnectionWasUserInitiated = enabled;
+        try { App.LogInfo($"SetUserInitiatedConnection: {enabled}"); } catch { }
     }
 
     private static string BuildConnectionErrorMessage(Exception ex)
@@ -334,6 +425,7 @@ public class ControllerService : IControllerService
     {
         try
         {
+            try { App.LogInfo("DisconnectPMAC"); } catch { }
             if (gpascii != null)
             {
                 gpascii.DisconnectGpascii();

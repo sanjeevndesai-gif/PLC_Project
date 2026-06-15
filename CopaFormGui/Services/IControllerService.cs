@@ -19,7 +19,11 @@ public interface IControllerService
     event EventHandler<ConnectionState>? ConnectionStateChanged;
 
     Task<bool> ConnectAsync(string ipAddress, string userName, string password);
+    // Attempts to connect without raising transient ConnectionState changes (used by background watchers)
+    Task<bool> ConnectSilentlyAsync(string ipAddress, string userName, string password);
     void Disconnect();
+    // Mark whether subsequent heartbeat TCP checks should be treated as user-initiated.
+    void SetUserInitiatedConnection(bool enabled);
     Task<string?> ReadResponseAsync(string commandOrVariable);
     Task<double?> ReadVariableAsync(string variableName);
     Task<bool> WriteVariableAsync(string variableName, double value);

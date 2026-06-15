@@ -28,6 +28,7 @@ public partial class LoginViewModel : ObservableObject
     private bool _hasError;
 
     public event EventHandler<bool>? LoginCompleted; // true = connected, false = no device
+    private CancellationTokenSource? _offlineWatcherCts;
 
     public LoginViewModel(IControllerService controllerService, ISettingsService settingsService)
     {
@@ -68,6 +69,7 @@ public partial class LoginViewModel : ObservableObject
                     Password = Password ?? string.Empty
                 });
                 StatusMessage = "Connected successfully.";
+                CancelOfflineWatcher();
                 LoginCompleted?.Invoke(this, true);
             }
             else
@@ -96,8 +98,78 @@ public partial class LoginViewModel : ObservableObject
     private void NoDevice()
     {
         StatusMessage = "Opening without device...";
+        // Ensure controller treats this session as offline (do not enable TCP heartbeat checks)
+        try { (_controllerService as ControllerService)?.SetUserInitiatedConnection(false); } catch { }
         LoginCompleted?.Invoke(this, false);
+        // Start background watcher that will attempt to auto-connect
+        StartOfflineAutoConnectWatcher();
     }
 
+    private void StartOfflineAutoConnectWatcher()
+    {
+        // If there's already a watcher running, leave it.
+        if (_offlineWatcherCts != null && !_offlineWatcherCts.IsCancellationRequested) return;
+
+        _offlineWatcherCts = new CancellationTokenSource();
+        var token = _offlineWatcherCts.Token;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                // Check every 5 seconds until cancelled or connected
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        if (_controllerService.IsConnected)
+                        {
+                            // Already connected; raise event and stop watcher
+                            LoginCompleted?.Invoke(this, true);
+                            break;
+                        }
+
+                        var saved = _settingsService.LoadConnectionSettings();
+                        if (string.IsNullOrWhiteSpace(saved.IpAddress) || string.IsNullOrWhiteSpace(saved.UserName))
+                        {
+                            await Task.Delay(5000, token);
+                            continue;
+                        }
+
+                        // Attempt to connect using saved credentials (silent background attempt)
+                        var ok = await _controllerService.ConnectSilentlyAsync(saved.IpAddress, saved.UserName, saved.Password ?? string.Empty);
+                        if (ok)
+                        {
+                            CancelOfflineWatcher();
+                            LoginCompleted?.Invoke(this, true);
+                            break;
+                        }
+                    }
+                    catch (OperationCanceledException) { break; }
+                    catch { /* ignore transient errors and retry */ }
+
+                    await Task.Delay(5000, token);
+                }
+            }
+            finally
+            {
+                // ensure CTS disposed
+                _offlineWatcherCts?.Dispose();
+                _offlineWatcherCts = null;
+            }
+        }, token);
+    }
+
+    private void CancelOfflineWatcher()
+    {
+        try
+        {
+            if (_offlineWatcherCts == null) return;
+            _offlineWatcherCts.Cancel();
+            _offlineWatcherCts.Dispose();
+            _offlineWatcherCts = null;
+        }
+        catch { }
+    }
     partial void OnIsConnectingChanged(bool value) => ConnectCommand.NotifyCanExecuteChanged();
 }
