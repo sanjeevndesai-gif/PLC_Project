@@ -538,6 +538,12 @@ public partial class PunchingViewModel : ObservableObject
         foreach (var step in PunchSteps)
         {
             var hasTool = toolsById.TryGetValue(step.ToolId, out var toolRecord);
+            // Skip rendering shapes for tools assigned to station T3 (cut-off)
+            if (hasTool && toolRecord is not null &&
+                string.Equals(toolRecord.ToolStation, "T3", System.StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
             var isSquare = hasTool && toolRecord is not null && IsSquareToolType(toolRecord.ToolType);
 
             var toolDiameter = toolRecord?.Diameter ?? 0;

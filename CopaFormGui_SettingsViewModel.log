@@ -1562,3 +1562,26 @@
 [2026-06-15 16:09:01] LoadFromSettings called with: {"SpeedX":1000,"SpeedY":1000,"SpeedXHand":200,"SpeedYHand":200,"SpeedZ":1000,"SpeedZHand":200,"XMin":0,"XMax":1000,"YMin":0,"YMax":600,"ZMin":0,"ZMax":500,"ToolLength1":50,"ToolLength2":50,"ToolLength3":50,"ToolLength4":50,"T1OffsetPos":10,"T2OffsetPos":20,"T3OffsetPos":30,"T4OffsetPos":40,"T1OffsetPosX":0,"T2OffsetPosX":0,"T3OffsetPosX":0,"T4OffsetPosX":0,"HomeX":0,"HomeY":0,"SafetyHeight":50,"ClampForce":100,"SuperviseTimePunching":0,"RunningTimeBeltWorkpiece":0,"RunningTimeBeltRest":0,"WaitingTimeClosingGrippers":0,"WaitingTimeOpenGrippers":0,"WaitingTimeClosingClamping":0,"WaitingTimeOpenClamping":0,"PartDropOffPosition":0,"GrabPositionGripper":0,"ChangeoverPositionPunching":0,"ChangeoverPositionCutting":0,"OffsetSideStop":0,"ZeroPointTool4":0,"ChangePositionTool4":0,"XAxisAcceleration":0,"XAxisUnblockY":0,"YAxisAcceleration":0,"YAxisUnblockXRight":0,"YAxisUnblockXLeft":0,"YAxisSideStop":0,"ZAxisAcceleration":0,"HOMEX_POS":0,"HOMEY_POS":0}
 [2026-06-15 16:09:01] LoadFromSettings finished property assignment
 [2026-06-15 16:09:01] LoadFromSettings completed
+[2026-06-15 18:47:56] SettingsViewModel constructor start
+[2026-06-15 18:47:56] Calling LoadFromSettings
+[2026-06-15 18:47:56] LoadFromSettings called with: {"SpeedX":1000,"SpeedY":1000,"SpeedXHand":200,"SpeedYHand":200,"SpeedZ":1000,"SpeedZHand":200,"XMin":0,"XMax":1000,"YMin":0,"YMax":600,"ZMin":0,"ZMax":500,"ToolLength1":50,"ToolLength2":50,"ToolLength3":50,"ToolLength4":50,"T1OffsetPos":10,"T2OffsetPos":20,"T3OffsetPos":30,"T4OffsetPos":40,"T1OffsetPosX":30,"T2OffsetPosX":40,"T3OffsetPosX":50,"T4OffsetPosX":60,"HomeX":0,"HomeY":0,"SafetyHeight":50,"ClampForce":100,"SuperviseTimePunching":0,"RunningTimeBeltWorkpiece":0,"RunningTimeBeltRest":0,"WaitingTimeClosingGrippers":0,"WaitingTimeOpenGrippers":0,"WaitingTimeClosingClamping":0,"WaitingTimeOpenClamping":0,"PartDropOffPosition":0,"GrabPositionGripper":0,"ChangeoverPositionPunching":0,"ChangeoverPositionCutting":0,"OffsetSideStop":0,"ZeroPointTool4":0,"ChangePositionTool4":0,"XAxisAcceleration":0,"XAxisUnblockY":0,"YAxisAcceleration":0,"YAxisUnblockXRight":0,"YAxisUnblockXLeft":0,"YAxisSideStop":0,"ZAxisAcceleration":0,"HOMEX_POS":0,"HOMEY_POS":0}
+[2026-06-15 18:47:56] LoadFromSettings finished property assignment
+[2026-06-15 18:47:56] LoadFromSettings completed
+[2026-06-15 18:50:42] SettingsViewModel constructor start
+[2026-06-15 18:50:42] Calling LoadFromSettings
+[2026-06-15 18:50:42] LoadFromSettings called with: {"SpeedX":30,"SpeedY":30,"SpeedXHand":50,"SpeedYHand":200,"SpeedZ":1000,"SpeedZHand":200,"XMin":70,"XMax":50,"YMin":60,"YMax":800,"ZMin":0,"ZMax":500,"ToolLength1":50,"ToolLength2":50,"ToolLength3":50,"ToolLength4":50,"T1OffsetPos":10,"T2OffsetPos":20,"T3OffsetPos":30,"T4OffsetPos":40,"T1OffsetPosX":30,"T2OffsetPosX":40,"T3OffsetPosX":50,"T4OffsetPosX":60,"HomeX":0,"HomeY":0,"SafetyHeight":50,"ClampForce":100,"SuperviseTimePunching":0,"RunningTimeBeltWorkpiece":0,"RunningTimeBeltRest":0,"WaitingTimeClosingGrippers":0,"WaitingTimeOpenGrippers":0,"WaitingTimeClosingClamping":0,"WaitingTimeOpenClamping":0,"PartDropOffPosition":0,"GrabPositionGripper":0,"ChangeoverPositionPunching":0,"ChangeoverPositionCutting":0,"OffsetSideStop":0,"ZeroPointTool4":0,"ChangePositionTool4":0,"XAxisAcceleration":0,"XAxisUnblockY":0,"YAxisAcceleration":0,"YAxisUnblockXRight":0,"YAxisUnblockXLeft":0,"YAxisSideStop":0,"ZAxisAcceleration":0,"HOMEX_POS":0,"HOMEY_POS":0}
+[2026-06-15 18:50:42] LoadFromSettings finished property assignment
+[2026-06-15 18:50:42] LoadFromSettings completed
+[2026-06-15 23:46:25] SettingsViewModel constructor start
+[2026-06-15 23:46:25] Calling LoadFromSettings
+[2026-06-15 23:46:25] LoadFromSettings called with: {"SpeedX":100,"SpeedY":100,"SpeedXHand":300,"SpeedYHand":200,"SpeedZ":1000,"SpeedZHand":200,"XMin":10,"XMax":100,"YMin":20,"YMax":700,"ZMin":0,"ZMax":500,"ToolLength1":10,"ToolLength2":20,"ToolLength3":30,"ToolLength4":40,"T1OffsetPos":20,"T2OffsetPos":40,"T3OffsetPos":60,"T4OffsetPos":80,"T1OffsetPosX":10,"T2OffsetPosX":30,"T3OffsetPosX":50,"T4OffsetPosX":70,"HomeX":0,"HomeY":0,"SafetyHeight":50,"ClampForce":100,"SuperviseTimePunching":0,"RunningTimeBeltWorkpiece":0,"RunningTimeBeltRest":0,"WaitingTimeClosingGrippers":0,"WaitingTimeOpenGrippers":0,"WaitingTimeClosingClamping":0,"WaitingTimeOpenClamping":0,"PartDropOffPosition":0,"GrabPositionGripper":0,"ChangeoverPositionPunching":0,"ChangeoverPositionCutting":0,"OffsetSideStop":0,"ZeroPointTool4":0,"ChangePositionTool4":0,"XAxisAcceleration":0,"XAxisUnblockY":0,"YAxisAcceleration":0,"YAxisUnblockXRight":0,"YAxisUnblockXLeft":0,"YAxisSideStop":0,"ZAxisAcceleration":0,"HOMEX_POS":11070,"HOMEY_POS":10565}
+[2026-06-15 23:46:25] LoadFromSettings finished property assignment
+[2026-06-15 23:46:25] LoadFromSettings completed
+[2026-06-15 23:46:32] SetHomeXPos start
+[2026-06-15 23:46:35] HOMEX write results: pos=True, trigger=True
+[2026-06-15 23:46:38] HOMEX verified: 964
+[2026-06-15 23:46:41] SetHomeXPos start
+[2026-06-15 23:46:46] HOMEX write results: pos=True, trigger=True
+[2026-06-15 23:46:52] HOMEX verified: 2042
+[2026-06-15 23:47:24] SetHomeYPos start
+[2026-06-15 23:47:47] HOMEY write results: pos=True, trigger=True

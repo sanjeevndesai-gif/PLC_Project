@@ -333,10 +333,21 @@ public partial class OverviewViewModel : ObservableObject
             .GroupBy(t => t.ToolId)
             .ToDictionary(g => g.Key, g => g.Last());
 
+        // Detect if any T3 (cut-off) tool is present. We will continue
+        // rendering other tool shapes (e.g., T1) but skip shapes for T3.
+        var hasT3 = program.Steps.Any(s => toolsById.TryGetValue(s.ToolId, out var tr)
+                                           && string.Equals(tr.ToolStation, "T3", System.StringComparison.OrdinalIgnoreCase));
+
         var shapes = new List<PunchPreviewShape>();
         foreach (var step in program.Steps)
         {
             var hasTool = toolsById.TryGetValue(step.ToolId, out var toolRecord);
+            // Skip rendering shapes for tools assigned to station T3 (cut-off).
+            if (hasTool && toolRecord is not null &&
+                string.Equals(toolRecord.ToolStation, "T3", System.StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
             var isSquare = hasTool && toolRecord is not null && IsSquareToolType(toolRecord.ToolType);
 
             var diameter = toolRecord?.Diameter ?? 0;
