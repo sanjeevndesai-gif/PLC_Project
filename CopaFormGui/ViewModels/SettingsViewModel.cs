@@ -92,13 +92,29 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private int _selectedTabIndex;
     [ObservableProperty] private string _statusMessage = string.Empty;
-    public SettingsViewModel(ISettingsService settingsService, IControllerService controllerService)
-    {
-        Log("SettingsViewModel constructor start");
-        _settingsService = settingsService;
-        _controllerService = controllerService;
-        _controllerService.ConnectionStateChanged += (_, s) => IsConnected = s == ConnectionState.Connected;
-        IsConnected = controllerService.IsConnected;
+        public SettingsViewModel(ISettingsService settingsService, IControllerService controllerService)
+        {
+            Log("SettingsViewModel constructor start");
+            _settingsService = settingsService;
+            _controllerService = controllerService;
+            // Subscribe to the controller's ConnectionStateChanged using the existing handler
+            _controllerService.ConnectionStateChanged += OnConnectionStateChanged;
+            IsConnected = controllerService.IsConnected;
+
+            // Auto-save settings when properties change (except UI-only properties)
+            this.PropertyChanged += async (s, e) =>
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(e?.PropertyName)) return;
+                    if (e.PropertyName == nameof(StatusMessage) || e.PropertyName == nameof(IsConnected) || e.PropertyName == nameof(SelectedTabIndex))
+                        return;
+
+                    // Persist settings whenever a setting property changes
+                    SaveSettings();
+                }
+                catch { }
+            };
         try
         {
             // If already connected at startup, push settings once
@@ -222,9 +238,26 @@ public partial class SettingsViewModel : ObservableObject
 
         HomeXPos = val.Value;
         SaveSettings();
+        // Send new home position and trigger home write, then wait and verify
         await _controllerService.WriteVariableAsync("HOMEX_POS", HomeXPos);
         await _controllerService.WriteVariableAsync("HOMEX", 1);
-        StatusMessage = $"HOMEX_POS set to {HomeXPos:0.###}";
+        StatusMessage = $"HOMEX_POS sent ({HomeXPos:0.###}), awaiting controller response...";
+
+        // Wait 3 seconds to allow controller to process
+        await Task.Delay(3000);
+
+        // Read back stored value to confirm
+        var verify = await _controllerService.ReadVariableAsync("HOMEX_POS");
+        if (verify is not null)
+        {
+            HomeXPos = verify.Value;
+            SaveSettings();
+            StatusMessage = $"HOMEX_POS verified as {HomeXPos:0.###}";
+        }
+        else
+        {
+            StatusMessage = "HOMEX_POS write sent but verification failed.";
+        }
     }
 
     [RelayCommand]
@@ -245,9 +278,26 @@ public partial class SettingsViewModel : ObservableObject
 
         HomeYPos = val.Value;
         SaveSettings();
+        // Send new home position and trigger home write, then wait and verify
         await _controllerService.WriteVariableAsync("HOMEY_POS", HomeYPos);
         await _controllerService.WriteVariableAsync("HOMEY", 1);
-        StatusMessage = $"HOMEY_POS set to {HomeYPos:0.###}";
+        StatusMessage = $"HOMEY_POS sent ({HomeYPos:0.###}), awaiting controller response...";
+
+        // Wait 3 seconds to allow controller to process
+        await Task.Delay(3000);
+
+        // Read back stored value to confirm
+        var verify = await _controllerService.ReadVariableAsync("HOMEY_POS");
+        if (verify is not null)
+        {
+            HomeYPos = verify.Value;
+            SaveSettings();
+            StatusMessage = $"HOMEY_POS verified as {HomeYPos:0.###}";
+        }
+        else
+        {
+            StatusMessage = "HOMEY_POS write sent but verification failed.";
+        }
     }
 
     [RelayCommand]

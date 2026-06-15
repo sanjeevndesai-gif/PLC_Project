@@ -39,6 +39,7 @@ public partial class SettingsView : UserControl
     private bool IsTextValidDecimal(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return true;
-        return System.Text.RegularExpressions.Regex.IsMatch(text, @"^\d*([\.,]\d*)?$", System.Text.RegularExpressions.RegexOptions.Compiled);
+        // Allow optional leading negative sign, digits, optional decimal separator and digits
+        return System.Text.RegularExpressions.Regex.IsMatch(text, @"^-?\d*([\.,]\d*)?$", System.Text.RegularExpressions.RegexOptions.Compiled);
     }
 }

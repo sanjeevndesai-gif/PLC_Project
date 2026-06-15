@@ -3,7 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:CopaFormGui.Views"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <local:NullToBoolConverter x:Key="NullToBoolConverter"/>
+    </UserControl.Resources>
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -60,6 +64,12 @@
 
         <Border Grid.Row="3" Style="{StaticResource CardStyle}" Padding="8,6" Margin="0,8,0,0">
             <StackPanel Orientation="Horizontal">
+                <Button Content="Delete Selected"
+                        Command="{Binding DeleteRecordCommand}"
+                        Style="{StaticResource DangerButtonStyle}"
+                        Margin="0,0,8,0"
+                        IsEnabled="{Binding SelectedRecord, Converter={StaticResource NullToBoolConverter}}"/>
+
                 <Button Content="Clear Database"
                         Command="{Binding DeleteOldDataCommand}"
                         Style="{StaticResource DangerButtonStyle}"/>
