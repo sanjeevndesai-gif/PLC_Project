@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
+  <Costura CreateTemporaryAssemblies="false">
+    <IncludeUnmanagedAssemblies>true</IncludeUnmanagedAssemblies>
+    <!-- Specify only file names for native DLLs so Costura will pick them up from output -->
+    <Unmanaged32BitAssemblies>DKeyLib32.dll</Unmanaged32BitAssemblies>
+    <Unmanaged64BitAssemblies>DKeyLib64.dll</Unmanaged64BitAssemblies>
+  </Costura>
+</Weavers>

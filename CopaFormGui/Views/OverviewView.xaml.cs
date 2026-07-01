@@ -328,9 +328,20 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         {
             lines.Add("// T3 POSITION");
 
-            double[] cutOffsets = widthForCuts <= 80.0
-                ? new[] { 20.0, 60.0 }           // Narrow part: 2 cuts
-                : new[] { 20.0, 60.0, 100.0 };   // Wide part:   3 cuts
+            // Determine number of cut passes based on part width (mm):
+            //  <40   => 1 pass
+            //  40-80 => 2 passes
+            //  80-120=> 3 passes
+            // 120-160=> 4 passes (max)
+            double clampedWidth = Math.Max(0.0, Math.Min(160.0, widthForCuts));
+            int passes;
+            if (clampedWidth < 40.0) passes = 1;
+            else if (clampedWidth <= 80.0) passes = 2;
+            else if (clampedWidth <= 120.0) passes = 3;
+            else passes = 4;
+
+            // Offsets into the material: start at +20 mm, then every +40 mm for each additional pass
+            double[] cutOffsets = Enumerable.Range(0, passes).Select(i => 20.0 + i * 40.0).ToArray();
 
             foreach (var step in t3Steps)
             {
@@ -351,7 +362,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
                         lines.Add($"N{nNum++} DWELL 10");
                         lines.Add($"N{nNum++} X0");
                         lines.Add($"N{nNum++} M22");
-                        lines.Add($"N{nNum++} M27");
+                       // lines.Add($"N{nNum++} M27");
                         lines.Add($"N{nNum++} {gT3}");                          // Extend cut head
                         lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
                         lines.Add($"N{nNum++} M26");                           // Cut down
@@ -362,7 +373,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
                     {
                         lines.Add($"N{nNum++} {gT3}");                        // Activate T3 work offset
                         lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}"); // Y cut position (offset into material)
-                        lines.Add($"N{nNum++} M27");                           // Extend cut head
+                       // lines.Add($"N{nNum++} M27");                           // Extend cut head
                         lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
                         lines.Add($"N{nNum++} M26");                           // Cut down
                         lines.Add($"N{nNum++} M20");                           // Cut cycle step 1
@@ -379,21 +390,39 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         // dwells 3 seconds (for part ejection / operator clearance), increments
         // the part counter, then closes the loop. After all parts are done,
         // the machine homes and ends the program.
-        lines.AddRange(new[]
+        // Compute last T3 X once and reuse for footer moves (offset +100mm)
+        double lastXForT3 = GetLastXForStation(latest, toolById, "T3", 500.0);
+
+        // FOOTER
+        lines.Add("// FOOTER");
+        lines.Add($"N{nNum++} X{FormatNc(lastXForT3 + 100)}");        // Return X to park position (T3 last X +100)
+        lines.Add($"N{nNum++} M23");         // Engage brake
+        lines.Add($"N{nNum++} M24");         // End-of-part signal
+        lines.Add("DWELL 3000");             // Wait 3 seconds (part eject / clearance)
+        lines.Add($"N{nNum++} M25");         // Release end-of-part signal
+        lines.Add("P2101=P2101+1");          // Increment part counter
+        // Optionally add part-off signal if operator enabled it via RunPartOff
+        if (vm.RunPartOff)
         {
-            "// FOOTER",
-            $"N{nNum++} X500",        // Return X to park position
-            $"N{nNum++} M23",         // Engage brake
-            $"N{nNum++} M24",         // End-of-part signal
-            "DWELL 3000",             // Wait 3 seconds (part eject / clearance)
-            $"N{nNum++} M25",         // Release end-of-part signal
-            "P2101=P2101+1",          // Increment part counter
-            "}",                      // End of while-loop
-            $"N{nNum++} G59",         // Restore home coordinate system
-            $"N{nNum++} X500 Y910",   // Park axes
-            $"N{nNum++} M30",         // End of program
-            "CLOSE"                   // Close PMAC program buffer
-        });
+            lines.Add($"N{nNum++} M28");     // Part-off signal
+        }
+        lines.Add("}");                              // End of while-loop
+
+        lines.Add($"N{nNum++} X0"); 
+        lines.Add($"N{nNum++} M22"); 
+        lines.Add($"N{nNum++} M27"); 
+        lines.Add($"N{nNum++} X{FormatNc(lastXForT3 + 100)}");
+        lines.Add($"N{nNum++} M23"); 
+        lines.Add($"N{nNum++} M24"); 
+        lines.Add($"N{nNum++} DWELL 3000"); 
+        lines.Add($"N{nNum++} M25"); 
+        lines.Add($"N{nNum++} Y910"); 
+        lines.Add($"N{nNum++} M30"); 
+
+       // lines.Add($"N{nNum++} G59");         // Restore home coordinate system
+       // lines.Add($"N{nNum++} X500 Y910");   // Park axes
+       // lines.Add($"N{nNum++} M30");         // End of program
+        lines.Add("CLOSE");                  // Close PMAC program buffer
 
         // ── Convert all lines to UPPER CASE (PMAC requirement) ────────────────
         lines = lines.Select(l => l.ToUpperInvariant()).ToList();
