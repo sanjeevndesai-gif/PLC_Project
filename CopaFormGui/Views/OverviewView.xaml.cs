@@ -335,7 +335,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             // 120-160=> 4 passes (max)
             double clampedWidth = Math.Max(0.0, Math.Min(160.0, widthForCuts));
             int passes;
-            if (clampedWidth < 40.0) passes = 1;
+            if (clampedWidth <= 40.0) passes = 1;
             else if (clampedWidth <= 80.0) passes = 2;
             else if (clampedWidth <= 120.0) passes = 3;
             else passes = 4;
@@ -362,7 +362,22 @@ public partial class OverviewView : System.Windows.Controls.UserControl
                         lines.Add($"N{nNum++} DWELL 10");
                         lines.Add($"N{nNum++} X0");
                         lines.Add($"N{nNum++} M22");
-                       // lines.Add($"N{nNum++} M27");
+                        lines.Add($"N{nNum++} M27");
+                        lines.Add($"N{nNum++} {gT3}");                          // Extend cut head
+                        lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
+                        lines.Add($"N{nNum++} M26");                           // Cut down
+                        lines.Add($"N{nNum++} M20");                           // Cut cycle step 1
+                        lines.Add($"N{nNum++} M21");
+                    }
+                   else if (cutNum == 1)
+                    {
+                        lines.Add($"N{nNum++} {gT3}");                        // Activate T3 work offset
+                        lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}"); // Y cut position (offset into material)
+                        lines.Add($"N{nNum++} G59");
+                        lines.Add($"N{nNum++} DWELL 10");
+                        lines.Add($"N{nNum++} X0");
+                        lines.Add($"N{nNum++} M22");
+                        lines.Add($"N{nNum++} M27");
                         lines.Add($"N{nNum++} {gT3}");                          // Extend cut head
                         lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
                         lines.Add($"N{nNum++} M26");                           // Cut down
@@ -382,7 +397,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
                     cutNum++;
                 }
             }
-            lines.Add($"N{nNum++} M27"); // Final retract after all cuts
+          //  lines.Add($"N{nNum++} M27"); // Final retract after all cuts
         }
 
         // ── FOOTER ────────────────────────────────────────────────────────────
@@ -407,7 +422,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
             lines.Add($"N{nNum++} M28");     // Part-off signal
         }
         lines.Add("}");                              // End of while-loop
-
+        lines.Add($"N{nNum++} G59");         // Restore home coordinate system
         lines.Add($"N{nNum++} X0"); 
         lines.Add($"N{nNum++} M22"); 
         lines.Add($"N{nNum++} M27"); 
