@@ -369,26 +369,12 @@ public partial class OverviewView : System.Windows.Controls.UserControl
                         lines.Add($"N{nNum++} M20");                           // Cut cycle step 1
                         lines.Add($"N{nNum++} M21");
                     }
-                   else if (cutNum == 1)
-                    {
-                        lines.Add($"N{nNum++} {gT3}");                        // Activate T3 work offset
-                        lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}"); // Y cut position (offset into material)
-                        lines.Add($"N{nNum++} G59");
-                        lines.Add($"N{nNum++} DWELL 10");
-                        lines.Add($"N{nNum++} X0");
-                        lines.Add($"N{nNum++} M22");
-                        lines.Add($"N{nNum++} M27");
-                        lines.Add($"N{nNum++} {gT3}");                          // Extend cut head
-                        lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
-                        lines.Add($"N{nNum++} M26");                           // Cut down
-                        lines.Add($"N{nNum++} M20");                           // Cut cycle step 1
-                        lines.Add($"N{nNum++} M21");
-                    }
+                   
                     else
                     {
                         lines.Add($"N{nNum++} {gT3}");                        // Activate T3 work offset
                         lines.Add($"N{nNum++} Y{FormatNc(step.Y + yOffset)}"); // Y cut position (offset into material)
-                       // lines.Add($"N{nNum++} M27");                           // Extend cut head
+                       if (cutNum == 1){lines.Add($"N{nNum++} M27"); }                          // Extend cut head
                         lines.Add($"N{nNum++} X{FormatNc(step.X + 4)}");      // X cut position (+4 mm blade offset)
                         lines.Add($"N{nNum++} M26");                           // Cut down
                         lines.Add($"N{nNum++} M20");                           // Cut cycle step 1
@@ -431,7 +417,7 @@ public partial class OverviewView : System.Windows.Controls.UserControl
         lines.Add($"N{nNum++} M24"); 
         lines.Add($"N{nNum++} DWELL 3000"); 
         lines.Add($"N{nNum++} M25"); 
-        lines.Add($"N{nNum++} Y910"); 
+        //lines.Add($"N{nNum++} Y910"); 
         lines.Add($"N{nNum++} M30"); 
 
        // lines.Add($"N{nNum++} G59");         // Restore home coordinate system

@@ -11,6 +11,7 @@ namespace CopaFormGui.Views
         public PasswordPrompt()
         {
             InitializeComponent();
+            Closing += OnWindowClosing;
         }
 
         private static string ComputeSha256Hex(string input)
@@ -42,6 +43,25 @@ namespace CopaFormGui.Views
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            NavigateToOverview();
+        }
+
+        private void OnWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Treat window close (X) the same as Cancel button
+            try
+            {
+                NavigateToOverview();
+            }
+            catch (System.Exception ex)
+            {
+                CopaFormGui.App.LogException("PasswordPrompt_OnWindowClosing", ex);
+            }
+            // allow close to proceed
+        }
+
+        private void NavigateToOverview()
+        {
             var app = System.Windows.Application.Current;
             try
             {
@@ -49,7 +69,7 @@ namespace CopaFormGui.Views
                 {
                     app.Dispatcher.Invoke(() =>
                     {
-                        CopaFormGui.App.LogInfo("PasswordPrompt: Cancel clicked - forcing Overview navigation");
+                        CopaFormGui.App.LogInfo("PasswordPrompt: navigating to Overview (Cancel/Close)");
 
                         // First, try resolving MainViewModel and OverviewViewModel from the DI container and set directly
                         var mainVmFromContainer = CopaFormGui.App.Services.GetService(typeof(CopaFormGui.ViewModels.MainViewModel)) as CopaFormGui.ViewModels.MainViewModel;
@@ -71,36 +91,34 @@ namespace CopaFormGui.Views
                             mainVm.CurrentViewName = "Overview";
                             return;
                         }
-                        else
+
+                        // Fallback to reflection-based attempt if direct assignment not possible
+                        try
                         {
-                            // Fallback to existing reflection-based attempt if direct assignment not possible
-                            try
+                            var main = mainWnd?.DataContext;
+                            if (main != null)
                             {
-                                var main = mainWnd?.DataContext;
-                                if (main != null)
+                                var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+                                var prop = main.GetType().GetProperty("ShowOverviewCommand", flags);
+                                if (prop != null)
                                 {
-                                    var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
-                                    var prop = main.GetType().GetProperty("ShowOverviewCommand", flags);
-                                    if (prop != null)
-                                    {
-                                        var cmd = prop.GetValue(main) as System.Windows.Input.ICommand;
-                                        if (cmd != null && cmd.CanExecute(null)) { cmd.Execute(null); CopaFormGui.App.LogInfo("PasswordPrompt: ShowOverviewCommand executed"); return; }
-                                    }
-                                    var method = main.GetType().GetMethod("ShowOverview", flags, null, System.Type.EmptyTypes, null);
-                                    if (method != null) { method.Invoke(main, null); CopaFormGui.App.LogInfo("PasswordPrompt: ShowOverview() invoked via reflection"); return; }
+                                    var cmd = prop.GetValue(main) as System.Windows.Input.ICommand;
+                                    if (cmd != null && cmd.CanExecute(null)) { cmd.Execute(null); CopaFormGui.App.LogInfo("PasswordPrompt: ShowOverviewCommand executed"); return; }
                                 }
+                                var method = main.GetType().GetMethod("ShowOverview", flags, null, System.Type.EmptyTypes, null);
+                                if (method != null) { method.Invoke(main, null); CopaFormGui.App.LogInfo("PasswordPrompt: ShowOverview() invoked via reflection"); return; }
                             }
-                            catch (System.Exception ex)
-                            {
-                                CopaFormGui.App.LogException("PasswordPrompt_CancelFallback", ex);
-                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            CopaFormGui.App.LogException("PasswordPrompt_NavigateFallback", ex);
                         }
                     });
                 }
             }
             catch (System.Exception ex)
             {
-                CopaFormGui.App.LogException("PasswordPrompt_Cancel", ex);
+                CopaFormGui.App.LogException("PasswordPrompt_Navigate", ex);
             }
 
             DialogResult = false;
