@@ -51,6 +51,13 @@ namespace CopaFormGui.Views
             // Treat window close (X) the same as Cancel button
             try
             {
+                // If the dialog was closed because authentication succeeded (DialogResult == true),
+                // do not navigate away — let caller continue with the successful result.
+                if (this.DialogResult == true)
+                {
+                    return;
+                }
+
                 NavigateToOverview();
             }
             catch (System.Exception ex)
